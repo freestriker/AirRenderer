@@ -97,8 +97,14 @@
     <QtUic Include="AirRenderer.ui" />
     <QtMoc Include="AirRenderer.h" />
     <ClCompile Include="AirRenderer.cpp" />
+    <ClCompile Include="Configuration.cpp" />
+    <ClCompile Include="Drawer.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClInclude Include="Configuration.h" />
+    <ClInclude Include="Drawer.h" />
+    <ClInclude Include="Renderer.h" />
     <ClInclude Include="stdafx.h" />
+    <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">Create</PrecompiledHeader>
