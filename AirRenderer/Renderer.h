@@ -2,6 +2,7 @@
 #include <QImage>
 #include <QLabel>
 #include "Configuration.h"
+#include "Drawer.h"
 
 class Renderer
 {
