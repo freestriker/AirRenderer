@@ -59,3 +59,81 @@ void Drawer::DrawLine(ivec2 startPosition, ivec2 endPosition, QRgb color)
 		}
 	}
 }
+void Drawer::DrawTriangle(ivec2 positionA, ivec2 positionB, ivec2 positionC, QRgb color)
+{
+	if (positionA.y > positionC.y)
+	{
+		ivec2 t = positionA;
+		positionA = positionC;
+		positionC = t;
+	}
+	if (positionB.y > positionC.y)
+	{
+		ivec2 t = positionB;
+		positionB = positionC;
+		positionC = t;
+	}
+	if (positionA.y > positionB.y)
+	{
+		ivec2 t = positionA;
+		positionA = positionB;
+		positionB = t;
+	}
+	int acHeight = positionC.y - positionA.y;
+	int abHeight = positionB.y - positionA.y;
+	int bcHeight = positionC.y - positionB.y;
+	ivec2 ac = positionC - positionA;
+	ivec2 ab = positionB - positionA;
+	ivec2 bc = positionC - positionB;
+	for (int y = positionA.y; y < positionB.y; y++)
+	{	
+		int m = positionA.x + ac.x * (float(y - positionA.y) / float(acHeight));
+		int n = positionA.x + ab.x * (float(y - positionA.y) / float(abHeight));
+		int minX = std::min(m, n);
+		int maxX = std::max(m, n);
+		for (int x = minX; x <= maxX; x++)
+		{
+			configuration.canvas.setPixel(x, y, color);
+		}
+	}
+	if (abHeight == 0)
+	{
+		int minX = std::min(positionA.x, positionB.x);
+		int maxX = std::max(positionA.x, positionB.x);
+		for (int x = minX; x <= maxX; x++)
+		{
+			configuration.canvas.setPixel(x, positionB.y, color);
+		}
+	}
+	else if (bcHeight == 0)
+	{
+		int minX = std::min(positionC.x, positionB.x);
+		int maxX = std::max(positionC.x, positionB.x);
+		for (int x = minX; x <= maxX; x++)
+		{
+			configuration.canvas.setPixel(x, positionB.y, color);
+		}
+	}
+	else
+	{
+		int m = positionC.x + ac.x * (float(positionB.y - positionC.y) / float(acHeight));
+		int n = positionB.x;
+		int minX = std::min(m, n);
+		int maxX = std::max(m, n);
+		for (int x = minX; x <= maxX; x++)
+		{
+			configuration.canvas.setPixel(x, positionB.y, color);
+		}
+	}
+	for (int y = positionC.y; y > positionB.y; y--)
+	{	
+		int m = positionC.x + ac.x * (float(y - positionC.y) / float(acHeight));
+		int n = positionC.x + bc.x * (float(y - positionC.y) / float(bcHeight));
+		int minX = std::min(m, n);
+		int maxX = std::max(m, n);
+		for (int x = minX; x <= maxX; x++)
+		{
+			configuration.canvas.setPixel(x, y, color);
+		}
+	}
+}
