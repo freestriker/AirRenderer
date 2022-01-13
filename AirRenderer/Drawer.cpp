@@ -79,6 +79,7 @@ void Drawer::DrawTriangle(ivec2 positionA, ivec2 positionB, ivec2 positionC, QRg
 		positionA = positionB;
 		positionB = t;
 	}
+
 	int acHeight = positionC.y - positionA.y;
 	int abHeight = positionB.y - positionA.y;
 	int bcHeight = positionC.y - positionB.y;
@@ -87,8 +88,8 @@ void Drawer::DrawTriangle(ivec2 positionA, ivec2 positionB, ivec2 positionC, QRg
 	ivec2 bc = positionC - positionB;
 	for (int y = positionA.y; y < positionB.y; y++)
 	{	
-		int m = positionA.x + ac.x * (float(y - positionA.y) / float(acHeight));
-		int n = positionA.x + ab.x * (float(y - positionA.y) / float(abHeight));
+		int m = positionA.x + ac.x * (double(y - positionA.y) / double(acHeight));
+		int n = positionA.x + ab.x * (double(y - positionA.y) / double(abHeight));
 		int minX = std::min(m, n);
 		int maxX = std::max(m, n);
 		for (int x = minX; x <= maxX; x++)
@@ -116,7 +117,7 @@ void Drawer::DrawTriangle(ivec2 positionA, ivec2 positionB, ivec2 positionC, QRg
 	}
 	else
 	{
-		int m = positionC.x + ac.x * (float(positionB.y - positionC.y) / float(acHeight));
+		int m = positionC.x + ac.x * (double(positionB.y - positionC.y) / double(acHeight));
 		int n = positionB.x;
 		int minX = std::min(m, n);
 		int maxX = std::max(m, n);
@@ -127,8 +128,8 @@ void Drawer::DrawTriangle(ivec2 positionA, ivec2 positionB, ivec2 positionC, QRg
 	}
 	for (int y = positionC.y; y > positionB.y; y--)
 	{	
-		int m = positionC.x + ac.x * (float(y - positionC.y) / float(acHeight));
-		int n = positionC.x + bc.x * (float(y - positionC.y) / float(bcHeight));
+		int m = positionC.x + ac.x * (double(y - positionC.y) / double(acHeight));
+		int n = positionC.x + bc.x * (double(y - positionC.y) / double(bcHeight));
 		int minX = std::min(m, n);
 		int maxX = std::max(m, n);
 		for (int x = minX; x <= maxX; x++)
