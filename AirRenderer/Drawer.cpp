@@ -1,7 +1,7 @@
 #include "Drawer.h"
 
 
-void Drawer::DrawLine(ivec2 startPosition, ivec2 endPosition, QRgb color)
+void Drawer::DrawLine(ivec2 startPosition, ivec2 endPosition, Color color, Buffer<Color>& buffer)
 {
 	bool isSteep = false;
 	ivec2 difference = endPosition - startPosition;
@@ -34,7 +34,7 @@ void Drawer::DrawLine(ivec2 startPosition, ivec2 endPosition, QRgb color)
 	{
 		for (int x = startPosition.x, y = startPosition.y; x <= endPosition.x; x++)
 		{
-			configuration.canvas.setPixel(y, x, color);
+			buffer.SetData(color, y, x);
 
 			d += deltaAbs2Y;
 			if (d > difference.x)
@@ -48,7 +48,7 @@ void Drawer::DrawLine(ivec2 startPosition, ivec2 endPosition, QRgb color)
 	{
 		for (int x = startPosition.x, y = startPosition.y; x <= endPosition.x; x++)
 		{
-			configuration.canvas.setPixel(x, y, color);
+			buffer.SetData(color, x, y);
 
 			d += deltaAbs2Y;
 			if (d > difference.x)
@@ -59,7 +59,7 @@ void Drawer::DrawLine(ivec2 startPosition, ivec2 endPosition, QRgb color)
 		}
 	}
 }
-void Drawer::DrawTriangle(ivec2 positionA, ivec2 positionB, ivec2 positionC, QRgb color)
+void Drawer::DrawTriangle(ivec2 positionA, ivec2 positionB, ivec2 positionC, Color color, Buffer<Color>& buffer)
 {
 	if (positionA.y > positionC.y)
 	{
@@ -94,7 +94,7 @@ void Drawer::DrawTriangle(ivec2 positionA, ivec2 positionB, ivec2 positionC, QRg
 		int maxX = std::max(m, n);
 		for (int x = minX; x <= maxX; x++)
 		{
-			configuration.canvas.setPixel(x, y, color);
+			buffer.SetData(color, x, y);
 		}
 	}
 	if (abHeight == 0)
@@ -103,7 +103,7 @@ void Drawer::DrawTriangle(ivec2 positionA, ivec2 positionB, ivec2 positionC, QRg
 		int maxX = std::max(positionA.x, positionB.x);
 		for (int x = minX; x <= maxX; x++)
 		{
-			configuration.canvas.setPixel(x, positionB.y, color);
+			buffer.SetData(color, x, positionB.y);
 		}
 	}
 	else if (bcHeight == 0)
@@ -112,7 +112,7 @@ void Drawer::DrawTriangle(ivec2 positionA, ivec2 positionB, ivec2 positionC, QRg
 		int maxX = std::max(positionC.x, positionB.x);
 		for (int x = minX; x <= maxX; x++)
 		{
-			configuration.canvas.setPixel(x, positionB.y, color);
+			buffer.SetData(color, x, positionB.y);
 		}
 	}
 	else
@@ -123,7 +123,7 @@ void Drawer::DrawTriangle(ivec2 positionA, ivec2 positionB, ivec2 positionC, QRg
 		int maxX = std::max(m, n);
 		for (int x = minX; x <= maxX; x++)
 		{
-			configuration.canvas.setPixel(x, positionB.y, color);
+			buffer.SetData(color, x, positionB.y);
 		}
 	}
 	for (int y = positionC.y; y > positionB.y; y--)
@@ -134,7 +134,7 @@ void Drawer::DrawTriangle(ivec2 positionA, ivec2 positionB, ivec2 positionC, QRg
 		int maxX = std::max(m, n);
 		for (int x = minX; x <= maxX; x++)
 		{
-			configuration.canvas.setPixel(x, y, color);
+			buffer.SetData(color, x, y);
 		}
 	}
 }

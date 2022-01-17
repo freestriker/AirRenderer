@@ -59,6 +59,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories);E:\Projects\AirRenderer\glm</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
@@ -102,9 +103,13 @@
     <QtUic Include="AirRenderer.ui" />
     <QtMoc Include="AirRenderer.h" />
     <ClCompile Include="AirRenderer.cpp" />
+    <ClCompile Include="Buffer.cpp" />
+    <ClCompile Include="Color.cpp" />
     <ClCompile Include="Configuration.cpp" />
     <ClCompile Include="Drawer.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClInclude Include="Buffer.h" />
+    <ClInclude Include="Color.h" />
     <ClInclude Include="Configuration.h" />
     <ClInclude Include="Drawer.h" />
     <ClInclude Include="Renderer.h" />

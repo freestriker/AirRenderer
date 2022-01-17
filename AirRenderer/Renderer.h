@@ -3,6 +3,7 @@
 #include <QLabel>
 #include "Configuration.h"
 #include "Drawer.h"
+#include "Color.h"
 
 class Renderer
 {
