@@ -1,6 +1,7 @@
 #include "AirRenderer.h"
 #include "stdafx.h"
 #include "Configuration.h"
+#include "RenderThread.h"
 
 AirRenderer::AirRenderer(QWidget *parent)
     : QMainWindow(parent)
@@ -13,4 +14,5 @@ AirRenderer::AirRenderer(QWidget *parent)
     this->setFixedSize(size);
     configuration.canvas = QImage(size, QImage::Format_RGB32);
     configuration.label = label;
+
 }

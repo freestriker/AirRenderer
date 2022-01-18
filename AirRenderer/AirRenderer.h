@@ -2,6 +2,7 @@
 
 #include <QtWidgets/QMainWindow>
 #include "ui_AirRenderer.h"
+#include "Renderer.h"
 
 class AirRenderer : public QMainWindow
 {
@@ -9,7 +10,6 @@ class AirRenderer : public QMainWindow
 
 public:
     AirRenderer(QWidget *parent = Q_NULLPTR);
-
 private:
     Ui::AirRendererClass ui;
 };
