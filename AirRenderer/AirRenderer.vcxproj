@@ -108,8 +108,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ChildBrotherTree.cpp" />
+    <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Transform.cpp" />
     <ClInclude Include="ChildBrotherTree.h" />
+    <ClInclude Include="GameObject.h" />
     <ClInclude Include="Transform.h" />
     <QtRcc Include="AirRenderer.qrc" />
     <QtUic Include="AirRenderer.ui" />
