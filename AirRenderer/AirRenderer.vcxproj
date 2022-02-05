@@ -110,10 +110,12 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="ChildBrotherTree.cpp" />
     <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="MeshRenderer.cpp" />
     <ClCompile Include="Transform.cpp" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="ChildBrotherTree.h" />
     <ClInclude Include="GameObject.h" />
+    <ClInclude Include="MeshRenderer.h" />
     <ClInclude Include="Transform.h" />
     <QtRcc Include="AirRenderer.qrc" />
     <QtUic Include="AirRenderer.ui" />
