@@ -53,8 +53,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);E:\Software\OpenMesh\OpenMesh 9.0\include</IncludePath>
-    <LibraryPath>E:\Software\OpenMesh\OpenMesh 9.0\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\OpenMesh\include</IncludePath>
+    <LibraryPath>..\OpenMesh\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
   </PropertyGroup>
@@ -107,9 +107,11 @@
     </QtMoc>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="ChildBrotherTree.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Transform.cpp" />
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="ChildBrotherTree.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Transform.h" />
