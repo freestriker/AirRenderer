@@ -58,7 +58,7 @@ public:
         }
         bool operator==(ChildIterator other) const { return node == other.node; }
         bool operator!=(ChildIterator other) const { return node != other.node; }
-        T operator*() { return *static_cast<T*>(node); }
+        T* operator*() { return static_cast<T*>(node); }
     };
 
     T* parent;
