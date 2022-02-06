@@ -1,5 +1,5 @@
 #include "RenderThread.h"
-#include <vector>;
+#include <vector>
 
 RenderThread::RenderThread(QObject* parent) :QThread(parent)
 {

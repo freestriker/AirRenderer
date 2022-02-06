@@ -2,7 +2,7 @@
 #include <QImage>
 #include <QLabel>
 #include "GameObject.h"
-#include "glm/mat4x4.hpp";
+#include "glm/mat4x4.hpp"
 #include "Drawer.h"
 #include "Color.h"
 
