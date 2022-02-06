@@ -3,5 +3,6 @@
 GameObject::GameObject()
 {
 	this->transform = Transform();
-	this->meshRenderer = MeshRenderer();
+	this->meshRenderer = nullptr;
+	this->camera = nullptr;
 }

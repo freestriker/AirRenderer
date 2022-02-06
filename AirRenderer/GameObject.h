@@ -7,8 +7,8 @@ class GameObject : public ChildBrotherTree<GameObject>
 {
 public:
 	Transform transform;
-	Camera camera;
-	MeshRenderer meshRenderer;
+	Camera* camera;
+	MeshRenderer* meshRenderer;
 	GameObject();
 };
 
