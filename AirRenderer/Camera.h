@@ -11,7 +11,7 @@ public:
 	float size;
 	float nearFlat;
 	float farFlat;
-	glm::mat4 ProjectionMatrix(Transform transform);
+	glm::mat4 ProjectionMatrix();
 	glm::mat4 Camera::ObserveMatrix(Transform transform);
 	Camera();
 };
