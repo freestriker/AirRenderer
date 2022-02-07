@@ -114,6 +114,8 @@
     <ClCompile Include="FaceContext.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="MeshRenderer.cpp" />
+    <ClCompile Include="PixelContext.cpp" />
+    <ClCompile Include="PixelIterator.cpp" />
     <ClCompile Include="RenderItem.cpp" />
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="VertexContext.cpp" />
@@ -122,6 +124,8 @@
     <ClInclude Include="FaceContext.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="MeshRenderer.h" />
+    <ClInclude Include="PixelContext.h" />
+    <ClInclude Include="PixelIterator.h" />
     <ClInclude Include="RenderItem.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="VertexContext.h" />
