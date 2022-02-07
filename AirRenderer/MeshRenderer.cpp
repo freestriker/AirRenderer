@@ -3,6 +3,9 @@
 #include <qdir.h>
 #include <QCoreApplication>
 #include "Drawer.h"
+#include "FaceContext.h"
+#include "PixelContext.h"
+#include "PixelIterator.h"
 MeshRenderer::MeshRenderer()
 {
 	std::string s = (QCoreApplication::applicationDirPath() + '/' + "../../Model/Triangle.obj").toStdString();
@@ -47,15 +50,29 @@ void MeshRenderer::Render(glm::mat4 mvpMatrix, glm::mat4 screenMatrix)
             //光栅化
             pos = screenMatrix * pos;
 
-            faceContext.position[vertexIndex] = ivec2(pos.x, pos.y);
+            faceContext.screenPosition[vertexIndex] = ivec2(pos.x + 0.5, pos.y + 0.5);
             faceContext.z[vertexIndex] = pos.z;
             faceContext.w[vertexIndex] = pos.w;
+            faceContext.vertexContext[vertexIndex] = vertexContext[fv_it.handle().idx()];
             vertexIndex++;
         }
         if (inBoundryCount > 0)
         {
-            //像素着色器
-            Drawer::DrawTriangle_CheckBoundry(faceContext.position[0], faceContext.position[1], faceContext.position[2], Color::white, *configuration.colorBuffer, configuration.resolution.width, configuration.resolution.height);
+            for (PixelIterator pixelStartIterator = faceContext.GetStartPixelIterator(), pixelEndIterator = faceContext.GetEndPixelIterator()
+                ; pixelStartIterator != pixelEndIterator
+                ; pixelStartIterator++)
+            {
+                if (pixelStartIterator.CheckInTriangle())
+                {
+                    //像素着色器
+                    PixelContext pixelContext = (*pixelStartIterator);
+                    if (0 <= pixelContext.screenPosition.x && pixelContext.screenPosition.x < configuration.resolution.width
+                        && 0 <= pixelContext.screenPosition.y && pixelContext.screenPosition.y < configuration.resolution.height)
+                    {
+                        configuration.colorBuffer->SetData(Color::white, pixelContext.screenPosition.x, pixelContext.screenPosition.y);
+                    }
+                }
+            }
         }
     }
 }
