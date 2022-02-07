@@ -3,6 +3,8 @@
 #include <OpenMesh/Core/IO/MeshIO.hh>
 #include <OpenMesh/Core/Mesh/TriMesh_ArrayKernelT.hh>
 #include <glm/mat4x4.hpp>
+#include "VertexContext.h"
+#include "FaceContext.h"
 typedef OpenMesh::TriMesh_ArrayKernelT<OpenMesh::DefaultTraits> Mesh;
 
 class MeshRenderer

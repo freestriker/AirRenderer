@@ -5,7 +5,7 @@
 #include "Drawer.h"
 MeshRenderer::MeshRenderer()
 {
-	std::string s = (QCoreApplication::applicationDirPath() + '/' + "../../Model/Flat.obj").toStdString();
+	std::string s = (QCoreApplication::applicationDirPath() + '/' + "../../Model/Triangle.obj").toStdString();
 	qDebug() << "Current working directory: " << QCoreApplication::applicationDirPath() << endl;
 	if (!OpenMesh::IO::read_mesh(mesh, s))
 	{
@@ -16,49 +16,46 @@ MeshRenderer::MeshRenderer()
 
 void MeshRenderer::Render(glm::mat4 mvpMatrix, glm::mat4 screenMatrix)
 {
+    std::vector<VertexContext> vertexContext = std::vector<VertexContext>(mesh.vertices_end().handle().idx(), VertexContext());
+    for (Mesh::VertexIter v_it = mesh.vertices_sbegin(); v_it != mesh.vertices_end(); v_it++)
+    {
+        //顶点着色器
+        Mesh::Point p = mesh.point(*v_it);
+        vertexContext[v_it.handle().idx()].position = mvpMatrix * glm::vec4(p[0], p[1], p[2], 1);
+        qDebug() << v_it.handle().idx() << endl;
+    }
     for (Mesh::FaceIter f_it = mesh.faces_begin(); f_it != mesh.faces_end(); ++f_it)
     {
-        std::vector<glm::vec4> vertexes = std::vector<glm::vec4>();
-        std::vector<float> ws = std::vector<float>();
-        int inCount = 0;
+        FaceContext faceContext = FaceContext();
+        int vertexIndex = 0, inBoundryCount = 0;
         for (Mesh::FaceVertexIter fv_it = mesh.fv_iter(*f_it); fv_it.is_valid(); ++fv_it)
         {
-            //变换
-            Mesh::Point p = mesh.point(*fv_it);
-            glm::vec4 pos = glm::vec4(p[0], p[1], p[2], 1);
-            pos = mvpMatrix * pos;
+            glm::vec4 pos = vertexContext[fv_it.handle().idx()].position;
 
             //测试剔除
             if (-pos.w < pos.x && pos.x < pos.w
                 && -pos.w < pos.y && pos.y < pos.w
                 && 0 < pos.z && pos.z < pos.w)
             {
-                inCount++;
+                inBoundryCount++;
             }
 
             //透视除法
             float w = pos.w;
-            ws.push_back(w);
             pos = pos / w;
 
-            vertexes.push_back(pos);
-        }
+            //光栅化
+            pos = screenMatrix * pos;
 
-        //剔除
-        if (inCount == 0)
-        {
-
+            faceContext.position[vertexIndex] = ivec2(pos.x, pos.y);
+            faceContext.z[vertexIndex] = pos.z;
+            faceContext.w[vertexIndex] = pos.w;
+            vertexIndex++;
         }
-        else
+        if (inBoundryCount > 0)
         {
-            LogMatrix(screenMatrix);
-            std::vector<ivec2> pos = std::vector<ivec2>();
-            for (int i = 0; i < 3; i++)
-            {
-                vertexes[i] = screenMatrix * vertexes[i];
-                pos.push_back(ivec2(vertexes[i].x, vertexes[i].y));
-            }
-            Drawer::DrawTriangle_CheckBoundry(pos[0], pos[1], pos[2], Color::white, *configuration.colorBuffer, configuration.resolution.width, configuration.resolution.height);
+            //像素着色器
+            Drawer::DrawTriangle_CheckBoundry(faceContext.position[0], faceContext.position[1], faceContext.position[2], Color::white, *configuration.colorBuffer, configuration.resolution.width, configuration.resolution.height);
         }
     }
 }
