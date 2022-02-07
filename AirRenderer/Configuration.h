@@ -23,7 +23,6 @@ public:
 
 	GameObject sceneObject;
 	glm::mat4 GetScreenMatrix();
-	void Display();
 	Configuration();
 };
 
