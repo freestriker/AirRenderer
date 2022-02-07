@@ -16,15 +16,25 @@ RenderThread::RenderThread(QObject* parent) :QThread(parent)
     go11->transform.translation.y += 5;
     go11->transform.translation.z -= 1;
     go11->meshRenderer = new MeshRenderer();
+
+    GameObject* go12 = go1->AddChild();
+    go12->transform.translation.y -= 5;
+    go12->transform.translation.z -= 1;
+    go12->meshRenderer = new MeshRenderer();
+
+    GameObject* go13 = go1->AddChild();
+    go13->transform.translation.x -= 5;
+    go13->transform.translation.z -= 1;
+    go13->meshRenderer = new MeshRenderer();
 }
 
 void RenderThread::Run()
 {
     Render();
-    //timer->setInterval(900);
-    //connect(timer, SIGNAL(timeout()), this, SLOT(Render()));
-    //timer->start();
-    //this->exec();
+    timer->setInterval(900);
+    connect(timer, SIGNAL(timeout()), this, SLOT(Render()));
+    timer->start();
+    this->exec();
 }
 void RenderThread::GetCameras(std::vector<RenderItem<GameObject>>& vector)
 {
@@ -38,7 +48,6 @@ void RenderThread::GetCameras(std::vector<RenderItem<GameObject>>& vector)
 void RenderThread::GetCamerasDFS(std::vector<RenderItem<GameObject>>& vector, GameObject* gameObject, glm::mat4 parentMatrix)
 {
     glm::mat4 matrix = parentMatrix * gameObject->transform.TranslationMatrix() * gameObject->transform.RotationMatrix();
-    LogMatrix(matrix);
     for (GameObject::ChildIterator i = gameObject->GetStartChildIterator(), end = gameObject->GetEndChildIterator(); i != end; i++)
     {
         GetCamerasDFS(vector, *i, matrix);
@@ -61,7 +70,6 @@ void RenderThread::GetMeshRenderers(std::vector<RenderItem<GameObject>>& vector)
 void RenderThread::GetMeshRenderersDFS(std::vector<RenderItem<GameObject>>& vector, GameObject* gameObject, glm::mat4 parentMatrix)
 {
     glm::mat4 matrix = parentMatrix * gameObject->transform.TranslationMatrix() * gameObject->transform.RotationMatrix() * gameObject->transform.ScaleMatrix();
-    LogMatrix(matrix);
     for (GameObject::ChildIterator i = gameObject->GetStartChildIterator(), end = gameObject->GetEndChildIterator(); i != end; i++)
     {    
         GetMeshRenderersDFS(vector, *i, matrix);
@@ -99,8 +107,22 @@ void RenderThread::Render()
             meshRendererItem.item->meshRenderer->Render(mvpMatrix, screenMatrix);
         }
     }
-    configuration.Display();
+    Display();
 }
+void RenderThread::Display()
+{
+    for (int x = 0; x < configuration.resolution.width; x++)
+    {
+        for (int y = 0; y < configuration.resolution.height; y++)
+        {
+            Color color = configuration.colorBuffer->GetData(x, y);
+            configuration.canvas.setPixelColor(x, y, QColor(color.r * color.a * 255, color.g * color.a * 255, color.b * color.a * 255));
+        }
+    }
+    configuration.label->setPixmap(QPixmap::fromImage(configuration.canvas));
+
+}
+
 void RenderThread::LogMatrix(glm::mat4 matrix)
 {
     qDebug() << "Matrix :";
