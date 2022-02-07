@@ -111,16 +111,20 @@
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="ChildBrotherTree.cpp" />
+    <ClCompile Include="FaceContext.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="MeshRenderer.cpp" />
     <ClCompile Include="RenderItem.cpp" />
     <ClCompile Include="Transform.cpp" />
+    <ClCompile Include="VertexContext.cpp" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="ChildBrotherTree.h" />
+    <ClInclude Include="FaceContext.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="MeshRenderer.h" />
     <ClInclude Include="RenderItem.h" />
     <ClInclude Include="Transform.h" />
+    <ClInclude Include="VertexContext.h" />
     <QtRcc Include="AirRenderer.qrc" />
     <QtUic Include="AirRenderer.ui" />
     <QtMoc Include="AirRenderer.h" />
