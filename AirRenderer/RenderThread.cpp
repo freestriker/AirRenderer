@@ -7,7 +7,7 @@ RenderThread::RenderThread(QObject* parent) :QThread(parent)
     renderer = new Renderer();
     GameObject* camera = configuration.sceneObject.AddChild();
     camera->camera = new Camera();
-    //camera->transform.translation.z += 5;
+    camera->transform.translation.z += 5;
 
     GameObject* go1 = configuration.sceneObject.AddChild();
     go1->transform.translation.x += 5;
@@ -106,17 +106,17 @@ void RenderThread::Render()
     for (RenderItem<GameObject> cameraItem : cameraItems)
     {
         
-        LogMatrix(cameraItem.transformationMatrix);
+        //LogMatrix(cameraItem.transformationMatrix);
         glm::mat4 observeMatrix = glm::inverse(cameraItem.transformationMatrix);
-        LogMatrix(observeMatrix);
+        //LogMatrix(observeMatrix);
         glm::mat4 projectionMatrix = cameraItem.item->camera->ProjectionMatrix();
-        LogMatrix(projectionMatrix);
+        //LogMatrix(projectionMatrix);
         for (RenderItem<GameObject> meshRendererItem : meshRendererItems)
         {
             glm::mat4 mvpMatrix = projectionMatrix * observeMatrix * meshRendererItem.transformationMatrix;
-            LogMatrix(mvpMatrix);
+            //LogMatrix(mvpMatrix);
             glm::mat4 screenMatrix = configuration.GetScreenMatrix();
-            LogMatrix(screenMatrix);
+            //LogMatrix(screenMatrix);
 
             meshRendererItem.item->meshRenderer->Render(mvpMatrix, screenMatrix);
         }
