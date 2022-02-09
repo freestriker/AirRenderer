@@ -93,10 +93,15 @@ void MeshRenderer::Render(glm::mat4 mvpMatrix, glm::mat4 screenMatrix)
                     pixelInContext.w = faceContext.w[0] * barycentricPosition.x + faceContext.w[1] * barycentricPosition.y + faceContext.w[2] * barycentricPosition.z;
                     pixelInContext.z = faceContext.z[0] * barycentricPosition.x + faceContext.z[1] * barycentricPosition.y + faceContext.z[2] * barycentricPosition.z;
                     
-                    //像素着色器
-                    shader.PixelShading(pixelInContext, pixelOutContext);
+                    if (pixelInContext.z < configuration.depthBuffer->GetData(screenPosition.x, screenPosition.y))
+                    {
+                        configuration.depthBuffer->SetData(pixelInContext.z, screenPosition.x, screenPosition.y);
 
-                    configuration.colorBuffer->SetData(pixelOutContext.color, screenPosition.x, screenPosition.y);
+                        //像素着色器
+                        shader.PixelShading(pixelInContext, pixelOutContext);
+
+                        configuration.colorBuffer->SetData(pixelOutContext.color, screenPosition.x, screenPosition.y);
+                    }
                 }
             }
         }

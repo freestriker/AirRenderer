@@ -25,7 +25,21 @@ RenderThread::RenderThread(QObject* parent) :QThread(parent)
     GameObject* go13 = go1->AddChild();
     go13->transform.translation.x -= 5;
     go13->transform.translation.z -= 1;
-    go13->meshRenderer = new MeshRenderer();
+
+    GameObject* go131 = go13->AddChild();
+    go131->meshRenderer = new MeshRenderer();
+    go131->transform.translation.x += 0;
+    go131->transform.translation.z -= 5;
+
+    GameObject* go132 = go13->AddChild();
+    go132->meshRenderer = new MeshRenderer();
+    go132->transform.translation.x += 0.45;
+    go132->transform.translation.z -= 5;
+
+    GameObject* go133 = go13->AddChild();
+    go133->meshRenderer = new MeshRenderer();
+    go133->transform.translation.x += 0.9;
+    go133->transform.translation.z -= 5;
 }
 
 void RenderThread::Run()
