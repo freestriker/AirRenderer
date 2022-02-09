@@ -1,5 +1,16 @@
 #include "MeshRenderer.h"
 #include "Configuration.h"
+#include <QDebug>
+#include <qdir.h>
+#include <QCoreApplication>
+#include "FaceContext.h"
+#include "PixelInContext.h"
+#include "PixelOutContext.h"
+#include "PixelIterator.h"
+#include <OpenMesh/Core/IO/MeshIO.hh>
+#include "VertexInContext.h"
+#include "VertexOutContext.h"
+#include "FaceContext.h"
 
 MeshRenderer::MeshRenderer()
 {
@@ -22,11 +33,9 @@ void MeshRenderer::Render(glm::mat4 mvpMatrix, glm::mat4 screenMatrix)
     {
         int index = (*v_it).idx();
         Mesh::Point p = mesh.point(*v_it);
-        //qDebug() << mesh.has_vertex_colors();
         Mesh::Color c = mesh.vertex_colors()[index] / 255.0;
         VertexInContext vertexInContext = VertexInContext();
         vertexInContext.position = glm::vec4(p[0], p[1], p[2], 1);
-        //vertexInContext.color = Color::white;
         vertexInContext.color = Color(c[0], c[1], c[2], 1);
         vertexInContext.mvpMatrix = mvpMatrix;
         vertexInContext.vertexIndex = index;
