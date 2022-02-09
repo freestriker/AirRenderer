@@ -4,6 +4,9 @@ Color::Color():Color(0, 0, 0, 0)
 {
 
 }
+Color::Color(glm::vec4 color): Color(color.x, color.y, color.z, color.w)
+{
+}
 Color::Color(float r, float g, float b, float a)
 {
 	this->r = r;
