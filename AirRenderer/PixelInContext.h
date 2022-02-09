@@ -1,7 +1,8 @@
 #pragma once
-#include "VertexContext.h"
+#include "VertexOutContext.h"
 #include <glm/ext/vector_int2.hpp>
-class PixelContext
+#include "Color.h"
+class PixelInContext
 {
 public:
     glm::ivec2 screenPosition;
