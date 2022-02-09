@@ -9,8 +9,16 @@
 typedef struct DisplayResolution
 {
 public:
-	int width = 800;
-	int height = 450;
+	int width;
+	int height;
+	DisplayResolution(int width, int height)
+	{
+		this->width = width;
+		this->height = height;
+	}
+	DisplayResolution():DisplayResolution(800, 450)
+	{
+	}
 } Resolution;
 
 class Configuration
@@ -20,6 +28,7 @@ public:
 	QImage canvas;
 	QLabel* label;
 	Buffer<Color>* colorBuffer;
+	Buffer<float>* depthBuffer;
 
 	GameObject sceneObject;
 	glm::mat4 GetScreenMatrix();
