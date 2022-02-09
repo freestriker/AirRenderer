@@ -82,16 +82,25 @@
     <ClCompile Include="RenderItem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="VertexContext.cpp">
+    <ClCompile Include="VertexOutContext.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FaceContext.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PixelContext.cpp">
+    <ClCompile Include="PixelInContext.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PixelIterator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VertexInContext.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PixelOutContext.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -129,16 +138,25 @@
     <ClInclude Include="RenderItem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VertexContext.h">
+    <ClInclude Include="VertexOutContext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="FaceContext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PixelContext.h">
+    <ClInclude Include="PixelInContext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PixelIterator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexInContext.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PixelOutContext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
