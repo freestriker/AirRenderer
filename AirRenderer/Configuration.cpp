@@ -13,7 +13,7 @@ glm::mat4 Configuration::GetScreenMatrix()
 
 Configuration::Configuration()
 {
-	this->colorBuffer = new Buffer<Color>(800, 450);
-	this->depthBuffer = new Buffer<float>(800, 450);
+	this->colorBuffer = new Buffer<Color>(800, 450, 1, Color(0, 0, 0, 1));
+	this->depthBuffer = new Buffer<float>(800, 450, 1, float(1));
     this->resolution = Resolution(800, 450);
 }

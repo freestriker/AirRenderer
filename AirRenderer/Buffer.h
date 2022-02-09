@@ -15,9 +15,9 @@ public:
 	T GetData(int x, int y);
 	T GetData(int x, int y, int z);
 
-	Buffer(int x);
-	Buffer(int x, int y);
-	Buffer(int x, int y, int z);
+	Buffer(int x, T t);
+	Buffer(int x, int y, T t);
+	Buffer(int x, int y, int z, T t);
 
 	int GetIndex(int x);
 	int GetIndex(int x, int y);
@@ -75,19 +75,20 @@ int Buffer<T>::GetIndex(int x, int y, int z)
 }
 
 template <class T>
-Buffer<T>::Buffer(int x) : Buffer(x, 1, 1)
+Buffer<T>::Buffer(int x, T t) : Buffer(x, 1, 1, t)
 {
 
 }
 template <class T>
-Buffer<T>::Buffer(int x, int y) : Buffer(x, y, 1)
+Buffer<T>::Buffer(int x, int y, T t) : Buffer(x, y, 1, t)
 {
 
 }
 template <class T>
-Buffer<T>::Buffer(int x, int y, int z)
+Buffer<T>::Buffer(int x, int y, int z, T t)
 {
 	this->data = new T[x * y * z]();
+	std::fill(data, data + x * y * z, t);
 	this->dimensionX = x;
 	this->dimensionY = y;
 	this->dimensionZ = z;

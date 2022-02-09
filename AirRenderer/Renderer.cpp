@@ -26,5 +26,5 @@ void Renderer::Display()
 
 Renderer::Renderer()
 {
-	buffer = new Buffer<Color>(configuration.resolution.width, configuration.resolution.height);
+	buffer = new Buffer<Color>(configuration.resolution.width, configuration.resolution.height, Color::white);
 }
