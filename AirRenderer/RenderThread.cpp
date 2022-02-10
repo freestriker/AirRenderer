@@ -40,6 +40,7 @@ RenderThread::RenderThread(QObject* parent) :QThread(parent)
     go133->meshRenderer = new MeshRenderer();
     go133->transform.translation.x += 0.9;
     go133->transform.translation.z -= 5;
+    go133->transform.scale = glm::vec3(15, 15, 15);
 }
 
 void RenderThread::Run()

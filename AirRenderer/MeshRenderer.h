@@ -1,14 +1,16 @@
 #pragma once
 #include <OpenMesh/Core/Mesh/TriMesh_ArrayKernelT.hh>
-#include <glm/mat4x4.hpp>
+#include <glm/glm.hpp>
 #include "Shader.h"
-typedef OpenMesh::TriMesh_ArrayKernelT<OpenMesh::DefaultTraits> Mesh;
+#include "Material.h"
 
 class MeshRenderer
 {
 public:
+	typedef OpenMesh::TriMesh_ArrayKernelT<OpenMesh::DefaultTraits> Mesh;
 	Shader shader;
 	Mesh mesh;
+	Material material;
 	MeshRenderer();
 	void Render(glm::mat4 mvpMatrix, glm::mat4 screenMatrix);
 	void LogMatrix(glm::mat4 matrix);

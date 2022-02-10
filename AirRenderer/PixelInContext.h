@@ -10,5 +10,6 @@ public:
     float w;
     glm::vec4 position;
     Color color;
+    glm::vec2 texcoord1;
 };
 

@@ -12,18 +12,21 @@
 #include "VertexOutContext.h"
 #include "FaceContext.h"
 
+
 MeshRenderer::MeshRenderer()
 {
-	std::string s = (QCoreApplication::applicationDirPath() + '/' + "../../Model/Triangle.obj").toStdString();
+	std::string s = (QCoreApplication::applicationDirPath() + '/' + "../../Model/Flat_Wall.obj").toStdString();
 	qDebug() << "Current working directory: " << QCoreApplication::applicationDirPath() << endl;
-    OpenMesh::IO::Options o = OpenMesh::IO::Options::ColorFloat + OpenMesh::IO::Options::VertexColor + OpenMesh::IO::Options::ColorAlpha;
+    OpenMesh::IO::Options o = OpenMesh::IO::Options::ColorFloat + OpenMesh::IO::Options::VertexColor + OpenMesh::IO::Options::ColorAlpha + OpenMesh::IO::Options::VertexTexCoord;
     mesh.request_vertex_colors();
+    mesh.request_vertex_texcoords2D();
 	if (!OpenMesh::IO::read_mesh(mesh, s, o, true))
 	{
 		qDebug() << "Failed to load " << QString::fromStdString(s) << endl;
 		exit(1);
 	}
     shader = Shader();
+    material = Material();
 }
 
 void MeshRenderer::Render(glm::mat4 mvpMatrix, glm::mat4 screenMatrix)
@@ -33,15 +36,17 @@ void MeshRenderer::Render(glm::mat4 mvpMatrix, glm::mat4 screenMatrix)
     {
         int index = (*v_it).idx();
         Mesh::Point p = mesh.point(*v_it);
+        Mesh::TexCoord2D uv = mesh.texcoords2D()[index];    
         Mesh::Color c = mesh.vertex_colors()[index] / 255.0;
         VertexInContext vertexInContext = VertexInContext();
         vertexInContext.position = glm::vec4(p[0], p[1], p[2], 1);
+        vertexInContext.texcoord1 = glm::vec2(uv[0], uv[1]);
         vertexInContext.color = Color(c[0], c[1], c[2], 1);
         vertexInContext.mvpMatrix = mvpMatrix;
         vertexInContext.vertexIndex = index;
 
         //顶点着色器
-        shader.VertexShading(vertexInContext, vertexOutContext[index]);
+        shader.VertexShading(vertexInContext, vertexOutContext[index], material);
     }
     for (Mesh::FaceIter f_it = mesh.faces_begin(); f_it != mesh.faces_end(); ++f_it)
     {
@@ -74,7 +79,7 @@ void MeshRenderer::Render(glm::mat4 mvpMatrix, glm::mat4 screenMatrix)
             faceContext.vertexIndex[index] = vertexIndex;
             index++;
         }
-        if (inBoundryCount > 0)
+        //if (inBoundryCount > 0)
         {
             for (PixelIterator pixelIterator = PixelIterator(faceContext); pixelIterator.CheckValid(); pixelIterator++)
             {
@@ -90,6 +95,7 @@ void MeshRenderer::Render(glm::mat4 mvpMatrix, glm::mat4 screenMatrix)
                     
                     pixelInContext.position = vertexOutContext[faceContext.vertexIndex[0]].position * float(barycentricPosition.x) + vertexOutContext[faceContext.vertexIndex[1]].position * float(barycentricPosition.y) + vertexOutContext[faceContext.vertexIndex[2]].position * float(barycentricPosition.z);
                     pixelInContext.color = vertexOutContext[faceContext.vertexIndex[0]].color * barycentricPosition.x + vertexOutContext[faceContext.vertexIndex[1]].color * barycentricPosition.y + vertexOutContext[faceContext.vertexIndex[2]].color * barycentricPosition.z;
+                    pixelInContext.texcoord1 = vertexOutContext[faceContext.vertexIndex[0]].texcoord1 * float(barycentricPosition.x) + vertexOutContext[faceContext.vertexIndex[1]].texcoord1 * float(barycentricPosition.y) + vertexOutContext[faceContext.vertexIndex[2]].texcoord1 * float(barycentricPosition.z);
                     pixelInContext.w = faceContext.w[0] * barycentricPosition.x + faceContext.w[1] * barycentricPosition.y + faceContext.w[2] * barycentricPosition.z;
                     pixelInContext.z = faceContext.z[0] * barycentricPosition.x + faceContext.z[1] * barycentricPosition.y + faceContext.z[2] * barycentricPosition.z;
                     
@@ -98,7 +104,7 @@ void MeshRenderer::Render(glm::mat4 mvpMatrix, glm::mat4 screenMatrix)
                         configuration.depthBuffer->SetData(pixelInContext.z, screenPosition.x, screenPosition.y);
 
                         //像素着色器
-                        shader.PixelShading(pixelInContext, pixelOutContext);
+                        shader.PixelShading(pixelInContext, pixelOutContext, material);
 
                         configuration.colorBuffer->SetData(pixelOutContext.color, screenPosition.x, screenPosition.y);
                     }
