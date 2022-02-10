@@ -1,6 +1,4 @@
 #pragma once
-#include<algorithm>
-#include<glm/vec4.hpp>
 class Color
 {
 public:
@@ -10,7 +8,6 @@ public:
 	float a = 0;
 
 	Color();
-	Color(glm::vec4 color);
 	Color(float r, float g, float b, float a);
 
 	const static Color red;
@@ -23,5 +20,6 @@ public:
 	Color operator- (const Color& c);
 	Color operator/ (const float& s);
 	Color operator* (const float& s);
+	Color operator*(const Color& c);
 	float& operator[] (const int& i);
 };
