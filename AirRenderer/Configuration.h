@@ -30,7 +30,7 @@ public:
 	Buffer<Color>* colorBuffer;
 	Buffer<float>* depthBuffer;
 
-	GameObject sceneObject;
+	GameObject sceneObject = GameObject("Root GameObject");
 	glm::mat4 GetScreenMatrix();
 	Configuration();
 };
