@@ -53,8 +53,26 @@ public:
         }
         ChildIterator operator++(int) {
             node = node->brother;
-            ChildIterator ret_val = ChildIterator(static_cast<T*>(node));
-            return ret_val;
+            return *this;
+        }
+        ChildIterator operator+(int i) {
+            for (int j = 1; j <= i; j++)
+            {
+                node = node->brother;
+            }
+            return *this;
+        }
+        T* operator[](int i) {
+            for (int j = 0; j <= i; j++)
+            {
+                node = node->brother;
+            }
+            return **this;
+        }
+        ChildIterator operator= (ChildIterator childIterator) {
+            
+            this->node = childIterator->node;
+            return *this;
         }
         bool operator==(ChildIterator other) const { return node == other.node; }
         bool operator!=(ChildIterator other) const { return node != other.node; }
@@ -64,6 +82,7 @@ public:
     T* parent;
 	T* child;
 	T* brother;
+    int childCount;
 
 	ChildBrotherTree(T* parent, T* child, T* brother);
 
