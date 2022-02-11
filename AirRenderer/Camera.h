@@ -2,9 +2,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
-#include "Transform.h"
+#include "Component.h"
 
-class Camera
+class Camera: public Component
 {
 public:
 	float aspectRatio;
@@ -12,7 +12,7 @@ public:
 	float nearFlat;
 	float farFlat;
 	glm::mat4 ProjectionMatrix();
-	glm::mat4 Camera::ObserveMatrix(Transform transform);
 	Camera();
+	void UpdateSelf(void* data);
 };
 

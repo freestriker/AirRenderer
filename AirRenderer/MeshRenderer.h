@@ -3,8 +3,9 @@
 #include <glm/glm.hpp>
 #include "Shader.h"
 #include "Material.h"
+#include "Component.h"
 
-class MeshRenderer
+class MeshRenderer: public Component
 {
 public:
 	typedef OpenMesh::TriMesh_ArrayKernelT<OpenMesh::DefaultTraits> Mesh;

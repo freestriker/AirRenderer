@@ -13,10 +13,9 @@
 #include "FaceContext.h"
 
 
-MeshRenderer::MeshRenderer()
+MeshRenderer::MeshRenderer():Component("MeshRenderer")
 {
 	std::string s = (QCoreApplication::applicationDirPath() + '/' + "../../Model/Flat_Wall.obj").toStdString();
-	qDebug() << "Current working directory: " << QCoreApplication::applicationDirPath() << endl;
     OpenMesh::IO::Options o = OpenMesh::IO::Options::ColorFloat + OpenMesh::IO::Options::VertexColor + OpenMesh::IO::Options::ColorAlpha + OpenMesh::IO::Options::VertexTexCoord;
     mesh.request_vertex_colors();
     mesh.request_vertex_texcoords2D();
