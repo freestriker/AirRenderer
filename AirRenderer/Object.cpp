@@ -1,0 +1,16 @@
+#include "Object.h"
+
+void Object::UpdateSelf(void* data)
+{
+}
+
+Object::Object()
+{
+	active = true;
+	typeName = "Unknown";
+}
+Object::Object(std::string name)
+{
+	active = true;
+	typeName = name;
+}
