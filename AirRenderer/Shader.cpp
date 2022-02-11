@@ -10,7 +10,7 @@ void Shader::VertexShading(VertexInContext& vertexInContext, VertexOutContext& v
 
 void Shader::PixelShading(PixelInContext& vertexInContext, PixelOutContext& vertexOutContext, Material& material)
 {
-	Color c = static_cast<Texture*>(material.texture)->Sample(vertexInContext.texcoord1);
-	c = c * vertexInContext.color;
+	Color c = vertexInContext.color; 
+	c = c * static_cast<Texture*>(material.texture)->Sample(vertexInContext.texcoord1);
 	vertexOutContext.color = c;
 }
