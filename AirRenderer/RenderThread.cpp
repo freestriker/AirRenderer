@@ -1,75 +1,84 @@
 #include "RenderThread.h"
 #include <vector>
+#include "Utils.h"
 
 RenderThread::RenderThread(QObject* parent) :QThread(parent)
 {
     timer = new QTimer(this);
     renderer = new Renderer();
-    GameObject* camera = configuration.sceneObject.AddChild();
-    camera->camera = new Camera();
-    camera->transform.translation.z += 5;
+    GameObject* camera = new GameObject("Camera");
+    configuration.sceneObject.AddChild(camera);
+    camera->AddComponent(new Camera());
+    camera->transform.SetTranslation(glm::vec3(0, 0, 5));
 
-    GameObject* go1 = configuration.sceneObject.AddChild();
-    go1->transform.translation.x += 5;
+    GameObject* go1 = new GameObject("go1");
+    configuration.sceneObject.AddChild(go1);
+    go1->transform.SetTranslation(glm::vec3(5, 0, 0));
 
-    GameObject* go11 = go1->AddChild();
-    go11->transform.translation.y += 5;
-    go11->transform.translation.z -= 1;
-    go11->meshRenderer = new MeshRenderer();
+    GameObject* go11 = new GameObject("go11");
+    go1->AddChild(go11);
+    go11->transform.SetTranslation(glm::vec3(0, 5, -1));
+    go11->AddComponent(new MeshRenderer());
 
-    GameObject* go12 = go1->AddChild();
-    go12->transform.translation.y -= 5;
-    go12->transform.translation.z -= 1;
-    go12->meshRenderer = new MeshRenderer();
+    GameObject* go12 = new GameObject("go12");
+    go1->AddChild(go12);
+    go12->transform.SetTranslation(glm::vec3(0, -5, -1));
+    go12->AddComponent(new MeshRenderer());
 
-    GameObject* go13 = go1->AddChild();
-    go13->transform.translation.x -= 5;
-    go13->transform.translation.z -= 1;
+    GameObject* go13 = new GameObject("go13");
+    go1->AddChild(go13);
+    go13->transform.SetTranslation(glm::vec3(-5, 0, 0));
 
-    GameObject* go131 = go13->AddChild();
-    go131->meshRenderer = new MeshRenderer();
-    go131->transform.translation.x += 0;
-    go131->transform.translation.z -= 5;
+    GameObject* go131 = new GameObject("go131");
+    go13->AddChild(go131);
+    go131->transform.SetTranslation(glm::vec3(0, 0, -1));
+    go131->AddComponent(new MeshRenderer());
 
-    GameObject* go132 = go13->AddChild();
-    go132->meshRenderer = new MeshRenderer();
-    go132->transform.translation.x += 0.45;
-    go132->transform.translation.z -= 5;
+    GameObject* go132 = new GameObject("go132");
+    go13->AddChild(go132);
+    go132->transform.SetTranslation(glm::vec3(0.45, 0, -2));
+    go132->AddComponent(new MeshRenderer());
 
-    GameObject* go133 = go13->AddChild();
-    go133->meshRenderer = new MeshRenderer();
-    go133->transform.translation.x += 0.9;
-    go133->transform.translation.z -= 5;
-    go133->transform.scale = glm::vec3(15, 15, 15);
+    GameObject* go133 = new GameObject("go133");
+    go13->AddChild(go133);
+    go133->transform.SetTranslation(glm::vec3(0.9, 0, -3));
+    go133->transform.SetScale(glm::vec3(15, 15, 1));
+    go133->AddComponent(new MeshRenderer());
 }
 
 void RenderThread::Run()
 {
     Render();
-    timer->setInterval(900);
-    connect(timer, SIGNAL(timeout()), this, SLOT(Render()));
-    timer->start();
-    this->exec();
+    //timer->setInterval(900);
+    //connect(timer, SIGNAL(timeout()), this, SLOT(Render()));
+    //timer->start();
+    //this->exec();
 }
 void RenderThread::GetCameras(std::vector<RenderItem<GameObject>>& vector)
 {
     vector.clear();
     for (GameObject::ChildIterator i = configuration.sceneObject.GetStartChildIterator(), end = configuration.sceneObject.GetEndChildIterator(); i != end; i++)
     {
-        GetCamerasDFS(vector, *i, glm::mat4(1));
+        GetCamerasDFS(vector, *i);
     }
 
 }
-void RenderThread::GetCamerasDFS(std::vector<RenderItem<GameObject>>& vector, GameObject* gameObject, glm::mat4 parentMatrix)
+void RenderThread::GetCamerasDFS(std::vector<RenderItem<GameObject>>& vector, GameObject* gameObject)
 {
-    glm::mat4 matrix = parentMatrix * gameObject->transform.TranslationMatrix() * gameObject->transform.RotationMatrix();
     for (GameObject::ChildIterator i = gameObject->GetStartChildIterator(), end = gameObject->GetEndChildIterator(); i != end; i++)
     {
-        GetCamerasDFS(vector, *i, matrix);
+        GetCamerasDFS(vector, *i);
     }
-    if (gameObject->camera)
+    if (gameObject->FindComponent<Camera>("Camera"))
     {
-        vector.push_back(RenderItem<GameObject>(gameObject, matrix));
+        GameObject* parent = gameObject;
+        glm::mat4 m = glm::mat4(1);
+        while (parent)
+        {
+            m = parent->transform.TranslationMatrix() * parent->transform.RotationMatrix() * m;
+            parent = parent->parent;
+        }
+        vector.push_back(RenderItem<GameObject>(gameObject, m));
     }
 }
 
@@ -89,17 +98,16 @@ void RenderThread::GetMeshRenderersDFS(std::vector<RenderItem<GameObject>>& vect
     {    
         GetMeshRenderersDFS(vector, *i, matrix);
     }
-    if (gameObject->meshRenderer)
+    MeshRenderer* meshRenderer = gameObject->FindComponent<MeshRenderer>("MeshRenderer");
+    if (meshRenderer)
     {
-        vector.push_back(RenderItem<GameObject>(gameObject, matrix));
+        vector.push_back(RenderItem<GameObject>(gameObject, meshRenderer->gameObject->transform.worldMatrix));
+        //Utils::LogMatrix("MeshRenderer World", meshRenderer->gameObject->transform.worldMatrix);
     }
 }
 
 void RenderThread::Render()
 {
-    //renderer->Render();
-    //renderer->Display();
-
     std::vector<RenderItem<GameObject>> cameraItems = std::vector<RenderItem<GameObject>>();
     GetCameras(cameraItems);
     std::vector<RenderItem<GameObject>> meshRendererItems = std::vector<RenderItem<GameObject>>();
@@ -108,18 +116,18 @@ void RenderThread::Render()
     {
         
         //LogMatrix(cameraItem.transformationMatrix);
-        glm::mat4 observeMatrix = glm::inverse(cameraItem.transformationMatrix);
+        glm::mat4 viewMatrix = glm::inverse(cameraItem.transformationMatrix);
         //LogMatrix(observeMatrix);
-        glm::mat4 projectionMatrix = cameraItem.item->camera->ProjectionMatrix();
+        glm::mat4 projectionMatrix = cameraItem.item->FindComponent<Camera>("Camera")->ProjectionMatrix();
         //LogMatrix(projectionMatrix);
         for (RenderItem<GameObject> meshRendererItem : meshRendererItems)
         {
-            glm::mat4 mvpMatrix = projectionMatrix * observeMatrix * meshRendererItem.transformationMatrix;
+            glm::mat4 mvpMatrix = projectionMatrix * viewMatrix * meshRendererItem.transformationMatrix;
             //LogMatrix(mvpMatrix);
             glm::mat4 screenMatrix = configuration.GetScreenMatrix();
             //LogMatrix(screenMatrix);
 
-            meshRendererItem.item->meshRenderer->Render(mvpMatrix, screenMatrix);
+            meshRendererItem.item->FindComponent<MeshRenderer>("MeshRenderer")->Render(mvpMatrix, screenMatrix);
         }
     }
     Display();
@@ -136,19 +144,4 @@ void RenderThread::Display()
     }
     configuration.label->setPixmap(QPixmap::fromImage(configuration.canvas));
 
-}
-
-void RenderThread::LogMatrix(glm::mat4 matrix)
-{
-    qDebug() << "Matrix :";
-    for (int i = 0; i < 4; i++)
-    {
-        QString s = "";
-        for (int j = 0; j < 4; j++)
-        {
-            s += QString::number(matrix[j][i], 'f', 6);
-            s += " ";
-        }
-        qDebug() << s;
-    }
 }

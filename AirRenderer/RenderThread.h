@@ -13,11 +13,10 @@ public:
 	QTimer* timer;
 	void Run();
 	void GetCameras(std::vector<RenderItem<GameObject>>& vector);
-	void GetCamerasDFS(std::vector<RenderItem<GameObject>>& vector, GameObject* gameObject, mat4 parentMatrix);
+	void GetCamerasDFS(std::vector<RenderItem<GameObject>>& vector, GameObject* gameObject);
 	void GetMeshRenderers(std::vector<RenderItem<GameObject>>& vector);
 	void GetMeshRenderersDFS(std::vector<RenderItem<GameObject>>& vector, GameObject* gameObject, glm::mat4 parentMatrix);
 	void Display();
-	void LogMatrix(glm::mat4 Matrix);
 	RenderThread(QObject* parent);
 	Renderer* renderer;
 private slots:void Render();
