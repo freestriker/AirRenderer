@@ -13,8 +13,8 @@ RenderThread::RenderThread(QObject* parent) :QThread(parent)
 
     GameObject* go0 = new GameObject("go0");
     configuration.sceneObject.AddChild(go0);
-    go0->transform.SetTranslationRotationScale(glm::vec3(-5, 0, 0), glm::quat(glm::vec3(0.7853981633974483, 0.7853981633974483, 0.7853981633974483)), glm::vec3(5, 5, 5));
-    go0->AddComponent(new MeshRenderer("../../Model/Cube_Wall.obj"));
+    go0->transform.SetTranslationRotationScale(glm::vec3(-5, 0, 0), glm::quat(glm::vec3(0, 0, 0)), glm::vec3(5, 5, 5));
+    go0->AddComponent(new MeshRenderer("../../Model/Sphere_Wall_Normal.ply"));
     
     GameObject* go1 = new GameObject("go1");
     configuration.sceneObject.AddChild(go1);
@@ -148,5 +148,6 @@ void RenderThread::Display()
         }
     }
     configuration.label->setPixmap(QPixmap::fromImage(configuration.canvas));
+    configuration.canvas.save("C:\\Users\\23174\\Desktop\\Out.png", "PNG", 100);
 
 }

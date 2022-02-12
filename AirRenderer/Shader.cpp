@@ -5,7 +5,22 @@ void Shader::VertexShading(VertexInContext& vertexInContext, VertexOutContext& v
 {
 	vertexOutContext.position = vertexInContext.mvpMatrix * vertexInContext.position;
 	vertexOutContext.texcoord1 = vertexInContext.texcoord1;
-	vertexOutContext.color = vertexInContext.color;
+	if (vertexInContext.vertexIndex % 3 == 0)
+	{
+		vertexOutContext.color = Color::red;
+	}
+	else if (vertexInContext.vertexIndex % 3 == 1)
+	{
+		vertexOutContext.color = Color::green;
+	}
+	else if(vertexInContext.vertexIndex % 3 == 2)
+	{
+		vertexOutContext.color = Color::blue;
+	}
+	else
+	{
+		vertexOutContext.color = vertexInContext.color;
+	}
 }
 
 void Shader::PixelShading(PixelInContext& vertexInContext, PixelOutContext& vertexOutContext, Material& material)

@@ -15,6 +15,5 @@ public:
 	MeshRenderer();
 	MeshRenderer(std::string filePath);
 	void Render(glm::mat4 mvpMatrix, glm::mat4 screenMatrix);
-	void LogMatrix(glm::mat4 matrix);
 };
 

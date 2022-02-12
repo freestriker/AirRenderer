@@ -13,7 +13,7 @@
 #include "FaceContext.h"
 
 
-MeshRenderer::MeshRenderer():MeshRenderer("../../Model/Flat_Wall.obj")
+MeshRenderer::MeshRenderer():MeshRenderer("../../Model/Flat_Wall_Normal.ply")
 {
 
 }
@@ -39,12 +39,11 @@ void MeshRenderer::Render(glm::mat4 mvpMatrix, glm::mat4 screenMatrix)
     {
         int index = (*v_it).idx();
         Mesh::Point p = mesh.point(*v_it);
-        Mesh::TexCoord2D uv = mesh.texcoords2D()[index];    
-        Mesh::Color c = mesh.vertex_colors()[index] / 255.0;
+        Mesh::TexCoord2D uv = mesh.texcoord2D(v_it);
         VertexInContext vertexInContext = VertexInContext();
         vertexInContext.position = glm::vec4(p[0], p[1], p[2], 1);
         vertexInContext.texcoord1 = glm::vec2(uv[0], uv[1]);
-        vertexInContext.color = Color(c[0], c[1], c[2], 1);
+        vertexInContext.color = Color::white;
         vertexInContext.mvpMatrix = mvpMatrix;
         vertexInContext.vertexIndex = index;
 
@@ -114,19 +113,5 @@ void MeshRenderer::Render(glm::mat4 mvpMatrix, glm::mat4 screenMatrix)
                 }
             }
         }
-    }
-}
-void MeshRenderer::LogMatrix(glm::mat4 matrix)
-{
-    qDebug() << "Matrix :";
-    for (int i = 0; i < 4; i++)
-    {
-        QString s = "";
-        for (int j = 0; j < 4; j++)
-        {
-            s += QString::number(matrix[j][i], 'f', 6);
-            s += " ";
-        }
-        qDebug() << s;
     }
 }
