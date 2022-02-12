@@ -6,6 +6,24 @@ PixelIterator::PixelIterator(FaceContext& faceContext)
     this->pole = faceContext.GetFacePole();
     this->x = this->pole.x;
     this->y = this->pole.y;
+
+    int i = -1, j = -1;
+    for (i = x; i <= pole.z; i++)
+    {
+        for (j = i == x ? y + 1 : pole.y; j <= pole.w; j++)
+        {
+            if (CheckInTriangle(glm::ivec2(i, j)))
+            {
+                x = i;
+                y = j;
+                goto Out;
+            }
+        }
+    }
+    Out:
+    x = i;
+    y = j;
+
 }
 PixelIterator& PixelIterator::operator++() 
 {
@@ -80,9 +98,12 @@ glm::dvec3 PixelIterator::GetBarycentricCoordinates()
     glm::ivec2 pos3 = screenPosition[2];
     double ratio1 = double(-(x - pos2.x) * (pos3.y - pos2.y) + (y - pos2.y) * (pos3.x - pos2.x))
         / double(-(pos1.x - pos2.x) * (pos3.y - pos2.y) + (pos1.y - pos2.y) * (pos3.x - pos2.x));
+    ratio1 = std::clamp(ratio1, 0.0, 1.0);
     double ratio2 = double(-(x - pos3.x) * (pos1.y - pos3.y) + (y - pos3.y) * (pos1.x - pos3.x))
         / double(-(pos2.x - pos3.x) * (pos1.y - pos3.y) + (pos2.y - pos3.y) * (pos1.x - pos3.x));
+    ratio2 = std::clamp(ratio2, 0.0, 1.0);
     double ratio3 = 1.0 - ratio1 - ratio2;
+    ratio3 = std::clamp(ratio3, 0.0, 1.0);
 
     return glm::dvec3(ratio1, ratio2, ratio3);
 }
