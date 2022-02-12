@@ -34,30 +34,26 @@ MeshRenderer::MeshRenderer(std::string filePath):Component("MeshRenderer")
 
 void MeshRenderer::Render(glm::mat4 mvpMatrix, glm::mat4 screenMatrix)
 {
-    std::vector<VertexOutContext> vertexOutContext = std::vector<VertexOutContext>(mesh.vertices_end().handle().idx(), VertexOutContext());
-    for (Mesh::VertexIter v_it = mesh.vertices_sbegin(); v_it != mesh.vertices_end(); v_it++)
-    {
-        int index = (*v_it).idx();
-        Mesh::Point p = mesh.point(*v_it);
-        Mesh::TexCoord2D uv = mesh.texcoord2D(v_it);
-        VertexInContext vertexInContext = VertexInContext();
-        vertexInContext.position = glm::vec4(p[0], p[1], p[2], 1);
-        vertexInContext.texcoord1 = glm::vec2(uv[0], uv[1]);
-        vertexInContext.color = Color::white;
-        vertexInContext.mvpMatrix = mvpMatrix;
-        vertexInContext.vertexIndex = index;
-
-        //顶点着色器
-        shader.VertexShading(vertexInContext, vertexOutContext[index], material);
-    }
     for (Mesh::FaceIter f_it = mesh.faces_begin(); f_it != mesh.faces_end(); ++f_it)
     {
         FaceContext faceContext = FaceContext();
+        VertexOutContext vertexOutContext[3] = {VertexOutContext(), VertexOutContext(), VertexOutContext()};
         int index = 0, inBoundryCount = 0;
         for (Mesh::FaceVertexIter fv_it = mesh.fv_iter(*f_it); fv_it.is_valid(); ++fv_it)
         {
-            int vertexIndex = (*fv_it).idx();
-            glm::vec4 pos = vertexOutContext[vertexIndex].position;
+            Mesh::Point p = mesh.point(fv_it);
+            Mesh::TexCoord2D uv = mesh.texcoord2D(fv_it);
+            VertexInContext vertexInContext = VertexInContext();
+            vertexInContext.position = glm::vec4(p[0], p[1], p[2], 1);
+            vertexInContext.texcoord1 = glm::vec2(uv[0], uv[1]);
+            vertexInContext.color = Color::white;
+            vertexInContext.mvpMatrix = mvpMatrix;
+            vertexInContext.vertexIndex = index;
+
+            //顶点着色器
+            shader.VertexShading(vertexInContext, vertexOutContext[index], material);
+
+            glm::vec4 pos = vertexOutContext[index].position;
 
             //测试剔除
             if (-pos.w < pos.x && pos.x < pos.w
@@ -78,7 +74,7 @@ void MeshRenderer::Render(glm::mat4 mvpMatrix, glm::mat4 screenMatrix)
             faceContext.screenPosition[index] = glm::ivec2(pos.x + 0.5, pos.y + 0.5);
             faceContext.z[index] = pos.z;
             faceContext.w[index] = pos.w;
-            faceContext.vertexIndex[index] = vertexIndex;
+            faceContext.vertexIndex[index] = index;
             index++;
         }
         //if (inBoundryCount > 0)
