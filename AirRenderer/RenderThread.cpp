@@ -1,6 +1,7 @@
 #include "RenderThread.h"
 #include <vector>
 #include "Utils.h"
+#include "MatrixContext.h"
 
 RenderThread::RenderThread(QObject* parent) :QThread(parent)
 {
@@ -119,20 +120,20 @@ void RenderThread::Render()
     GetMeshRenderers(meshRendererItems);
     for (RenderItem<GameObject> cameraItem : cameraItems)
     {
-        
-        //LogMatrix(cameraItem.transformationMatrix);
-        glm::mat4 viewMatrix = glm::inverse(cameraItem.transformationMatrix);
-        //LogMatrix(observeMatrix);
-        glm::mat4 projectionMatrix = cameraItem.item->FindComponent<Camera>("Camera")->ProjectionMatrix();
-        //LogMatrix(projectionMatrix);
+        MatrixContext matrixContext = MatrixContext();
+        matrixContext.viewMatrix = glm::inverse(cameraItem.transformationMatrix);
+        matrixContext.projectionMatrix = cameraItem.item->FindComponent<Camera>("Camera")->ProjectionMatrix();
+        matrixContext.rasterizationMatrix = configuration.GetScreenMatrix();
+        matrixContext.vpMatrix = matrixContext.projectionMatrix * matrixContext.viewMatrix;
+
         for (RenderItem<GameObject> meshRendererItem : meshRendererItems)
         {
-            glm::mat4 mvpMatrix = projectionMatrix * viewMatrix * meshRendererItem.transformationMatrix;
-            //LogMatrix(mvpMatrix);
-            glm::mat4 screenMatrix = configuration.GetScreenMatrix();
-            //LogMatrix(screenMatrix);
+            matrixContext.worldMatrix = meshRendererItem.transformationMatrix;
+            matrixContext.wvMatrix = matrixContext.viewMatrix * matrixContext.worldMatrix;
+            matrixContext.wv_tiMatrix = glm::inverse(glm::transpose(matrixContext.wvMatrix));
+            matrixContext.wvpMatrix = matrixContext.vpMatrix * matrixContext.worldMatrix;
 
-            meshRendererItem.item->FindComponent<MeshRenderer>("MeshRenderer")->Render(mvpMatrix, screenMatrix);
+            meshRendererItem.item->FindComponent<MeshRenderer>("MeshRenderer")->Render(&matrixContext);
         }
     }
     Display();

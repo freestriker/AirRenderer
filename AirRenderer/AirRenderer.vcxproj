@@ -115,6 +115,7 @@
     <ClCompile Include="FaceContext.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Material.cpp" />
+    <ClCompile Include="MatrixContext.cpp" />
     <ClCompile Include="MeshRenderer.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="PixelInContext.cpp" />
@@ -133,6 +134,7 @@
     <ClInclude Include="FaceContext.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Material.h" />
+    <ClInclude Include="MatrixContext.h" />
     <ClInclude Include="MeshRenderer.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="PixelInContext.h" />

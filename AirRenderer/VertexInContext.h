@@ -6,10 +6,10 @@ class VertexInContext
 {
 public:
 	glm::vec4 position;
+	glm::vec3 normal;
 	glm::vec2 texcoord1;
 	Color color;
 
-	glm::mat4 mvpMatrix;
 	int vertexIndex;
 };
 

@@ -1,10 +1,11 @@
 #include "Shader.h"
 #include "Texture.h"
 
-void Shader::VertexShading(VertexInContext& vertexInContext, VertexOutContext& vertexOutContext, Material& material)
+void Shader::VertexShading(VertexInContext& vertexInContext, VertexOutContext& vertexOutContext, Material& material, MatrixContext* matrixContext)
 {
-	vertexOutContext.position = vertexInContext.mvpMatrix * vertexInContext.position;
+	vertexOutContext.position = matrixContext->wvpMatrix * vertexInContext.position;
 	vertexOutContext.texcoord1 = vertexInContext.texcoord1;
+	vertexOutContext.normal = glm::mat3(matrixContext->wv_tiMatrix) * vertexInContext.normal;
 	if (vertexInContext.vertexIndex % 3 == 0)
 	{
 		vertexOutContext.color = Color::red;
@@ -23,7 +24,7 @@ void Shader::VertexShading(VertexInContext& vertexInContext, VertexOutContext& v
 	}
 }
 
-void Shader::PixelShading(PixelInContext& vertexInContext, PixelOutContext& vertexOutContext, Material& material)
+void Shader::PixelShading(PixelInContext& vertexInContext, PixelOutContext& vertexOutContext, Material& material, MatrixContext* matrixContext)
 {
 	Color c = vertexInContext.color; 
 	c = c * static_cast<Texture*>(material.texture)->Sample(vertexInContext.texcoord1);

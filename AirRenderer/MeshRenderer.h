@@ -4,6 +4,7 @@
 #include "Shader.h"
 #include "Material.h"
 #include "Component.h"
+#include "MatrixContext.h"
 
 class MeshRenderer: public Component
 {
@@ -14,6 +15,6 @@ public:
 	Material material;
 	MeshRenderer();
 	MeshRenderer(std::string filePath);
-	void Render(glm::mat4 mvpMatrix, glm::mat4 screenMatrix);
+	void Render(MatrixContext* matrixContext);
 };
 
