@@ -16,6 +16,8 @@ public:
 	void GetCamerasDFS(std::vector<RenderItem<GameObject>>& vector, GameObject* gameObject);
 	void GetMeshRenderers(std::vector<RenderItem<GameObject>>& vector);
 	void GetMeshRenderersDFS(std::vector<RenderItem<GameObject>>& vector, GameObject* gameObject, glm::mat4 parentMatrix);
+	void GetLights(std::vector<RenderItem<GameObject>>& vector);
+	void GetLightsDFS(std::vector<RenderItem<GameObject>>& vector, GameObject* gameObject, glm::mat4 parentMatrix);
 	void Display();
 	RenderThread(QObject* parent);
 	Renderer* renderer;

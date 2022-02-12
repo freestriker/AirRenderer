@@ -5,6 +5,7 @@
 #include "Material.h"
 #include "Component.h"
 #include "MatrixContext.h"
+#include "LightContext.h"
 
 class MeshRenderer: public Component
 {
@@ -15,6 +16,6 @@ public:
 	Material material;
 	MeshRenderer();
 	MeshRenderer(std::string filePath);
-	void Render(MatrixContext* matrixContext);
+	void Render(MatrixContext* matrixContext, LightContext* lightContext);
 };
 

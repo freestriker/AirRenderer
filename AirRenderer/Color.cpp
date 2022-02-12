@@ -21,19 +21,19 @@ const Color Color::white = Color(1, 1, 1, 1);
 
 Color Color::operator+ (const Color& c)
 {
-	return Color(c.r + this->r, c.g + this->g, c.b + this->b, c.a + this->a);
+	return Color(c.r + this->r, c.g + this->g, c.b + this->b, this->a);
 }
 Color Color::operator- (const Color& c)
 {
-	return Color(-c.r + this->r, -c.g + this->g, -c.b + this->b, -c.a + this->a);
+	return Color(-c.r + this->r, -c.g + this->g, -c.b + this->b, this->a);
 }
 Color Color::operator/ (const float& s)
 {
-	return Color(this->r / s, this->g / s, this->b / s, this->a / s);
+	return Color(this->r / s, this->g / s, this->b / s, this->a);
 }
 Color Color::operator* (const float& s)
 {
-	return Color(this->r * s, this->g * s, this->b * s, this->a * s);
+	return Color(this->r * s, this->g * s, this->b * s, this->a);
 }
 Color Color::operator* (const Color& c)
 {

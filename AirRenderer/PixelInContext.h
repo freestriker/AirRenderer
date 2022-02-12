@@ -9,6 +9,7 @@ public:
     float z;
     float w;
     glm::vec4 position;
+    glm::vec4 worldPosition;
     glm::vec3 normal;
     Color color;
     glm::vec2 texcoord1;

@@ -7,6 +7,7 @@ class VertexOutContext
 {
 public:
 	glm::vec4 position;
+	glm::vec4 worldPosition;
 	glm::vec3 normal;
 	glm::vec2 texcoord1;
 	Color color;

@@ -33,7 +33,7 @@ MeshRenderer::MeshRenderer(std::string filePath):Component("MeshRenderer")
     material = Material();
 }
 
-void MeshRenderer::Render(MatrixContext* matrixContext)
+void MeshRenderer::Render(MatrixContext* matrixContext, LightContext* lightContext)
 {
     for (Mesh::FaceIter f_it = mesh.faces_begin(); f_it != mesh.faces_end(); ++f_it)
     {
@@ -53,7 +53,7 @@ void MeshRenderer::Render(MatrixContext* matrixContext)
             vertexInContext.vertexIndex = index;
 
             //顶点着色器
-            shader.VertexShading(vertexInContext, vertexOutContext[index], material, matrixContext);
+            shader.VertexShading(vertexInContext, vertexOutContext[index], material, matrixContext, lightContext);
 
             glm::vec4 pos = vertexOutContext[index].position;
 
@@ -94,6 +94,7 @@ void MeshRenderer::Render(MatrixContext* matrixContext)
                     pixelInContext.screenPosition = screenPosition;
                     
                     pixelInContext.position = vertexOutContext[faceContext.vertexIndex[0]].position * float(barycentricPosition.x) + vertexOutContext[faceContext.vertexIndex[1]].position * float(barycentricPosition.y) + vertexOutContext[faceContext.vertexIndex[2]].position * float(barycentricPosition.z);
+                    pixelInContext.worldPosition = vertexOutContext[faceContext.vertexIndex[0]].worldPosition * float(barycentricPosition.x) + vertexOutContext[faceContext.vertexIndex[1]].worldPosition * float(barycentricPosition.y) + vertexOutContext[faceContext.vertexIndex[2]].worldPosition * float(barycentricPosition.z);
                     pixelInContext.normal = glm::normalize(vertexOutContext[faceContext.vertexIndex[0]].normal * float(barycentricPosition.x) + vertexOutContext[faceContext.vertexIndex[1]].normal * float(barycentricPosition.y) + vertexOutContext[faceContext.vertexIndex[2]].normal * float(barycentricPosition.z));
                     pixelInContext.color = vertexOutContext[faceContext.vertexIndex[0]].color * barycentricPosition.x + vertexOutContext[faceContext.vertexIndex[1]].color * barycentricPosition.y + vertexOutContext[faceContext.vertexIndex[2]].color * barycentricPosition.z;
                     pixelInContext.texcoord1 = vertexOutContext[faceContext.vertexIndex[0]].texcoord1 * float(barycentricPosition.x) + vertexOutContext[faceContext.vertexIndex[1]].texcoord1 * float(barycentricPosition.y) + vertexOutContext[faceContext.vertexIndex[2]].texcoord1 * float(barycentricPosition.z);
@@ -105,7 +106,7 @@ void MeshRenderer::Render(MatrixContext* matrixContext)
                         configuration.depthBuffer->SetData(pixelInContext.z, screenPosition.x, screenPosition.y);
 
                         //像素着色器
-                        shader.PixelShading(pixelInContext, pixelOutContext, material, matrixContext);
+                        shader.PixelShading(pixelInContext, pixelOutContext, material, matrixContext, lightContext);
 
                         configuration.colorBuffer->SetData(pixelOutContext.color, screenPosition.x, screenPosition.y);
                     }

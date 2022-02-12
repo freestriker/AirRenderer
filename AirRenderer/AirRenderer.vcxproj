@@ -112,8 +112,11 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="ChildBrotherTree.cpp" />
     <ClCompile Include="Component.cpp" />
+    <ClCompile Include="DirectionalLight.cpp" />
     <ClCompile Include="FaceContext.cpp" />
     <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="Light.cpp" />
+    <ClCompile Include="LightContext.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="MatrixContext.cpp" />
     <ClCompile Include="MeshRenderer.cpp" />
@@ -121,6 +124,7 @@
     <ClCompile Include="PixelInContext.cpp" />
     <ClCompile Include="PixelIterator.cpp" />
     <ClCompile Include="PixelOutContext.cpp" />
+    <ClCompile Include="PointLight.cpp" />
     <ClCompile Include="RenderItem.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Texture.cpp" />
@@ -131,8 +135,11 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="ChildBrotherTree.h" />
     <ClInclude Include="Component.h" />
+    <ClInclude Include="DirectionalLight.h" />
     <ClInclude Include="FaceContext.h" />
     <ClInclude Include="GameObject.h" />
+    <ClInclude Include="Light.h" />
+    <ClInclude Include="LightContext.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="MatrixContext.h" />
     <ClInclude Include="MeshRenderer.h" />
@@ -140,6 +147,7 @@
     <ClInclude Include="PixelInContext.h" />
     <ClInclude Include="PixelIterator.h" />
     <ClInclude Include="PixelOutContext.h" />
+    <ClInclude Include="PointLight.h" />
     <ClInclude Include="RenderItem.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Texture.h" />

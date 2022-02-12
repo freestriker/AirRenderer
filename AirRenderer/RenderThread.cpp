@@ -2,6 +2,10 @@
 #include <vector>
 #include "Utils.h"
 #include "MatrixContext.h"
+#include "Light.h"
+#include "LightContext.h"
+#include "DirectionalLight.h"
+#include "PointLight.h"
 
 RenderThread::RenderThread(QObject* parent) :QThread(parent)
 {
@@ -12,44 +16,95 @@ RenderThread::RenderThread(QObject* parent) :QThread(parent)
     camera->AddComponent(new Camera());
     camera->transform.SetTranslation(glm::vec3(0, 0, 5));
 
+    GameObject* lightRoot = new GameObject("LightRoot");
+    configuration.sceneObject.AddChild(lightRoot);
+
+    GameObject* directionalLight1 = new GameObject("DirectionalLight1");
+    lightRoot->AddChild(directionalLight1);
+    directionalLight1->AddComponent(new DirectionalLight());
+    //directionalLight->transform.SetRotation(glm::qua(glm::vec3(0, 0, 0)));
+
+    //GameObject* directionalLight2 = new GameObject("DirectionalLight2");
+    //lightRoot->AddChild(directionalLight2);
+    //directionalLight2->AddComponent(new DirectionalLight());
+    //directionalLight2->FindComponent<Light>("Light")->baseColor = Color(0, 0.7, 0.2, 1);
+    ////directionalLight->transform.SetRotation(glm::qua(glm::vec3(0, 0, 0)));
+    //directionalLight2->transform.SetRotation(glm::qua(glm::vec3(1.0707963267948966, 0, 0)));
+
+    GameObject* pointLight1 = new GameObject("PointLight1");
+    lightRoot->AddChild(pointLight1);
+    pointLight1->AddComponent(new PointLight());
+    pointLight1->FindComponent< Light>("Light")->baseColor = Color(1, 0, 0, 1);
+    pointLight1->transform.SetTranslationRotationScale(glm::vec3(4, -3, 3), glm::quat(glm::vec3(0, 0, 0)), glm::vec3(1, 1, 1));
+
+    GameObject* pointLight2 = new GameObject("PointLight2");
+    lightRoot->AddChild(pointLight2);
+    pointLight2->AddComponent(new PointLight());
+    pointLight2->FindComponent< Light>("Light")->baseColor = Color(0, 0, 1, 1);
+    pointLight2->transform.SetTranslationRotationScale(glm::vec3(-4, -3, 3), glm::quat(glm::vec3(0, 0, 0)), glm::vec3(1, 1, 1));
+
+    GameObject* pointLight3 = new GameObject("PointLight3");
+    lightRoot->AddChild(pointLight3);
+    pointLight3->AddComponent(new PointLight());
+    pointLight3->FindComponent< Light>("Light")->baseColor = Color(0, 1, 0, 1);
+    pointLight3->transform.SetTranslationRotationScale(glm::vec3(0, 5, 3), glm::quat(glm::vec3(0, 0, 0)), glm::vec3(1, 1, 1));
+
+    GameObject* pointLight4 = new GameObject("PointLight4");
+    lightRoot->AddChild(pointLight4);
+    pointLight4->AddComponent(new PointLight());
+    pointLight4->FindComponent< Light>("Light")->baseColor = Color(1, 1, 1, 1);
+    pointLight4->transform.SetTranslationRotationScale(glm::vec3(0, 0, 8), glm::quat(glm::vec3(0, 0, 0)), glm::vec3(1, 1, 1));
+
+
+    //GameObject* go0 = new GameObject("go0");
+    //configuration.sceneObject.AddChild(go0);
+    //go0->transform.SetScale(glm::vec3(2, 2, 1));
+    //go0->AddComponent(new MeshRenderer("../../Model/Flat_Wall_Normal.ply"));
+
     GameObject* go0 = new GameObject("go0");
     configuration.sceneObject.AddChild(go0);
-    go0->transform.SetTranslationRotationScale(glm::vec3(-5, 0, 0), glm::quat(glm::vec3(0, 0, 0)), glm::vec3(5, 5, 5));
+    go0->transform.SetTranslationRotationScale(glm::vec3(0, 0, 0), glm::quat(glm::vec3(1.5707963267948966, 0, 0)), glm::vec3(5, 5, 5));
     go0->AddComponent(new MeshRenderer("../../Model/Sphere_Wall_Normal.ply"));
     
     GameObject* go1 = new GameObject("go1");
     configuration.sceneObject.AddChild(go1);
     go1->transform.SetTranslation(glm::vec3(5, 0, 0));
 
-    GameObject* go11 = new GameObject("go11");
-    go1->AddChild(go11);
-    go11->transform.SetTranslation(glm::vec3(0, 5, -1));
-    go11->AddComponent(new MeshRenderer());
+    //GameObject* go11 = new GameObject("go11");
+    //go1->AddChild(go11);
+    //go11->transform.SetTranslation(glm::vec3(0, 5, -1));
+    //go11->AddComponent(new MeshRenderer());
 
-    GameObject* go12 = new GameObject("go12");
-    go1->AddChild(go12);
-    go12->transform.SetTranslation(glm::vec3(0, -5, -1));
-    go12->AddComponent(new MeshRenderer());
+    //GameObject* go12 = new GameObject("go12");
+    //go1->AddChild(go12);
+    //go12->transform.SetTranslation(glm::vec3(0, -5, -1));
+    //go12->AddComponent(new MeshRenderer());
 
     GameObject* go13 = new GameObject("go13");
     go1->AddChild(go13);
     go13->transform.SetTranslation(glm::vec3(-5, 0, 0));
 
-    GameObject* go131 = new GameObject("go131");
-    go13->AddChild(go131);
-    go131->transform.SetTranslation(glm::vec3(0, 0, -1));
-    go131->AddComponent(new MeshRenderer());
+    //GameObject* go131 = new GameObject("go131");
+    //go13->AddChild(go131);
+    //go131->transform.SetTranslation(glm::vec3(0, 0, -1));
+    //go131->AddComponent(new MeshRenderer());
 
-    GameObject* go132 = new GameObject("go132");
-    go13->AddChild(go132);
-    go132->transform.SetTranslation(glm::vec3(0.45, 0, -2));
-    go132->AddComponent(new MeshRenderer());
+    //GameObject* go132 = new GameObject("go132");
+    //go13->AddChild(go132);
+    //go132->transform.SetTranslation(glm::vec3(0.45, 0, -2));
+    //go132->AddComponent(new MeshRenderer());
 
     GameObject* go133 = new GameObject("go133");
     go13->AddChild(go133);
     go133->transform.SetTranslation(glm::vec3(0.9, 0, -3));
     go133->transform.SetScale(glm::vec3(15, 15, 1));
     go133->AddComponent(new MeshRenderer());
+
+    //GameObject* go134 = new GameObject("go134");
+    //go13->AddChild(go133);
+    //go134->transform.SetTranslation(glm::vec3(0, 0, 0));
+    //go134->transform.SetScale(glm::vec3(2, 2, 1));
+    //go134->AddComponent(new MeshRenderer());
 }
 
 void RenderThread::Run()
@@ -111,6 +166,27 @@ void RenderThread::GetMeshRenderersDFS(std::vector<RenderItem<GameObject>>& vect
         //Utils::LogMatrix("MeshRenderer World", meshRenderer->gameObject->transform.worldMatrix);
     }
 }
+void RenderThread::GetLights(std::vector<RenderItem<GameObject>>& vector)
+{
+    vector.clear();
+    for (GameObject::ChildIterator i = configuration.sceneObject.GetStartChildIterator(), end = configuration.sceneObject.GetEndChildIterator(); i != end; i++)
+    {
+        GetLightsDFS(vector, *i, glm::mat4(1));
+    }
+
+}
+void RenderThread::GetLightsDFS(std::vector<RenderItem<GameObject>>& vector, GameObject* gameObject, glm::mat4 parentMatrix)
+{
+    for (GameObject::ChildIterator i = gameObject->GetStartChildIterator(), end = gameObject->GetEndChildIterator(); i != end; i++)
+    {    
+        GetLightsDFS(vector, *i, parentMatrix);
+    }
+    Light* light = gameObject->FindComponent<Light>("Light");
+    if (light)
+    {
+        vector.push_back(RenderItem<GameObject>(gameObject, parentMatrix));
+    }
+}
 
 void RenderThread::Render()
 {
@@ -118,6 +194,16 @@ void RenderThread::Render()
     GetCameras(cameraItems);
     std::vector<RenderItem<GameObject>> meshRendererItems = std::vector<RenderItem<GameObject>>();
     GetMeshRenderers(meshRendererItems);
+    std::vector<RenderItem<GameObject>> lightItems = std::vector<RenderItem<GameObject>>();
+    GetLights(lightItems);
+
+    LightContext lightContext = LightContext();
+    lightContext.lights = std::vector<Light*>();
+    for (RenderItem<GameObject> lightItem : lightItems)
+    {
+        lightContext.lights.push_back(lightItem.item->FindComponent<Light>("Light"));
+    }
+
     for (RenderItem<GameObject> cameraItem : cameraItems)
     {
         MatrixContext matrixContext = MatrixContext();
@@ -133,7 +219,7 @@ void RenderThread::Render()
             matrixContext.wv_tiMatrix = glm::inverse(glm::transpose(matrixContext.wvMatrix));
             matrixContext.wvpMatrix = matrixContext.vpMatrix * matrixContext.worldMatrix;
 
-            meshRendererItem.item->FindComponent<MeshRenderer>("MeshRenderer")->Render(&matrixContext);
+            meshRendererItem.item->FindComponent<MeshRenderer>("MeshRenderer")->Render(&matrixContext, &lightContext);
         }
     }
     Display();
