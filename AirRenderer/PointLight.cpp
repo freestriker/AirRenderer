@@ -7,6 +7,12 @@ glm::vec3 PointLight::IncidentLight(glm::vec3& position, glm::mat4& viewMatrix)
     return position - glm::vec3(lp);
 }
 
+glm::vec3 PointLight::IncidentLight(glm::vec3& position)
+{
+    glm::vec4 lp = gameObject->transform.worldMatrix * glm::vec4(0, 0, 0, 1);
+    return position - glm::vec3(lp);
+}
+
 Color PointLight::ColorIntensity(glm::vec3& incidentLight)
 {
     float dis = glm::distance(incidentLight, glm::vec3(0, 0, 0));

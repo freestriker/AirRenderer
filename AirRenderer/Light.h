@@ -9,6 +9,7 @@ public:
 	Color baseColor;
 	float intensity;
 	virtual glm::vec3 IncidentLight(glm::vec3& position, glm::mat4& viewMatrix) = 0;
+	virtual glm::vec3 IncidentLight(glm::vec3& position) = 0;
 	virtual Color ColorIntensity(glm::vec3& incidentLight) = 0;
 	virtual Color AmbintColorIntensity();
 	Light(std::string lightTypeName);
