@@ -35,19 +35,62 @@ MeshRenderer::MeshRenderer(std::string filePath):Component("MeshRenderer")
 
 void MeshRenderer::Render(MatrixContext* matrixContext, LightContext* lightContext)
 {
+    FaceContext faceContext = FaceContext();
     for (Mesh::FaceIter f_it = mesh.faces_begin(); f_it != mesh.faces_end(); ++f_it)
     {
-        FaceContext faceContext = FaceContext();
         VertexOutContext vertexOutContext[3] = {VertexOutContext(), VertexOutContext(), VertexOutContext()};
+        VertexInContext vertexInContext = VertexInContext();
+
+        //ÇÐÏß
+        int ii = 0;
+        glm::vec3 pos[3] = { glm::vec3(0) };
+        glm::vec2 uv[3] = { glm::vec2(0) };
+        for (Mesh::FaceVertexIter fv_it = mesh.fv_iter(*f_it); fv_it.is_valid(); ++fv_it)
+        {
+            Mesh::Point p = mesh.point(fv_it);
+            Mesh::TexCoord2D tex = mesh.texcoord2D(fv_it);
+            pos[ii] = glm::vec3(p[0], p[1], p[2]);
+            uv[ii] = glm::vec2(tex[0], tex[1]);
+            ii++;
+        }
+        float s1 = uv[1].x - uv[0].x;
+        float t1 = uv[1].y - uv[0].y;
+        float s2 = uv[2].x - uv[0].x;
+        float t2 = uv[2].y - uv[0].y;
+        float r = 1.0 / (s1 * t2 - s2 * t1);
+        glm::vec3 tangent = t2 * (pos[1] - pos[0]) - t1 * (pos[2] - pos[0]);
+        tangent = tangent * r;
+        tangent = glm::normalize(tangent);
+
+        ////ÇÐÏß
+        //int ii = 0;
+        //glm::vec3 pos[3] = { glm::vec3(0) };
+        //glm::vec2 uv[3] = { glm::vec2(0) };
+        //for (Mesh::FaceVertexIter fv_it = ++mesh.fv_iter(*f_it); fv_it.is_valid(); ++fv_it)
+        //{
+        //    Mesh::Point p = mesh.point(fv_it);
+        //    Mesh::TexCoord2D tex = mesh.texcoord2D(fv_it);
+        //    pos[ii] = glm::vec3(p[0], p[1], p[2]);
+        //    uv[ii] = glm::vec2(tex[0], tex[1]);
+        //    ii++;
+        //}
+        //glm::mat2 m = glm::mat2(
+        //    uv[1].x - uv[0].x, uv[2].x - uv[0].x, 
+        //    uv[1].y - uv[0].y, uv[2].y - uv[0].y
+        //    );
+        //m = glm::inverse(m);
+        //glm::vec3 tangent = m[0][0] * (pos[1] - pos[0]) + m[1][0] * (pos[2] - pos[0]);
+        //tangent = glm::normalize(tangent);
+
         int index = 0, inBoundryCount = 0;
         for (Mesh::FaceVertexIter fv_it = mesh.fv_iter(*f_it); fv_it.is_valid(); ++fv_it)
         {
             Mesh::Point p = mesh.point(fv_it);
             Mesh::Point vn = mesh.normal(fv_it);
             Mesh::TexCoord2D uv = mesh.texcoord2D(fv_it);
-            VertexInContext vertexInContext = VertexInContext();
-            vertexInContext.position = glm::vec4(p[0], p[1], p[2], 1);
-            vertexInContext.normal = glm::normalize(glm::vec3(vn[0], vn[1], vn[2]));
+            vertexInContext.mPosition = glm::vec4(p[0], p[1], p[2], 1);
+            vertexInContext.mNormal = glm::normalize(glm::vec3(vn[0], vn[1], vn[2]));
+            vertexInContext.mTangent = tangent;
             vertexInContext.texcoord1 = glm::vec2(uv[0], uv[1]);
             vertexInContext.color = Color::white;
             vertexInContext.vertexIndex = index;
@@ -55,7 +98,7 @@ void MeshRenderer::Render(MatrixContext* matrixContext, LightContext* lightConte
             //¶¥µã×ÅÉ«Æ÷
             shader.VertexShading(vertexInContext, vertexOutContext[index], material, matrixContext, lightContext);
 
-            glm::vec4 pos = vertexOutContext[index].position;
+            glm::vec4 pos = vertexOutContext[index].pPosition;
 
             //²âÊÔÌÞ³ý
             if (-pos.w < pos.x && pos.x < pos.w
@@ -93,9 +136,13 @@ void MeshRenderer::Render(MatrixContext* matrixContext, LightContext* lightConte
                     PixelOutContext pixelOutContext = PixelOutContext();
                     pixelInContext.screenPosition = screenPosition;
                     
-                    pixelInContext.position = vertexOutContext[faceContext.vertexIndex[0]].position * float(barycentricPosition.x) + vertexOutContext[faceContext.vertexIndex[1]].position * float(barycentricPosition.y) + vertexOutContext[faceContext.vertexIndex[2]].position * float(barycentricPosition.z);
-                    pixelInContext.worldPosition = vertexOutContext[faceContext.vertexIndex[0]].worldPosition * float(barycentricPosition.x) + vertexOutContext[faceContext.vertexIndex[1]].worldPosition * float(barycentricPosition.y) + vertexOutContext[faceContext.vertexIndex[2]].worldPosition * float(barycentricPosition.z);
-                    pixelInContext.normal = glm::normalize(vertexOutContext[faceContext.vertexIndex[0]].normal * float(barycentricPosition.x) + vertexOutContext[faceContext.vertexIndex[1]].normal * float(barycentricPosition.y) + vertexOutContext[faceContext.vertexIndex[2]].normal * float(barycentricPosition.z));
+                    pixelInContext.pPosition = vertexOutContext[faceContext.vertexIndex[0]].pPosition * float(barycentricPosition.x) + vertexOutContext[faceContext.vertexIndex[1]].pPosition * float(barycentricPosition.y) + vertexOutContext[faceContext.vertexIndex[2]].pPosition * float(barycentricPosition.z);
+                    pixelInContext.vPosition = vertexOutContext[faceContext.vertexIndex[0]].vPosition * float(barycentricPosition.x) + vertexOutContext[faceContext.vertexIndex[1]].vPosition * float(barycentricPosition.y) + vertexOutContext[faceContext.vertexIndex[2]].vPosition * float(barycentricPosition.z);
+                    pixelInContext.wPosition = vertexOutContext[faceContext.vertexIndex[0]].wPosition * float(barycentricPosition.x) + vertexOutContext[faceContext.vertexIndex[1]].wPosition * float(barycentricPosition.y) + vertexOutContext[faceContext.vertexIndex[2]].wPosition * float(barycentricPosition.z);
+                    pixelInContext.vNormal = glm::normalize(vertexOutContext[faceContext.vertexIndex[0]].vNormal * float(barycentricPosition.x) + vertexOutContext[faceContext.vertexIndex[1]].vNormal * float(barycentricPosition.y) + vertexOutContext[faceContext.vertexIndex[2]].vNormal * float(barycentricPosition.z));
+                    pixelInContext.wNormal = glm::normalize(vertexOutContext[faceContext.vertexIndex[0]].wNormal * float(barycentricPosition.x) + vertexOutContext[faceContext.vertexIndex[1]].wNormal * float(barycentricPosition.y) + vertexOutContext[faceContext.vertexIndex[2]].wNormal * float(barycentricPosition.z));
+                    pixelInContext.vTangent = vertexOutContext[0].vTangent;
+                    pixelInContext.wTangent = vertexOutContext[0].wTangent;
                     pixelInContext.color = vertexOutContext[faceContext.vertexIndex[0]].color * barycentricPosition.x + vertexOutContext[faceContext.vertexIndex[1]].color * barycentricPosition.y + vertexOutContext[faceContext.vertexIndex[2]].color * barycentricPosition.z;
                     pixelInContext.texcoord1 = vertexOutContext[faceContext.vertexIndex[0]].texcoord1 * float(barycentricPosition.x) + vertexOutContext[faceContext.vertexIndex[1]].texcoord1 * float(barycentricPosition.y) + vertexOutContext[faceContext.vertexIndex[2]].texcoord1 * float(barycentricPosition.z);
                     pixelInContext.w = faceContext.w[0] * barycentricPosition.x + faceContext.w[1] * barycentricPosition.y + faceContext.w[2] * barycentricPosition.z;

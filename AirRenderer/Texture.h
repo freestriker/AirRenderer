@@ -39,6 +39,7 @@ public:
 	void LoadTexture();
 	Texture();
 	Color Sample(glm::fvec2& uv);
+	glm::vec3 SampleNormal(glm::fvec2& uv);
 	Texture(std::string filaPath, InterpolationOption interpolationOption, WrapOption wrapOption, MipMapOption mipMapOption);
 };
 

@@ -56,6 +56,13 @@ Color Texture::Sample(glm::fvec2& uv)
     Color c = Interpolate(uv);
     return c;
 }
+glm::vec3 Texture::SampleNormal(glm::fvec2& uv)
+{
+    glm::fvec2 pos = Wrap(uv);
+    Color c = Interpolate(uv);
+    glm::vec3 normal = (glm::vec3(c.r, c.g, c.b) - glm::vec3(0.5, 0.5, 0.5)) * float(2);
+    return normal;
+}
 
 glm::fvec2 Texture::Wrap(glm::fvec2 uv)
 {

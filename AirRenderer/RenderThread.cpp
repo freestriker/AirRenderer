@@ -15,6 +15,7 @@ RenderThread::RenderThread(QObject* parent) :QThread(parent)
     configuration.sceneObject.AddChild(camera);
     camera->AddComponent(new Camera());
     camera->transform.SetTranslation(glm::vec3(0, 0, 5));
+    camera->transform.SetTranslationRotationScale(glm::vec3(0, 0, 5), glm::quat(glm::vec3(0, 0, 0)), glm::vec3(1, 1, 1));
 
     GameObject* lightRoot = new GameObject("LightRoot");
     configuration.sceneObject.AddChild(lightRoot);
@@ -58,8 +59,8 @@ RenderThread::RenderThread(QObject* parent) :QThread(parent)
 
     //GameObject* go0 = new GameObject("go0");
     //configuration.sceneObject.AddChild(go0);
-    //go0->transform.SetScale(glm::vec3(2, 2, 1));
-    //go0->AddComponent(new MeshRenderer("../../Model/Flat_Wall_Normal.ply"));
+    //go0->transform.SetTranslationRotationScale(glm::vec3(0, 0, 0), glm::quat(glm::vec3(0.7853981633974483, 0.7853981633974483, 0.7853981633974483)), glm::vec3(2, 2, 2));
+    //go0->AddComponent(new MeshRenderer("../../Model/Cube_Wall_Normal.ply"));
 
     GameObject* go0 = new GameObject("go0");
     configuration.sceneObject.AddChild(go0);
@@ -96,9 +97,9 @@ RenderThread::RenderThread(QObject* parent) :QThread(parent)
 
     GameObject* go133 = new GameObject("go133");
     go13->AddChild(go133);
-    go133->transform.SetTranslation(glm::vec3(0.9, 0, -3));
-    go133->transform.SetScale(glm::vec3(15, 15, 1));
-    go133->AddComponent(new MeshRenderer());
+    go133->transform.SetTranslation(glm::vec3(0, 0, -3));
+    go133->transform.SetScale(glm::vec3(18, 18, 1));
+    go133->AddComponent(new MeshRenderer("../../Model/Flat_Wall_Normal.ply"));
 
     //GameObject* go134 = new GameObject("go134");
     //go13->AddChild(go133);
@@ -217,6 +218,7 @@ void RenderThread::Render()
             matrixContext.worldMatrix = meshRendererItem.transformationMatrix;
             matrixContext.wvMatrix = matrixContext.viewMatrix * matrixContext.worldMatrix;
             matrixContext.wv_tiMatrix = glm::inverse(glm::transpose(matrixContext.wvMatrix));
+            matrixContext.w_tiMatrix = glm::inverse(glm::transpose(matrixContext.worldMatrix));
             matrixContext.wvpMatrix = matrixContext.vpMatrix * matrixContext.worldMatrix;
 
             meshRendererItem.item->FindComponent<MeshRenderer>("MeshRenderer")->Render(&matrixContext, &lightContext);

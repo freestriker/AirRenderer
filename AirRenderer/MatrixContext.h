@@ -10,6 +10,7 @@ public:
 	glm::mat4 wvpMatrix;
 	glm::mat4 wvMatrix;
 	glm::mat4 wv_tiMatrix;
+	glm::mat4 w_tiMatrix;
 	glm::mat4 vpMatrix;
 };
 
