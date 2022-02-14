@@ -16,7 +16,7 @@ public:
 	void UpdateSelf(void* data);
 	void UpdateSelfWithoutTransform(void* data);
 	void CascadeUpdate(void* data);
-
+	void OnAddedAsChild(void* data);
 	void AddComponent(Component* component);
 	template<typename T>
 	T* FindComponent(std::string typeName);

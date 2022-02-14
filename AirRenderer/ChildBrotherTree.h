@@ -84,6 +84,8 @@ public:
 	T* brother;
     int childCount;
 
+    virtual void OnAddedAsChild(void* data);
+
 	ChildBrotherTree(T* parent, T* child, T* brother);
 
 	ChildBrotherTree(T* parent);
@@ -113,6 +115,11 @@ public:
 };
 template<class T>
 ChildBrotherTree<T>::ChildBrotherTree() :ChildBrotherTree(nullptr, nullptr, nullptr)
+{
+
+}
+template<class T>
+void ChildBrotherTree<T>::OnAddedAsChild(void* data)
 {
 
 }
@@ -147,6 +154,7 @@ void ChildBrotherTree<T>::AddChild(T* child)
     else
     {
         this->child = child;
+        static_cast<ChildBrotherTree<T>*>(child)->OnAddedAsChild(this);
     }
 }
 
@@ -174,5 +182,6 @@ void ChildBrotherTree<T>::AddBrother(T* brother)
     {
         this->brother = brother;
     }
+    static_cast<ChildBrotherTree<T>*>(brother)->OnAddedAsChild(this->parent);
 }
 

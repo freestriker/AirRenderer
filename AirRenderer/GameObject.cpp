@@ -27,6 +27,11 @@ void GameObject::CascadeUpdate(void* data)
 		(*startIterator)->UpdateSelf(this);
 	}
 }
+void GameObject::OnAddedAsChild(void* data)
+{
+	UpdateSelf(data);
+	CascadeUpdate(data);
+}
 void GameObject::UpdateSelfWithoutTransform(void* data)
 {
 	for each (Component * component in *components)
