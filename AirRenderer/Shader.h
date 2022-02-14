@@ -11,5 +11,6 @@ class Shader
 public:
 	void VertexShading(VertexInContext& vertexInContext, VertexOutContext& vertexOutContext, Material& material, MatrixContext* matrixContext, LightContext* lightContext);
 	void PixelShading(PixelInContext& vertexInContext, PixelOutContext& vertexOutContext, Material& material, MatrixContext* matrixContext, LightContext* lightContext);
+	glm::vec3 SchmidtOrthogonalization(glm::vec3& v1, glm::vec3& v2);
 };
 
