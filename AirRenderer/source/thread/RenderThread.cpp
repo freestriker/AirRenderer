@@ -64,7 +64,7 @@ RenderThread::RenderThread(QObject* parent) :QThread(parent)
     GameObject* go0 = new GameObject("go0");
     configuration.sceneObject.AddChild(go0);
     go0->transform.SetTranslationRotationScale(glm::vec3(0, 0, 0), glm::quat(glm::vec3(1.5707963267948966, 0, 0)), glm::vec3(5, 5, 5));
-    go0->AddComponent(new MeshRenderer("../../Model/Sphere_Wall_Normal.ply"));
+    go0->AddComponent(new MeshRenderer("../../Resources/Model/Sphere_Wall_Normal.ply"));
     
     GameObject* go1 = new GameObject("go1");
     configuration.sceneObject.AddChild(go1);
@@ -98,7 +98,7 @@ RenderThread::RenderThread(QObject* parent) :QThread(parent)
     go13->AddChild(go133);
     go133->transform.SetTranslation(glm::vec3(0, 0, -3));
     go133->transform.SetScale(glm::vec3(18, 18, 1));
-    go133->AddComponent(new MeshRenderer("../../Model/Flat_Wall_Normal.ply"));
+    go133->AddComponent(new MeshRenderer("../../Resources/Model/Flat_Wall_Normal.ply"));
 
     //GameObject* go134 = new GameObject("go134");
     //go13->AddChild(go133);

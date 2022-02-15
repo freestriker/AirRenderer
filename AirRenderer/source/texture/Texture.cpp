@@ -8,7 +8,7 @@ const glm::fvec2 Texture::fone = glm::fvec2(1, 1);
 const glm::ivec2 Texture::izero = glm::ivec2(0, 0);
 const glm::ivec2 Texture::ione = glm::ivec2(1, 1);
 
-Texture::Texture() :Texture("..\\Texture\\DefaultTexture.png", InterpolationOption::NEAREST, WrapOption::CLAMP, MipMapOption::NONE)
+Texture::Texture() :Texture("..\\Resources\\Texture\\DefaultTexture.png", InterpolationOption::NEAREST, WrapOption::CLAMP, MipMapOption::NONE)
 {
 }
 

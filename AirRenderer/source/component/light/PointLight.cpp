@@ -1,5 +1,5 @@
 #include "include/component/light/PointLight.h"
-#include "include/GameObject.h"
+#include "include/core_object/GameObject.h"
 
 glm::vec3 PointLight::IncidentLight(glm::vec3& position, glm::mat4& viewMatrix)
 {

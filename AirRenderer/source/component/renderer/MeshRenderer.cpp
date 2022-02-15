@@ -13,7 +13,7 @@
 #include "include/context/FaceContext.h"
 
 
-MeshRenderer::MeshRenderer():MeshRenderer("../../Model/Flat_Wall_Normal.ply")
+MeshRenderer::MeshRenderer():MeshRenderer("../../Resources/Model/Flat_Wall_Normal.ply")
 {
 
 }
