@@ -62,7 +62,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories);..\glm</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories);..\glm;..\AirRenderer</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PreprocessorDefinitions>_USE_MATH_DEFINES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
@@ -71,6 +71,11 @@
       </AdditionalLibraryDirectories>
       <AdditionalDependencies>OpenMeshCored.lib;OpenMeshToolsd.lib;OpenMeshCore.lib;OpenMeshTools.lib;FreeImage.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(Qt_INCLUDEPATH_);..\AirRenderer</AdditionalIncludeDirectories>
+    </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
     <ClCompile>
@@ -109,70 +114,68 @@
     </QtMoc>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="ChildBrotherTree.cpp" />
-    <ClCompile Include="Component.cpp" />
-    <ClCompile Include="DirectionalLight.cpp" />
-    <ClCompile Include="FaceContext.cpp" />
-    <ClCompile Include="GameObject.cpp" />
-    <ClCompile Include="Light.cpp" />
-    <ClCompile Include="LightContext.cpp" />
-    <ClCompile Include="Material.cpp" />
-    <ClCompile Include="MatrixContext.cpp" />
-    <ClCompile Include="MeshRenderer.cpp" />
-    <ClCompile Include="Object.cpp" />
-    <ClCompile Include="PixelInContext.cpp" />
-    <ClCompile Include="PixelIterator.cpp" />
-    <ClCompile Include="PixelOutContext.cpp" />
-    <ClCompile Include="PointLight.cpp" />
-    <ClCompile Include="RenderItem.cpp" />
-    <ClCompile Include="Shader.cpp" />
-    <ClCompile Include="Texture.cpp" />
-    <ClCompile Include="Transform.cpp" />
-    <ClCompile Include="Utils.cpp" />
-    <ClCompile Include="VertexOutContext.cpp" />
-    <ClCompile Include="VertexInContext.cpp" />
-    <ClInclude Include="Camera.h" />
-    <ClInclude Include="ChildBrotherTree.h" />
-    <ClInclude Include="Component.h" />
-    <ClInclude Include="DirectionalLight.h" />
-    <ClInclude Include="FaceContext.h" />
-    <ClInclude Include="GameObject.h" />
-    <ClInclude Include="Light.h" />
-    <ClInclude Include="LightContext.h" />
-    <ClInclude Include="Material.h" />
-    <ClInclude Include="MatrixContext.h" />
-    <ClInclude Include="MeshRenderer.h" />
-    <ClInclude Include="Object.h" />
-    <ClInclude Include="PixelInContext.h" />
-    <ClInclude Include="PixelIterator.h" />
-    <ClInclude Include="PixelOutContext.h" />
-    <ClInclude Include="PointLight.h" />
-    <ClInclude Include="RenderItem.h" />
-    <ClInclude Include="Shader.h" />
-    <ClInclude Include="Texture.h" />
-    <ClInclude Include="Transform.h" />
-    <ClInclude Include="Utils.h" />
-    <ClInclude Include="VertexOutContext.h" />
-    <ClInclude Include="VertexInContext.h" />
+    <ClCompile Include="source\component\camera\Camera.cpp" />
+    <ClCompile Include="source\utils\ChildBrotherTree.cpp" />
+    <ClCompile Include="source\component\Component.cpp" />
+    <ClCompile Include="source\component\light\DirectionalLight.cpp" />
+    <ClCompile Include="source\context\FaceContext.cpp" />
+    <ClCompile Include="source\core_object\GameObject.cpp" />
+    <ClCompile Include="source\component\light\Light.cpp" />
+    <ClCompile Include="source\context\LightContext.cpp" />
+    <ClCompile Include="source\material\Material.cpp" />
+    <ClCompile Include="source\context\MatrixContext.cpp" />
+    <ClCompile Include="source\component\renderer\MeshRenderer.cpp" />
+    <ClCompile Include="source\utils\Object.cpp" />
+    <ClCompile Include="source\context\PixelInContext.cpp" />
+    <ClCompile Include="source\context\PixelIterator.cpp" />
+    <ClCompile Include="source\context\PixelOutContext.cpp" />
+    <ClCompile Include="source\component\light\PointLight.cpp" />
+    <ClCompile Include="source\thread\RenderItem.cpp" />
+    <ClCompile Include="source\shader\Shader.cpp" />
+    <ClCompile Include="source\texture\Texture.cpp" />
+    <ClCompile Include="source\component\transform\Transform.cpp" />
+    <ClCompile Include="source\utils\Log.cpp" />
+    <ClCompile Include="source\context\VertexOutContext.cpp" />
+    <ClCompile Include="source\context\VertexInContext.cpp" />
+    <ClInclude Include="include\component\camera\Camera.h" />
+    <ClInclude Include="include\utils\ChildBrotherTree.h" />
+    <ClInclude Include="include\component\Component.h" />
+    <ClInclude Include="include\component\light\DirectionalLight.h" />
+    <ClInclude Include="include\context\FaceContext.h" />
+    <ClInclude Include="include\core_object\GameObject.h" />
+    <ClInclude Include="include\component\light\Light.h" />
+    <ClInclude Include="include\context\LightContext.h" />
+    <ClInclude Include="include\material\Material.h" />
+    <ClInclude Include="include\context\MatrixContext.h" />
+    <ClInclude Include="include\component\renderer\MeshRenderer.h" />
+    <ClInclude Include="include\utils\Object.h" />
+    <ClInclude Include="include\context\PixelInContext.h" />
+    <ClInclude Include="include\context\PixelIterator.h" />
+    <ClInclude Include="include\context\PixelOutContext.h" />
+    <ClInclude Include="include\component\light\PointLight.h" />
+    <ClInclude Include="include\thread\RenderItem.h" />
+    <ClInclude Include="include\shader\Shader.h" />
+    <ClInclude Include="include\texture\Texture.h" />
+    <ClInclude Include="include\component\transform\Transform.h" />
+    <ClInclude Include="include\utils\Log.h" />
+    <ClInclude Include="include\context\VertexOutContext.h" />
+    <ClInclude Include="include\context\VertexInContext.h" />
     <QtRcc Include="AirRenderer.qrc" />
     <QtUic Include="AirRenderer.ui" />
-    <QtMoc Include="AirRenderer.h" />
-    <ClCompile Include="AirRenderer.cpp" />
-    <ClCompile Include="Buffer.cpp" />
-    <ClCompile Include="Color.cpp" />
-    <ClCompile Include="Configuration.cpp" />
-    <ClCompile Include="Drawer.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClInclude Include="Buffer.h" />
-    <ClInclude Include="Color.h" />
-    <ClInclude Include="Configuration.h" />
-    <ClInclude Include="Drawer.h" />
-    <ClInclude Include="Renderer.h" />
-    <QtMoc Include="RenderThread.h" />
+    <QtMoc Include="include\thread\AirRenderer.h" />
+    <ClCompile Include="source\thread\AirRenderer.cpp" />
+    <ClCompile Include="source\utils\Buffer.cpp" />
+    <ClCompile Include="source\utils\Color.cpp" />
+    <ClCompile Include="source\core_object\Configuration.cpp" />
+    <ClCompile Include="source\utils\Drawer.cpp" />
+    <ClCompile Include="source\main.cpp" />
+    <ClInclude Include="include\utils\Buffer.h" />
+    <ClInclude Include="include\utils\Color.h" />
+    <ClInclude Include="include\core_object\Configuration.h" />
+    <ClInclude Include="include\utils\Drawer.h" />
+    <QtMoc Include="include\thread\RenderThread.h" />
     <ClInclude Include="stdafx.h" />
-    <ClCompile Include="Renderer.cpp" />
-    <ClCompile Include="RenderThread.cpp" />
+    <ClCompile Include="source\thread\RenderThread.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">Create</PrecompiledHeader>

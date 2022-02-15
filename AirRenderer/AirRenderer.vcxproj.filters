@@ -29,10 +29,10 @@
     <QtUic Include="AirRenderer.ui">
       <Filter>Form Files</Filter>
     </QtUic>
-    <QtMoc Include="AirRenderer.h">
+    <QtMoc Include="include\thread\AirRenderer.h">
       <Filter>Header Files</Filter>
     </QtMoc>
-    <ClCompile Include="AirRenderer.cpp">
+    <ClCompile Include="source\thread\AirRenderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClInclude Include="stdafx.h">
@@ -43,185 +43,179 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="source\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Configuration.cpp">
+    <ClCompile Include="source\core_object\Configuration.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Renderer.cpp">
+    <ClCompile Include="source\utils\Drawer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Drawer.cpp">
+    <ClCompile Include="source\utils\Color.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Color.cpp">
+    <ClCompile Include="source\utils\Buffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Buffer.cpp">
+    <ClCompile Include="source\thread\RenderThread.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RenderThread.cpp">
+    <ClCompile Include="source\component\transform\Transform.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Transform.cpp">
+    <ClCompile Include="source\utils\ChildBrotherTree.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ChildBrotherTree.cpp">
+    <ClCompile Include="source\core_object\GameObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GameObject.cpp">
+    <ClCompile Include="source\component\camera\Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Camera.cpp">
+    <ClCompile Include="source\component\renderer\MeshRenderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MeshRenderer.cpp">
+    <ClCompile Include="source\thread\RenderItem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RenderItem.cpp">
+    <ClCompile Include="source\context\VertexOutContext.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="VertexOutContext.cpp">
+    <ClCompile Include="source\context\FaceContext.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FaceContext.cpp">
+    <ClCompile Include="source\context\PixelInContext.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PixelInContext.cpp">
+    <ClCompile Include="source\context\PixelIterator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PixelIterator.cpp">
+    <ClCompile Include="source\context\VertexInContext.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="VertexInContext.cpp">
+    <ClCompile Include="source\shader\Shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Shader.cpp">
+    <ClCompile Include="source\context\PixelOutContext.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PixelOutContext.cpp">
+    <ClCompile Include="source\texture\Texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Texture.cpp">
+    <ClCompile Include="source\material\Material.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Material.cpp">
+    <ClCompile Include="source\utils\Object.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Object.cpp">
+    <ClCompile Include="source\component\Component.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Component.cpp">
+    <ClCompile Include="source\utils\Log.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Utils.cpp">
+    <ClCompile Include="source\context\MatrixContext.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MatrixContext.cpp">
+    <ClCompile Include="source\component\light\Light.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Light.cpp">
+    <ClCompile Include="source\component\light\DirectionalLight.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DirectionalLight.cpp">
+    <ClCompile Include="source\component\light\PointLight.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PointLight.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="LightContext.cpp">
+    <ClCompile Include="source\context\LightContext.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Configuration.h">
+    <ClInclude Include="include\core_object\Configuration.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Renderer.h">
+    <ClInclude Include="include\utils\Drawer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Drawer.h">
+    <ClInclude Include="include\utils\Color.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Color.h">
+    <ClInclude Include="include\utils\Buffer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Buffer.h">
+    <ClInclude Include="include\component\transform\Transform.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Transform.h">
+    <ClInclude Include="include\utils\ChildBrotherTree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ChildBrotherTree.h">
+    <ClInclude Include="include\core_object\GameObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GameObject.h">
+    <ClInclude Include="include\component\camera\Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Camera.h">
+    <ClInclude Include="include\component\renderer\MeshRenderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MeshRenderer.h">
+    <ClInclude Include="include\thread\RenderItem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RenderItem.h">
+    <ClInclude Include="include\context\VertexOutContext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VertexOutContext.h">
+    <ClInclude Include="include\context\FaceContext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FaceContext.h">
+    <ClInclude Include="include\context\PixelInContext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PixelInContext.h">
+    <ClInclude Include="include\context\PixelIterator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PixelIterator.h">
+    <ClInclude Include="include\context\VertexInContext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VertexInContext.h">
+    <ClInclude Include="include\shader\Shader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Shader.h">
+    <ClInclude Include="include\context\PixelOutContext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PixelOutContext.h">
+    <ClInclude Include="include\texture\Texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Texture.h">
+    <ClInclude Include="include\material\Material.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Material.h">
+    <ClInclude Include="include\utils\Object.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Object.h">
+    <ClInclude Include="include\component\Component.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Component.h">
+    <ClInclude Include="include\utils\Log.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Utils.h">
+    <ClInclude Include="include\context\MatrixContext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MatrixContext.h">
+    <ClInclude Include="include\component\light\Light.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Light.h">
+    <ClInclude Include="include\component\light\DirectionalLight.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DirectionalLight.h">
+    <ClInclude Include="include\component\light\PointLight.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PointLight.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="LightContext.h">
+    <ClInclude Include="include\context\LightContext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <QtMoc Include="RenderThread.h">
+    <QtMoc Include="include\thread\RenderThread.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>
