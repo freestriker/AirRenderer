@@ -130,6 +130,12 @@
     <ClCompile Include="source\context\LightContext.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\thread\LoadThread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\core_object\Mesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\core_object\Configuration.h">
@@ -213,9 +219,15 @@
     <ClInclude Include="include\context\LightContext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\core_object\Mesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\thread\RenderThread.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="include\thread\LoadThread.h">
       <Filter>Header Files</Filter>
     </QtMoc>
   </ItemGroup>

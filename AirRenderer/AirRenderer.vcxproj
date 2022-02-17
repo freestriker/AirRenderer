@@ -61,7 +61,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\ThirdParty\OpenMesh\include;..\ThirdParty\FreeImage\include;..\ThirdParty\Glm\include;..\AirRenderer;..\ThirdParty\NlohmannJson\include</IncludePath>
     <LibraryPath>..\ThirdParty\OpenMesh\lib;..\ThirdParty\FreeImage\lib;$(LibraryPath)</LibraryPath>
-</PropertyGroup>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -119,6 +119,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="source\component\camera\Camera.cpp" />
+    <ClCompile Include="source\core_object\Mesh.cpp" />
+    <ClCompile Include="source\thread\LoadThread.cpp" />
     <ClCompile Include="source\utils\ChildBrotherTree.cpp" />
     <ClCompile Include="source\component\Component.cpp" />
     <ClCompile Include="source\component\light\DirectionalLight.cpp" />
@@ -142,6 +144,8 @@
     <ClCompile Include="source\context\VertexOutContext.cpp" />
     <ClCompile Include="source\context\VertexInContext.cpp" />
     <ClInclude Include="include\component\camera\Camera.h" />
+    <QtMoc Include="include\thread\LoadThread.h" />
+    <ClInclude Include="include\core_object\Mesh.h" />
     <ClInclude Include="include\utils\ChildBrotherTree.h" />
     <ClInclude Include="include\component\Component.h" />
     <ClInclude Include="include\component\light\DirectionalLight.h" />
