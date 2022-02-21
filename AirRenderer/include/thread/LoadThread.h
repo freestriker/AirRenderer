@@ -33,17 +33,32 @@ public:
         void* resource;
         int referenceCount;
     };
+    LoadCommand Load(std::string path, ProcessOptions processOption);
+    LoadCommand Load(LoadCommand& resourceKey);
+    void Unload(LoadCommand& resourceKey);
+    template <typename T>
+    T* GetResource(LoadCommand& resourceKey);
+    LoadThread(QObject* parent);
+private:
+    std::vector<LoadCommand> command;
+    std::map<std::string, ResourceWrap*> resourecMap;
+
     ResourceWrap* LoadMesh(std::string path);
     ResourceWrap* LoadTexture(std::string path);
-    void AddCommand(LoadThread::LoadCommand loadCommand);
-    ResourceWrap* GetResourceWrap(std::string path);
-    std::queue<LoadCommand> commandQueue;
-    std::map<std::string, ResourceWrap*> resourecMap;
 
     QMutex commandQueueMutex;
     QWaitCondition commandAvailable; 
     QWaitCondition resourceAvailable; 
     QMutex resourecMapMutex;
-signals:
-    void resultReady(const QString&);
 };
+
+template <typename T>
+T* LoadThread::GetResource(LoadCommand& loadCommand)
+{
+    QMutexLocker lock(&resourecMapMutex);
+    while (!resourecMap.count(loadCommand.path))
+    {
+        resourceAvailable.wait(&resourecMapMutex);
+    }
+    return static_cast<T*>(resourecMap[loadCommand.path]->resource);
+}

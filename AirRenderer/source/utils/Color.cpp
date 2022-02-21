@@ -13,6 +13,11 @@ Color::Color(float r, float g, float b, float a)
 	this->a = std::clamp(a, float(0), float(1));
 }
 
+Color::Color(glm::vec4 color) :Color(color.x, color.y, color.z, color.w)
+{
+
+}
+
 const Color Color::red = Color(1, 0, 0, 1);
 const Color Color::green = Color(0, 1, 0, 1);
 const Color Color::blue = Color(0, 0, 1, 1);
@@ -54,4 +59,9 @@ float& Color::operator[] (const int& i)
 	default:
 		return r;
 	}
+}
+
+Color::operator glm::vec4()
+{
+	return glm::vec4(r, g, b, a);
 }

@@ -6,7 +6,8 @@
 #include "include/context/PixelIterator.h"
 #include "include/component/light/DirectionalLight.h"
 #include "include/component/light/PointLight.h"
-
+#include <include/thread/LoadThread.h>
+#include <include/core_object/Global.h>
 RenderThread::RenderThread(QObject* parent) :QThread(parent)
 {
     timer = new QTimer(this);
@@ -63,9 +64,34 @@ RenderThread::RenderThread(QObject* parent) :QThread(parent)
 
     GameObject* go0 = new GameObject("go0");
     configuration.sceneObject.AddChild(go0);
-    go0->transform.SetTranslationRotationScale(glm::vec3(0, 0, 0), glm::quat(glm::vec3(1.5707963267948966, 0, 0)), glm::vec3(5, 5, 5));
+    go0->transform.SetTranslationRotationScale(glm::vec3(0, 2, 0), glm::quat(glm::vec3(1.5707963267948966, 0, 0)), glm::vec3(5, 5, 5));
     go0->AddComponent(new MeshRenderer("../../Resources/Model/Sphere_Wall_Normal.ply"));
-    
+    //GameObject* go01 = new GameObject("go01");
+    //configuration.sceneObject.AddChild(go01);
+    //go01->transform.SetTranslationRotationScale(glm::vec3(5, 0, 0), glm::quat(glm::vec3(1.5707963267948966, 0, 0)), glm::vec3(5, 5, 5));
+    //go01->AddComponent(new MeshRenderer("../../Resources/Model/Sphere_Wall_Normal.ply"));
+    //GameObject* go02 = new GameObject("go02");
+    //configuration.sceneObject.AddChild(go02);
+    //go02->transform.SetTranslationRotationScale(glm::vec3(-5, 0, 0), glm::quat(glm::vec3(1.5707963267948966, 0, 0)), glm::vec3(5, 5, 5));
+    //go02->AddComponent(new MeshRenderer("../../Resources/Model/Sphere_Wall_Normal.ply"));
+
+    //LoadThread::LoadCommand lc = LoadThread::LoadCommand();
+    //lc.loadOption = LoadThread::LoadOption::LOAD;
+    //lc.path = "../../Resources/Model/Sphere_Wall_Normal.ply";
+    //lc.processOption = LoadThread::ProcessOptions::MESH;
+
+    //global.loadThread->AddCommand(lc);
+    //global.loadThread->AddCommand(lc);
+    //global.loadThread->AddCommand(lc);
+    //global.loadThread->AddCommand(lc);
+    //global.loadThread->AddCommand(lc);
+    //global.loadThread->AddCommand(lc);
+    //global.loadThread->AddCommand(lc);
+    //global.loadThread->AddCommand(lc);
+    //global.loadThread->AddCommand(lc);
+    //global.loadThread->AddCommand(lc);
+    //global.loadThread->AddCommand(lc);
+
     GameObject* go1 = new GameObject("go1");
     configuration.sceneObject.AddChild(go1);
     go1->transform.SetTranslation(glm::vec3(5, 0, 0));
@@ -94,6 +120,16 @@ RenderThread::RenderThread(QObject* parent) :QThread(parent)
     //go132->transform.SetTranslation(glm::vec3(0.45, 0, -2));
     //go132->AddComponent(new MeshRenderer());
 
+    //GameObject* go133 = new GameObject("go133");
+    //go13->AddChild(go133);
+    //go133->transform.SetTranslation(glm::vec3(6, 0, -3));
+    //go133->transform.SetScale(glm::vec3(5, 5, 1));
+    //go133->AddComponent(new MeshRenderer("../../Resources/Model/Flat_Wall_Normal.ply"));
+    //GameObject* go134 = new GameObject("go1334");
+    //go13->AddChild(go134);
+    //go134->transform.SetTranslation(glm::vec3(-6, 0, -3));
+    //go134->transform.SetScale(glm::vec3(5, 5, 1));
+    //go134->AddComponent(new MeshRenderer("../../Resources/Model/Flat_Wall_Normal.ply"));
     GameObject* go133 = new GameObject("go133");
     go13->AddChild(go133);
     go133->transform.SetTranslation(glm::vec3(0, 0, -3));

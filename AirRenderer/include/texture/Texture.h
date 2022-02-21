@@ -1,8 +1,8 @@
 #pragma once
 #include <string>
-#include <FreeImage.h>
 #include <glm/ext.hpp>
 #include "include/utils/Color.h"
+#include <include/thread/LoadThread.h>
 
 class Texture
 {
@@ -22,24 +22,21 @@ public:
 		CLAMP,
 		MIRROR
 	};
-	static const glm::fvec2 fzero;
-	static const glm::fvec2 fhalf;
-	static const glm::fvec2 fone;
+	static const glm::vec2 fzero;
+	static const glm::vec2 fhalf;
+	static const glm::vec2 fone;
 	static const glm::ivec2 izero;
 	static const glm::ivec2 ione;
-	FIBITMAP* texture;
 	InterpolationOption interpolationOption;
 	WrapOption wrapOption;
 	MipMapOption mipMapOption;
-	std::string filePath;
-	glm::ivec2 size;
-	Color GetColor(glm::fvec2 pos);
-	glm::fvec2 Wrap(glm::fvec2 uv);
-	Color Interpolate(glm::fvec2& uv);
-	void LoadTexture();
+	LoadThread::LoadCommand loadCommand;
+	Color GetColor(glm::vec2 pos, void* texture, glm::ivec2& size);
+	glm::vec2 Wrap(glm::vec2 uv);
+	Color Interpolate(glm::vec2& uv, void* texture, glm::ivec2& size);
 	Texture();
-	Color Sample(glm::fvec2& uv);
-	glm::vec3 SampleNormal(glm::fvec2& uv);
+	Color Sample(glm::vec2& uv);
+	glm::vec3 SampleNormal(glm::vec2& uv);
 	Texture(std::string filaPath, InterpolationOption interpolationOption, WrapOption wrapOption, MipMapOption mipMapOption);
 };
 

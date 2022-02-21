@@ -118,8 +118,13 @@
     </QtMoc>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="source\utils\RegisterIndex.cpp" />
+    <ClCompile Include="source\shader\ShaderBase.cpp" />
     <ClCompile Include="source\component\camera\Camera.cpp" />
+    <ClCompile Include="source\core_object\Global.cpp" />
     <ClCompile Include="source\core_object\Mesh.cpp" />
+    <ClCompile Include="source\material\NormalMaterial.cpp" />
+    <ClCompile Include="source\shader\NormalShader.cpp" />
     <ClCompile Include="source\thread\LoadThread.cpp" />
     <ClCompile Include="source\utils\ChildBrotherTree.cpp" />
     <ClCompile Include="source\component\Component.cpp" />
@@ -128,7 +133,6 @@
     <ClCompile Include="source\core_object\GameObject.cpp" />
     <ClCompile Include="source\component\light\Light.cpp" />
     <ClCompile Include="source\context\LightContext.cpp" />
-    <ClCompile Include="source\material\Material.cpp" />
     <ClCompile Include="source\context\MatrixContext.cpp" />
     <ClCompile Include="source\component\renderer\MeshRenderer.cpp" />
     <ClCompile Include="source\utils\Object.cpp" />
@@ -137,7 +141,6 @@
     <ClCompile Include="source\context\PixelOutContext.cpp" />
     <ClCompile Include="source\component\light\PointLight.cpp" />
     <ClCompile Include="source\thread\RenderItem.cpp" />
-    <ClCompile Include="source\shader\Shader.cpp" />
     <ClCompile Include="source\texture\Texture.cpp" />
     <ClCompile Include="source\component\transform\Transform.cpp" />
     <ClCompile Include="source\utils\Log.cpp" />
@@ -145,7 +148,14 @@
     <ClCompile Include="source\context\VertexInContext.cpp" />
     <ClInclude Include="include\component\camera\Camera.h" />
     <QtMoc Include="include\thread\LoadThread.h" />
+    <ClInclude Include="include\utils\RegisterIndex.h" />
+    <ClInclude Include="include\core_object\Global.h" />
     <ClInclude Include="include\core_object\Mesh.h" />
+    <ClInclude Include="include\material\MaterialBase.h" />
+    <ClInclude Include="include\material\NormalMaterial.h" />
+    <ClInclude Include="include\shader\NormalData.h" />
+    <ClInclude Include="include\shader\NormalShader.h" />
+    <ClInclude Include="include\shader\ShaderBase.h" />
     <ClInclude Include="include\utils\ChildBrotherTree.h" />
     <ClInclude Include="include\component\Component.h" />
     <ClInclude Include="include\component\light\DirectionalLight.h" />

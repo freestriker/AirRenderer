@@ -6,12 +6,7 @@
 class VertexInContext
 {
 public:
-	glm::vec4 mPosition;
-	glm::vec3 mNormal;
-	glm::vec3 mTangent;
-	glm::vec2 texcoord1;
-	Color color;
-
+	glm::vec4 data[8]{ glm::vec4(0, 0, 0, 0) };
 	int vertexIndex;
 };
 

@@ -1,4 +1,5 @@
 #pragma once
+#include <glm/vec4.hpp>
 class Color
 {
 public:
@@ -9,6 +10,7 @@ public:
 
 	Color();
 	Color(float r, float g, float b, float a);
+	Color(glm::vec4 color);
 
 	const static Color red;
 	const static Color green;
@@ -22,4 +24,5 @@ public:
 	Color operator* (const float& s);
 	Color operator*(const Color& c);
 	float& operator[] (const int& i);
+	operator glm::vec4();
 };

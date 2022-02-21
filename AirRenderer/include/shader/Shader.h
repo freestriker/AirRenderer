@@ -1,16 +1,34 @@
 #pragma once
-#include "include/context/VertexInContext.h"
-#include "include/context/VertexOutContext.h"
-#include "include/context/PixelInContext.h"
-#include "include/context/PixelOutContext.h"
-#include "include/material/Material.h"
-#include "include/context/MatrixContext.h"
-#include "include/context/LightContext.h"
-class Shader
+#include <include/shader/ShaderBase.h>
+
+template<typename TValue>
+class Shader:public ShaderBase
 {
 public:
-	void VertexShading(VertexInContext& vertexInContext, VertexOutContext& vertexOutContext, Material& material, MatrixContext* matrixContext, LightContext* lightContext);
-	void PixelShading(PixelInContext& vertexInContext, PixelOutContext& vertexOutContext, Material& material, MatrixContext* matrixContext, LightContext* lightContext);
+	TValue* value;
+	virtual void VertexShading(VertexInContext& vertexInContext, VertexOutContext& vertexOutContext, MatrixContext* matrixContext, LightContext* lightContext)override = 0;
+	virtual void PixelShading(PixelInContext& vertexInContext, PixelOutContext& vertexOutContext, MatrixContext* matrixContext, LightContext* lightContext)override = 0;
 	glm::vec3 SchmidtOrthogonalization(glm::vec3& v1, glm::vec3& v2);
+	void FillData(void* data)override;
+	Shader();
 };
 
+template<typename TValue>
+glm::vec3 Shader<TValue>::SchmidtOrthogonalization(glm::vec3& v1, glm::vec3& v2)
+{
+	glm::normalize(v1);
+	v2 = glm::normalize(v2 - glm::dot(v1, v2) * v1);
+	return glm::normalize(glm::cross(v1, v2));
+}
+
+template<typename TValue>
+void Shader<TValue>::FillData(void* data)
+{
+	value = static_cast<TValue*>(data);
+}
+
+template<typename TValue>
+Shader<TValue>::Shader():ShaderBase()
+{
+	value = nullptr;
+}

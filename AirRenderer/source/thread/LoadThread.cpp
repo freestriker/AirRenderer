@@ -10,74 +10,110 @@
 #include <glm/geometric.hpp>
 #include <FreeImage.h>
 
-void LoadThread::AddCommand(LoadThread::LoadCommand loadCommand)
+LoadThread::LoadThread(QObject* parent) : QThread(parent)
 {
+	this->command = std::vector<LoadCommand>();
+	this->resourecMap = std::map<std::string, ResourceWrap*>();
+}
+
+LoadThread::LoadCommand LoadThread::Load(std::string path, ProcessOptions processOption)
+{
+
 	commandQueueMutex.lock();
-	commandQueue.push(loadCommand);
+
+	LoadCommand loadCommand = LoadCommand();
+	loadCommand.path = path;
+	loadCommand.processOption = processOption;
+	loadCommand.loadOption = LoadOption::LOAD;
+	command.push_back(loadCommand);
+
 	commandQueueMutex.unlock();
 
 	commandAvailable.wakeAll();
+
+	return loadCommand;
 }
-LoadThread::ResourceWrap* LoadThread::GetResourceWrap(std::string path)
+LoadThread::LoadCommand LoadThread::Load(LoadCommand& loadCommand)
 {
-	QMutexLocker m_lock(&resourecMapMutex);
-	while (!resourecMap.count(path))
-	{
-		resourceAvailable.wait(&resourecMapMutex);
-	}
-	return resourecMap[path];
+
+	commandQueueMutex.lock();
+
+	command.push_back(loadCommand);
+
+	commandQueueMutex.unlock();
+
+	commandAvailable.wakeAll();
+
+	return loadCommand;
+}
+void LoadThread::Unload(LoadCommand& loadCommand)
+{
+
+	commandQueueMutex.lock();
+	loadCommand.loadOption = LoadOption::UNLOAD;
+	command.push_back(loadCommand);
+	commandQueueMutex.unlock();
+
+	commandAvailable.wakeAll();
 }
 void LoadThread::run()
 {
 	commandQueueMutex.lock();
 	while(true)
 	{
-		commandAvailable.wait(&commandQueueMutex);
-		while (commandQueue.size() > 0)
+		if (command.size() > 0)
 		{
-			LoadCommand loadCommand = commandQueue.front();
-			commandQueue.pop();
-
 			resourecMapMutex.lock();
-			switch (loadCommand.loadOption)
+			for each (LoadCommand loadCommand in command)
 			{
-			case LoadOption::LOAD:
-				if (resourecMap.count(loadCommand.path))
+				switch (loadCommand.loadOption)
 				{
-					resourecMap[loadCommand.path]->referenceCount++;
-				}
-				else
-				{
-					ResourceWrap* resourceWrap = nullptr;
-					switch (loadCommand.processOption)
+				case LoadOption::LOAD:
+					if (resourecMap.count(loadCommand.path))
 					{
-					case ProcessOptions::MESH:
-						resourceWrap = LoadMesh(loadCommand.path);
-						break;
-					case ProcessOptions::TEXTURE:
-						resourceWrap = LoadTexture(loadCommand.path);
-						break;
+						resourecMap[loadCommand.path]->referenceCount++;
 					}
-					resourecMap[loadCommand.path] = resourceWrap;
-				}
+					else
+					{
+						ResourceWrap* resourceWrap = nullptr;
+						switch (loadCommand.processOption)
+						{
+						case ProcessOptions::MESH:
+							resourceWrap = LoadMesh(loadCommand.path);
+							break;
+						case ProcessOptions::TEXTURE:
+							resourceWrap = LoadTexture(loadCommand.path);
+							break;
+						}
+						resourecMap[loadCommand.path] = resourceWrap;
+					}
 
-				break;
-			case LoadOption::UNLOAD:
-				if (resourecMap.count(loadCommand.path))
-				{
-					resourecMap[loadCommand.path]->referenceCount--;
-					if (resourecMap[loadCommand.path]->referenceCount == 0)
+					break;
+				case LoadOption::UNLOAD:
+					if (resourecMap.count(loadCommand.path))
 					{
-						ResourceWrap* resourceWrap = resourecMap[loadCommand.path];
-						resourecMap.erase(loadCommand.path);
-						delete resourceWrap;
+						resourecMap[loadCommand.path]->referenceCount--;
+						if (resourecMap[loadCommand.path]->referenceCount == 0)
+						{
+							ResourceWrap* resourceWrap = resourecMap[loadCommand.path];
+							resourecMap.erase(loadCommand.path);
+							delete resourceWrap;
+						}
 					}
+					break;
 				}
-				break;
 			}
 			resourecMapMutex.unlock();
+			resourceAvailable.wakeAll();
+
+			command.clear();
 		}
-		resourceAvailable.wakeAll();
+		else
+		{
+			commandAvailable.wakeAll();
+			resourceAvailable.wakeAll();
+			commandAvailable.wait(&commandQueueMutex);
+		}
 	}
 }
 LoadThread::ResourceWrap* LoadThread::LoadTexture(std::string path)
@@ -102,27 +138,9 @@ LoadThread::ResourceWrap* LoadThread::LoadTexture(std::string path)
 	{
 		throw "Read texture " + path + " failed.";
 	}
-
-
-	int width = FreeImage_GetWidth(texture);
-	int height = FreeImage_GetHeight(texture);
-	int pixelCount = width * height;
-	Buffer<Color>* buffer = new Buffer<Color>(width, height, Color::white);
-	BYTE* pixels = (BYTE*)FreeImage_GetBits(texture);
-	for (int i = 0; i < width; i++)
-	{
-		for (int j = 0; j < height; j++)
-		{
-			int pixelIndex = buffer->GetIndex(i, j);
-			buffer->SetData(Color(pixels[pixelIndex] / 255.0, pixels[pixelIndex + 1] / 255.0, pixels[pixelIndex + 2] / 255.0, pixels[pixelIndex + 3] / 255.0), i, j);
-		}
-	}
-	FreeImage_Unload(texture);
-	FreeImage_DeInitialise();
-
 	LoadThread::ResourceWrap* resourceWrap = new LoadThread::ResourceWrap();
 	resourceWrap->referenceCount = 1;
-	resourceWrap->resource = buffer;
+	resourceWrap->resource = texture;
 	return resourceWrap;
 }
 

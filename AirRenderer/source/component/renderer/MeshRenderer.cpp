@@ -11,7 +11,12 @@
 #include "include/context/VertexInContext.h"
 #include "include/context/VertexOutContext.h"
 #include "include/context/FaceContext.h"
-
+#include <include/thread/LoadThread.h>
+#include <include/core_object/Global.h>
+#include <include/core_object/Mesh.h>
+#include <include/material/NormalMaterial.h>
+#include <include/texture/Texture.h>
+#include <include/utils/RegisterIndex.h>
 
 MeshRenderer::MeshRenderer():MeshRenderer("../../Resources/Model/Flat_Wall_Normal.ply")
 {
@@ -19,66 +24,50 @@ MeshRenderer::MeshRenderer():MeshRenderer("../../Resources/Model/Flat_Wall_Norma
 }
 MeshRenderer::MeshRenderer(std::string filePath):Component("MeshRenderer")
 {
-	std::string s = (QCoreApplication::applicationDirPath() + "/" + QString::fromStdString(filePath)).toStdString();
-    OpenMesh::IO::Options o = OpenMesh::IO::Options::ColorFloat + OpenMesh::IO::Options::VertexColor + OpenMesh::IO::Options::ColorAlpha + OpenMesh::IO::Options::VertexTexCoord + OpenMesh::IO::Options::VertexNormal;
-    mesh.request_vertex_colors();
-    mesh.request_vertex_texcoords2D();
-    mesh.request_vertex_normals();
-	if (!OpenMesh::IO::read_mesh(mesh, s, o, true))
-	{
-		qDebug() << "Failed to load " << QString::fromStdString(s) << endl;
-		exit(1);
-	}
-    shader = Shader();
-    material = Material();
+    this->loadCommand = global.loadThread->Load(filePath, LoadThread::ProcessOptions::MESH);
+    material = new NormalMaterial([](NormalData& normalData)->void
+    {
+        normalData.ambientReflectance = 0.2;
+        normalData.convergenceExponent = 19;
+        normalData.diffuseReflectance = 1;
+        normalData.specularReflectance = 4;
+        normalData.texture = Texture("..\\Resources\\Texture\\Wall.png", Texture::InterpolationOption::BILINERA, Texture::WrapOption::CLAMP, Texture::MipMapOption::NONE);
+        normalData.normalMap = Texture("..\\Resources\\Texture\\Wall_Normal.png", Texture::InterpolationOption::BILINERA, Texture::WrapOption::CLAMP, Texture::MipMapOption::NONE);
+    });
 }
 
 void MeshRenderer::Render(MatrixContext* matrixContext, LightContext* lightContext)
 {
+    ShaderBase* shader = material->Shader();
+    
+    Mesh* mesh = global.loadThread->GetResource<Mesh>(loadCommand);
     FaceContext faceContext = FaceContext();
-    for (Mesh::FaceIter f_it = mesh.faces_begin(); f_it != mesh.faces_end(); ++f_it)
+
+    for (Mesh::FaceIter f_it = mesh->faces_begin(); f_it != mesh->faces_end(); ++f_it)
     {
-        VertexOutContext vertexOutContext[3] = {VertexOutContext(), VertexOutContext(), VertexOutContext()};
+        VertexOutContext vertexOutContext[3] = { VertexOutContext(), VertexOutContext(), VertexOutContext() };
         VertexInContext vertexInContext = VertexInContext();
 
-        //«–œﬂ
-        int ii = 0;
-        glm::vec3 pos[3] = { glm::vec3(0) };
-        glm::vec2 uv[3] = { glm::vec2(0) };
-        for (Mesh::FaceVertexIter fv_it = mesh.fv_iter(*f_it); fv_it.is_valid(); ++fv_it)
-        {
-            Mesh::Point p = mesh.point(fv_it);
-            Mesh::TexCoord2D tex = mesh.texcoord2D(fv_it);
-            pos[ii] = glm::vec3(p[0], p[1], p[2]);
-            uv[ii] = glm::vec2(tex[0], tex[1]);
-            ii++;
-        }
-        float s1 = uv[1].x - uv[0].x;
-        float t1 = uv[1].y - uv[0].y;
-        float s2 = uv[2].x - uv[0].x;
-        float t2 = uv[2].y - uv[0].y;
-        float r = 1.0 / (s1 * t2 - s2 * t1);
-        glm::vec3 tangent = t2 * (pos[1] - pos[0]) - t1 * (pos[2] - pos[0]);
-        tangent = tangent * r;
-        tangent = glm::normalize(tangent);
-
         int index = 0, inBoundryCount = 0;
-        for (Mesh::FaceVertexIter fv_it = mesh.fv_iter(*f_it); fv_it.is_valid(); ++fv_it)
+        for (Mesh::FaceVertexIter fv_it = mesh->fv_iter(f_it); fv_it.is_valid(); ++fv_it)
         {
-            Mesh::Point p = mesh.point(fv_it);
-            Mesh::Point vn = mesh.normal(fv_it);
-            Mesh::TexCoord2D uv = mesh.texcoord2D(fv_it);
-            vertexInContext.mPosition = glm::vec4(p[0], p[1], p[2], 1);
-            vertexInContext.mNormal = glm::normalize(glm::vec3(vn[0], vn[1], vn[2]));
-            vertexInContext.mTangent = tangent;
-            vertexInContext.texcoord1 = glm::vec2(uv[0], uv[1]);
-            vertexInContext.color = Color::white;
-            vertexInContext.vertexIndex = index;
+            Mesh::Point p = mesh->point(fv_it);
+            Mesh::Point t = mesh->data(fv_it).tangent;
+            Mesh::Point n = mesh->normal(fv_it);
+            Mesh::TexCoord2D uv = mesh->texcoord2D(fv_it); 
+            Mesh::Color c = mesh->color(fv_it);
+            vertexInContext.data[RegisterIndex::POSITION] = glm::vec4(p[0], p[1], p[2], 1);
+            vertexInContext.data[RegisterIndex::NORMAL] = glm::vec4(n[0], n[1], n[2], 0);
+            vertexInContext.data[RegisterIndex::TANGENT] = glm::vec4(t[0], t[1], t[2], 0);
+            vertexInContext.data[RegisterIndex::COLOR] = glm::vec4(c[0], c[1], c[2], 1);
+            vertexInContext.data[RegisterIndex::TEXCOORD1] = glm::vec4(uv[0], uv[1], 0, 0);
+
+            vertexInContext.vertexIndex = fv_it.handle().idx();
 
             //∂•µ„◊≈…´∆˜
-            shader.VertexShading(vertexInContext, vertexOutContext[index], material, matrixContext, lightContext);
+            shader->VertexShading(vertexInContext, vertexOutContext[index], matrixContext, lightContext);
 
-            glm::vec4 pos = vertexOutContext[index].pPosition;
+            glm::vec4 pos = vertexOutContext[index].data[RegisterIndex::POSITION];
 
             //≤‚ ‘Ãﬁ≥˝
             if (-pos.w < pos.x && pos.x < pos.w
@@ -115,25 +104,23 @@ void MeshRenderer::Render(MatrixContext* matrixContext, LightContext* lightConte
                     PixelInContext pixelInContext = PixelInContext();
                     PixelOutContext pixelOutContext = PixelOutContext();
                     pixelInContext.screenPosition = screenPosition;
-                    
-                    pixelInContext.pPosition = vertexOutContext[faceContext.vertexIndex[0]].pPosition * float(barycentricPosition.x) + vertexOutContext[faceContext.vertexIndex[1]].pPosition * float(barycentricPosition.y) + vertexOutContext[faceContext.vertexIndex[2]].pPosition * float(barycentricPosition.z);
-                    pixelInContext.vPosition = vertexOutContext[faceContext.vertexIndex[0]].vPosition * float(barycentricPosition.x) + vertexOutContext[faceContext.vertexIndex[1]].vPosition * float(barycentricPosition.y) + vertexOutContext[faceContext.vertexIndex[2]].vPosition * float(barycentricPosition.z);
-                    pixelInContext.wPosition = vertexOutContext[faceContext.vertexIndex[0]].wPosition * float(barycentricPosition.x) + vertexOutContext[faceContext.vertexIndex[1]].wPosition * float(barycentricPosition.y) + vertexOutContext[faceContext.vertexIndex[2]].wPosition * float(barycentricPosition.z);
-                    pixelInContext.vNormal = glm::normalize(vertexOutContext[faceContext.vertexIndex[0]].vNormal * float(barycentricPosition.x) + vertexOutContext[faceContext.vertexIndex[1]].vNormal * float(barycentricPosition.y) + vertexOutContext[faceContext.vertexIndex[2]].vNormal * float(barycentricPosition.z));
-                    pixelInContext.wNormal = glm::normalize(vertexOutContext[faceContext.vertexIndex[0]].wNormal * float(barycentricPosition.x) + vertexOutContext[faceContext.vertexIndex[1]].wNormal * float(barycentricPosition.y) + vertexOutContext[faceContext.vertexIndex[2]].wNormal * float(barycentricPosition.z));
-                    pixelInContext.vTangent = vertexOutContext[0].vTangent;
-                    pixelInContext.wTangent = vertexOutContext[0].wTangent;
-                    pixelInContext.color = vertexOutContext[faceContext.vertexIndex[0]].color * barycentricPosition.x + vertexOutContext[faceContext.vertexIndex[1]].color * barycentricPosition.y + vertexOutContext[faceContext.vertexIndex[2]].color * barycentricPosition.z;
-                    pixelInContext.texcoord1 = vertexOutContext[faceContext.vertexIndex[0]].texcoord1 * float(barycentricPosition.x) + vertexOutContext[faceContext.vertexIndex[1]].texcoord1 * float(barycentricPosition.y) + vertexOutContext[faceContext.vertexIndex[2]].texcoord1 * float(barycentricPosition.z);
+
+                    for (int i = 0; i < 8; i++)
+                    {
+                        pixelInContext.data[i] =
+                            vertexOutContext[0].data[i] * float(barycentricPosition.x)
+                            + vertexOutContext[1].data[i] * float(barycentricPosition.y)
+                            + vertexOutContext[2].data[i] * float(barycentricPosition.z);
+                    }
                     pixelInContext.w = faceContext.w[0] * barycentricPosition.x + faceContext.w[1] * barycentricPosition.y + faceContext.w[2] * barycentricPosition.z;
                     pixelInContext.z = faceContext.z[0] * barycentricPosition.x + faceContext.z[1] * barycentricPosition.y + faceContext.z[2] * barycentricPosition.z;
-                    
+
                     if (pixelInContext.z < configuration.depthBuffer->GetData(screenPosition.x, screenPosition.y))
                     {
                         configuration.depthBuffer->SetData(pixelInContext.z, screenPosition.x, screenPosition.y);
 
                         //œÒÀÿ◊≈…´∆˜
-                        shader.PixelShading(pixelInContext, pixelOutContext, material, matrixContext, lightContext);
+                        shader->PixelShading(pixelInContext, pixelOutContext, matrixContext, lightContext);
 
                         configuration.colorBuffer->SetData(pixelOutContext.color, screenPosition.x, screenPosition.y);
                     }
@@ -141,4 +128,5 @@ void MeshRenderer::Render(MatrixContext* matrixContext, LightContext* lightConte
             }
         }
     }
+    delete shader;
 }
