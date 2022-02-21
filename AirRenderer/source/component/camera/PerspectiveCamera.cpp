@@ -10,12 +10,13 @@ PerspectiveCamera::PerspectiveCamera() : Camera("Perspective")
 
 glm::mat4 PerspectiveCamera::ProjectionMatrix()
 {	
-    double halfFov = std::atan(1.0) / 90.0;
+    double pi = std::acos(-1.0);
+    double halfFov = fovAngle * pi / 360.0;
     double cot = 1.0 / std::tan(halfFov);
         return glm::mat4(
         cot / aspectRatio, 0, 0, 0,
         0, cot, 0, 0,
-        0, 0, -farFlat / (farFlat - nearFlat), 1,
-        0, 0, nearFlat * farFlat / (farFlat - nearFlat), 0
+        0, 0, -farFlat / (farFlat - nearFlat), -1,
+        0, 0, -nearFlat * farFlat / (farFlat - nearFlat), 0
     );
 }
