@@ -8,13 +8,15 @@
 #include "include/component/light/PointLight.h"
 #include <include/thread/LoadThread.h>
 #include <include/core_object/Global.h>
+#include <include/utils/Log.h>
+#include <include/component/camera/OrthographicCamera.h>
 RenderThread::RenderThread(QObject* parent) :QThread(parent)
 {
     timer = new QTimer(this);
     GameObject* camera = new GameObject("Camera");
     configuration.sceneObject.AddChild(camera);
-    camera->AddComponent(new Camera());
-    camera->transform.SetTranslation(glm::vec3(0, 0, 5));
+    camera->AddComponent(new OrthographicCamera());
+    //camera->transform.SetTranslation(glm::vec3(0, 0, 5));
     camera->transform.SetTranslationRotationScale(glm::vec3(0, 0, 5), glm::quat(glm::vec3(0, 0, 0)), glm::vec3(1, 1, 1));
 
     GameObject* lightRoot = new GameObject("LightRoot");
@@ -244,7 +246,9 @@ void RenderThread::Render()
     {
         MatrixContext matrixContext = MatrixContext();
         matrixContext.viewMatrix = glm::inverse(cameraItem.transformationMatrix);
+        Log::LogMatrix("viewMatrix", matrixContext.viewMatrix);
         matrixContext.projectionMatrix = cameraItem.item->FindComponent<Camera>("Camera")->ProjectionMatrix();
+        Log::LogMatrix("projectionMatrix", matrixContext.projectionMatrix);
         matrixContext.rasterizationMatrix = configuration.GetScreenMatrix();
         matrixContext.vpMatrix = matrixContext.projectionMatrix * matrixContext.viewMatrix;
 

@@ -5,12 +5,9 @@
 class Camera: public Component
 {
 public:
-	float aspectRatio;
-	float size;
-	float nearFlat;
-	float farFlat;
-	glm::mat4 ProjectionMatrix();
-	Camera();
+	std::string cameraType;
+	virtual glm::mat4 ProjectionMatrix() = 0;
 	void UpdateSelf(void* data);
+	Camera(std::string cameraType);
 };
 
