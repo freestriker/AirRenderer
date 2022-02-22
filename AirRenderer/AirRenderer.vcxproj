@@ -154,6 +154,7 @@
     <ClInclude Include="include\component\camera\OrthographicCamera.h" />
     <ClInclude Include="include\component\camera\PerspectiveCamera.h" />
     <ClInclude Include="include\context\CameraContext.h" />
+    <ClInclude Include="include\utils\OrientedBoundingBox.h" />
     <ClInclude Include="include\utils\RegisterIndex.h" />
     <ClInclude Include="include\core_object\Global.h" />
     <ClInclude Include="include\core_object\Mesh.h" />
