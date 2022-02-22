@@ -36,7 +36,7 @@ MeshRenderer::MeshRenderer(std::string filePath):Component("MeshRenderer")
     });
 }
 
-void MeshRenderer::Render(MatrixContext* matrixContext, LightContext* lightContext)
+void MeshRenderer::Render(MatrixContext* matrixContext, LightContext* lightContext, CameraContext* cameraContext)
 {
     ShaderBase* shader = material->Shader();
     
@@ -86,8 +86,8 @@ void MeshRenderer::Render(MatrixContext* matrixContext, LightContext* lightConte
 
             //Í¼Ôª×°Åä
             faceContext.screenPosition[index] = glm::ivec2(pos.x + 0.5, pos.y + 0.5);
-            faceContext.z[index] = pos.z;
-            faceContext.w[index] = pos.w;
+            //faceContext.z[index] = pos.z;
+            faceContext.w[index] = w;
             faceContext.vertexIndex[index] = index;
             index++;
         }
@@ -100,7 +100,7 @@ void MeshRenderer::Render(MatrixContext* matrixContext, LightContext* lightConte
                 if (0 <= screenPosition.x && screenPosition.x < configuration.resolution.width
                     && 0 <= screenPosition.y && screenPosition.y < configuration.resolution.height)
                 {
-                    glm::dvec3 barycentricPosition = pixelIterator.GetBarycentricCoordinates();
+                    glm::dvec3 interpolationCoefficient = pixelIterator.GetInterpolationCoefficient(cameraContext);
                     PixelInContext pixelInContext = PixelInContext();
                     PixelOutContext pixelOutContext = PixelOutContext();
                     pixelInContext.screenPosition = screenPosition;
@@ -108,12 +108,11 @@ void MeshRenderer::Render(MatrixContext* matrixContext, LightContext* lightConte
                     for (int i = 0; i < 8; i++)
                     {
                         pixelInContext.data[i] =
-                            vertexOutContext[0].data[i] * float(barycentricPosition.x)
-                            + vertexOutContext[1].data[i] * float(barycentricPosition.y)
-                            + vertexOutContext[2].data[i] * float(barycentricPosition.z);
+                            vertexOutContext[0].data[i] * float(interpolationCoefficient.x)
+                            + vertexOutContext[1].data[i] * float(interpolationCoefficient.y)
+                            + vertexOutContext[2].data[i] * float(interpolationCoefficient.z);
                     }
-                    pixelInContext.w = faceContext.w[0] * barycentricPosition.x + faceContext.w[1] * barycentricPosition.y + faceContext.w[2] * barycentricPosition.z;
-                    pixelInContext.z = faceContext.z[0] * barycentricPosition.x + faceContext.z[1] * barycentricPosition.y + faceContext.z[2] * barycentricPosition.z;
+                    pixelInContext.w = faceContext.w[0] * interpolationCoefficient.x + faceContext.w[1] * interpolationCoefficient.y + faceContext.w[2] * interpolationCoefficient.z;
 
                     if (pixelInContext.z < configuration.depthBuffer->GetData(screenPosition.x, screenPosition.y))
                     {

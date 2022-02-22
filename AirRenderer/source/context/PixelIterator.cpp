@@ -6,6 +6,7 @@ PixelIterator::PixelIterator(FaceContext& faceContext)
     this->pole = faceContext.GetFacePole();
     this->x = this->pole.x;
     this->y = this->pole.y;
+    this->faceContext = &faceContext;
 
     int i = -1, j = -1;
     for (i = x; i <= pole.z; i++)
@@ -91,7 +92,7 @@ bool PixelIterator::CheckInTriangle()
     return CheckInTriangle(screenPosition[0], screenPosition[1], screenPosition[2], glm::ivec2(x, y));
 }
 
-glm::dvec3 PixelIterator::GetBarycentricCoordinates()
+glm::dvec3 PixelIterator::GetInterpolationCoefficient(CameraContext* cameraContext)
 {
     glm::ivec2 pos1 = screenPosition[0];
     glm::ivec2 pos2 = screenPosition[1];
@@ -104,6 +105,14 @@ glm::dvec3 PixelIterator::GetBarycentricCoordinates()
     ratio2 = std::clamp(ratio2, 0.0, 1.0);
     double ratio3 = 1.0 - ratio1 - ratio2;
     ratio3 = std::clamp(ratio3, 0.0, 1.0);
+
+    if (cameraContext->needPerspectiveCorrection)
+    {
+        double zn = 1 / (ratio1 / faceContext->w[0] + ratio2 / faceContext->w[1] + ratio3 / faceContext->w[2]);
+        ratio1 = std::clamp(zn * ratio1 / faceContext->w[0], 0.0, 1.0);
+        ratio2 = std::clamp(zn * ratio2 / faceContext->w[1], 0.0, 1.0);
+        ratio3 = std::clamp(1.0 - ratio1 - ratio2, 0.0, 1.0);
+    }
 
     return glm::dvec3(ratio1, ratio2, ratio3);
 }

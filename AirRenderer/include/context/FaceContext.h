@@ -6,7 +6,7 @@ class FaceContext
 {
 public:
 	glm::ivec2 screenPosition[3];
-	float z[3];
+	//float z[3];
 	float w[3];
 	int vertexIndex[3];
 	glm::ivec4 GetFacePole();

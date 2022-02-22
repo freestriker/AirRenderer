@@ -10,12 +10,15 @@
 #include <include/core_object/Global.h>
 #include <include/utils/Log.h>
 #include <include/component/camera/OrthographicCamera.h>
+#include <include/component/camera/PerspectiveCamera.h>
+#include <include/context/CameraContext.h>
 RenderThread::RenderThread(QObject* parent) :QThread(parent)
 {
     timer = new QTimer(this);
     GameObject* camera = new GameObject("Camera");
     configuration.sceneObject.AddChild(camera);
-    camera->AddComponent(new OrthographicCamera());
+    camera->AddComponent(new PerspectiveCamera());
+    //camera->AddComponent(new OrthographicCamera());
     //camera->transform.SetTranslation(glm::vec3(0, 0, 5));
     camera->transform.SetTranslationRotationScale(glm::vec3(0, 0, 5), glm::quat(glm::vec3(0, 0, 0)), glm::vec3(1, 1, 1));
 
@@ -67,7 +70,7 @@ RenderThread::RenderThread(QObject* parent) :QThread(parent)
     GameObject* go0 = new GameObject("go0");
     configuration.sceneObject.AddChild(go0);
     go0->transform.SetTranslationRotationScale(glm::vec3(0, 2, 0), glm::quat(glm::vec3(1.5707963267948966, 0, 0)), glm::vec3(5, 5, 5));
-    go0->AddComponent(new MeshRenderer("../../Resources/Model/Sphere_Wall_Normal.ply"));
+    //go0->AddComponent(new MeshRenderer("../../Resources/Model/Sphere_Wall_Normal.ply"));
     //GameObject* go01 = new GameObject("go01");
     //configuration.sceneObject.AddChild(go01);
     //go01->transform.SetTranslationRotationScale(glm::vec3(5, 0, 0), glm::quat(glm::vec3(1.5707963267948966, 0, 0)), glm::vec3(5, 5, 5));
@@ -134,8 +137,10 @@ RenderThread::RenderThread(QObject* parent) :QThread(parent)
     //go134->AddComponent(new MeshRenderer("../../Resources/Model/Flat_Wall_Normal.ply"));
     GameObject* go133 = new GameObject("go133");
     go13->AddChild(go133);
-    go133->transform.SetTranslation(glm::vec3(0, 0, -3));
-    go133->transform.SetScale(glm::vec3(18, 18, 1));
+    //go133->transform.SetTranslation(glm::vec3(0, 0, -3));
+    //go133->transform.SetScale(glm::vec3(18, 18, 1));
+    go133->transform.SetRotation(glm::vec3(0.2617993877991494, 0.2617993877991494, 0.2617993877991494));
+    go133->transform.SetScale(glm::vec3(2, 2, 1));
     go133->AddComponent(new MeshRenderer("../../Resources/Model/Flat_Wall_Normal.ply"));
 
     //GameObject* go134 = new GameObject("go134");
@@ -244,6 +249,9 @@ void RenderThread::Render()
 
     for (RenderItem<GameObject> cameraItem : cameraItems)
     {
+        CameraContext cameraContext = CameraContext();
+        cameraContext.needPerspectiveCorrection = cameraItem.item->FindComponent<Camera>("Camera")->needPerspectiveCorrection;
+        
         MatrixContext matrixContext = MatrixContext();
         matrixContext.viewMatrix = glm::inverse(cameraItem.transformationMatrix);
         Log::LogMatrix("viewMatrix", matrixContext.viewMatrix);
@@ -260,7 +268,7 @@ void RenderThread::Render()
             matrixContext.w_tiMatrix = glm::inverse(glm::transpose(matrixContext.worldMatrix));
             matrixContext.wvpMatrix = matrixContext.vpMatrix * matrixContext.worldMatrix;
 
-            meshRendererItem.item->FindComponent<MeshRenderer>("MeshRenderer")->Render(&matrixContext, &lightContext);
+            meshRendererItem.item->FindComponent<MeshRenderer>("MeshRenderer")->Render(&matrixContext, &lightContext, &cameraContext);
         }
     }
     Display();

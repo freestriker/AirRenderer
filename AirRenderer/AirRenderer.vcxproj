@@ -120,6 +120,7 @@
   <ItemGroup>
     <ClCompile Include="source\component\camera\OrthographicCamera.cpp" />
     <ClCompile Include="source\component\camera\PerspectiveCamera.cpp" />
+    <ClCompile Include="source\context\CameraContext.cpp" />
     <ClCompile Include="source\utils\RegisterIndex.cpp" />
     <ClCompile Include="source\shader\ShaderBase.cpp" />
     <ClCompile Include="source\component\camera\Camera.cpp" />
@@ -152,6 +153,7 @@
     <QtMoc Include="include\thread\LoadThread.h" />
     <ClInclude Include="include\component\camera\OrthographicCamera.h" />
     <ClInclude Include="include\component\camera\PerspectiveCamera.h" />
+    <ClInclude Include="include\context\CameraContext.h" />
     <ClInclude Include="include\utils\RegisterIndex.h" />
     <ClInclude Include="include\core_object\Global.h" />
     <ClInclude Include="include\core_object\Mesh.h" />

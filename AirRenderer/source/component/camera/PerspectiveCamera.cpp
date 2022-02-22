@@ -6,6 +6,7 @@ PerspectiveCamera::PerspectiveCamera() : Camera("Perspective")
     this->farFlat = 100;
     this->aspectRatio = 16.0 / 9.0;
     this->fovAngle = 60;
+    this->needPerspectiveCorrection = true;
 }
 
 glm::mat4 PerspectiveCamera::ProjectionMatrix()

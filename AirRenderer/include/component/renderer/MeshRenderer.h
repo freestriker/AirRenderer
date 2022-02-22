@@ -5,7 +5,7 @@
 #include "include/context/MatrixContext.h"
 #include "include/context/LightContext.h"
 #include <include/thread/LoadThread.h>
-
+#include <include/context/CameraContext.h>
 class MeshRenderer: public Component
 {
 public:
@@ -13,6 +13,6 @@ public:
 	MaterialBase* material;
 	MeshRenderer();
 	MeshRenderer(std::string filePath);
-	void Render(MatrixContext* matrixContext, LightContext* lightContext);
+	void Render(MatrixContext* matrixContext, LightContext* lightContext, CameraContext* cameraContext);
 };
 
