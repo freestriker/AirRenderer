@@ -121,6 +121,7 @@
     <ClCompile Include="source\component\camera\OrthographicCamera.cpp" />
     <ClCompile Include="source\component\camera\PerspectiveCamera.cpp" />
     <ClCompile Include="source\context\CameraContext.cpp" />
+    <ClCompile Include="source\utils\OrientedBoundingBox.cpp" />
     <ClCompile Include="source\utils\RegisterIndex.cpp" />
     <ClCompile Include="source\shader\ShaderBase.cpp" />
     <ClCompile Include="source\component\camera\Camera.cpp" />

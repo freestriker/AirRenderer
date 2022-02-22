@@ -154,6 +154,9 @@
     <ClCompile Include="source\context\CameraContext.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\utils\OrientedBoundingBox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\core_object\Configuration.h">
