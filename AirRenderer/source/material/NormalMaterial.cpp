@@ -4,3 +4,8 @@ NormalMaterial::NormalMaterial(std::function<void(NormalData&)> loadValue): Mate
 {
 
 }
+
+MaterialBase* NormalMaterial::Clone()
+{
+    return new NormalMaterial(*this);
+}

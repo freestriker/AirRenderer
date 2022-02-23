@@ -1,6 +1,7 @@
 #pragma once
 #include <include/core_object/Mesh.h>
 #include <include/shader/ShaderBase.h>
+#include <include/material/MaterialBase.h>
 #include <include/context/CameraContext.h>
 #include <include/component/camera/Camera.h>
 #include <include/component/light/Light.h>
@@ -12,25 +13,25 @@ public:
 	public:
 		CameraContext cameraContext;
 		std::vector<int> shaderIndex;
-		CameraRenderWrap(Camera* camera)
+		CameraRenderWrap(Camera& camera)
 		{
-			cameraContext.needPerspectiveCorrection = camera->needPerspectiveCorrection;
-			cameraContext.projectionMatrix = camera->ProjectionMatrix();
-			cameraContext.worldMatrix = camera->WorldMatrix();
+			cameraContext.needPerspectiveCorrection = camera.needPerspectiveCorrection;
+			cameraContext.projectionMatrix = camera.ProjectionMatrix();
+			cameraContext.worldMatrix = camera.WorldMatrix();
 			shaderIndex = std::vector<int>();
 		}
 	};
-	class ShaderRenderWrap
+	class MaterialRenderWrap
 	{
 	public:
-		ShaderBase* shader;
+		MaterialBase* material;
 		int meshIndex;
 		glm::mat4 worldMatrix;
-		ShaderRenderWrap(ShaderBase* shader, int meshIndex, glm::mat4 oMatrix)
+		MaterialRenderWrap(MaterialBase* material, int meshIndex, glm::mat4 worldMatrix)
 		{
-			this->shader = shader;
+			this->material = material;
 			this->meshIndex = meshIndex;
-			this->worldMatrix = oMatrix;
+			this->worldMatrix = worldMatrix;
 		}
 	};
 
@@ -38,19 +39,19 @@ public:
 	std::map<std::string, int>* meshMap;
 	int curCameraRenderWrapIndex;
 	std::vector< CameraRenderWrap> cameraRenderWrap;
-	std::vector< ShaderRenderWrap> shaderRenderWrap;
+	std::vector< MaterialRenderWrap> materialRenderWrap;
 	std::vector<Mesh> mesh;
 	std::vector<Light*> lights;
-	void SetCamera(Camera* camera)
+	void SetCamera(Camera& camera)
 	{
-		if (cameraRenderWrapMap->count(camera))
+		if (cameraRenderWrapMap->count(&camera))
 		{
-			curCameraRenderWrapIndex = cameraRenderWrapMap->operator[](camera);
+			curCameraRenderWrapIndex = cameraRenderWrapMap->operator[](&camera);
 		}
 		else
 		{
 			curCameraRenderWrapIndex = cameraRenderWrap.size();
-			cameraRenderWrapMap->operator[](camera) = curCameraRenderWrapIndex;
+			cameraRenderWrapMap->operator[](&camera) = curCameraRenderWrapIndex;
 			cameraRenderWrap.push_back(CameraRenderWrap(camera));
 		}
 	}
@@ -58,7 +59,7 @@ public:
 	{
 		this->lights.push_back(light.Clone());
 	}
-	void DrawMesh(Mesh& modelMesh, glm::mat4 oMatrix, ShaderBase* shader)
+	void DrawMesh(Mesh& modelMesh, glm::mat4& worldMatrix, MaterialBase& material)
 	{
 		int meshIndex;
 		if (meshMap->count(modelMesh.loadCommand.path))
@@ -72,9 +73,9 @@ public:
 			mesh.push_back(modelMesh);
 		}
 
-		cameraRenderWrap[curCameraRenderWrapIndex].shaderIndex.push_back(shaderRenderWrap.size());
+		cameraRenderWrap[curCameraRenderWrapIndex].shaderIndex.push_back(materialRenderWrap.size());
 
-		shaderRenderWrap.push_back(ShaderRenderWrap(shader, meshIndex, oMatrix));
+		materialRenderWrap.push_back(MaterialRenderWrap(material.Clone(), meshIndex, worldMatrix));
 	}
 
 	RenderCommandBuffer()
@@ -84,7 +85,7 @@ public:
 		curCameraRenderWrapIndex = -1;
 
 		cameraRenderWrap = std::vector< CameraRenderWrap>() ;
-		shaderRenderWrap = std::vector< ShaderRenderWrap>() ;
+		materialRenderWrap = std::vector< MaterialRenderWrap>() ;
 		mesh = std::vector<Mesh> ();
 
 	}

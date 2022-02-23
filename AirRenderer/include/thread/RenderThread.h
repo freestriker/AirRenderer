@@ -4,12 +4,15 @@
 #include "glm/mat4x4.hpp"
 #include "include/thread/RenderItem.h"
 #include <include/thread/RenderCommandBuffer.h>
-
+#include <QWaitCondition>
+#include <QMutex>
+#include <include/thread/RenderCommandBuffer.h>
 class RenderThread : public QThread
 {
 	Q_OBJECT
+	void run() override;
 public:
-	QTimer* timer;
+	//QTimer* timer;
 	void Run();
 	void GetCameras(std::vector<RenderItem<GameObject>>& vector);
 	void GetCamerasDFS(std::vector<RenderItem<GameObject>>& vector, GameObject* gameObject);
@@ -19,7 +22,11 @@ public:
 	void GetLightsDFS(std::vector<RenderItem<GameObject>>& vector, GameObject* gameObject, glm::mat4 parentMatrix);
 	void Display();
 	RenderThread(QObject* parent);
-	void Render(RenderCommandBuffer renderCommandBuffer);
+	void Render(RenderCommandBuffer& renderCommandBuffer);
 	void Pipeline(MatrixContext* matrixContext, LightContext* lightContext, CameraContext* cameraContext, Mesh* mesh, ShaderBase* shader);
-	private slots:void Render();
+	QMutex commandBufferMutex;
+	QWaitCondition commandBufferAvailable;
+	std::vector< RenderCommandBuffer*> commandBufferList;
+	void SubmitCommandBuffer(RenderCommandBuffer& RenderCommandBuffer);
+private slots:void Render();
 };

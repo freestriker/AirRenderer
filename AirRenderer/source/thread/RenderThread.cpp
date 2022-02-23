@@ -14,7 +14,9 @@
 #include <include/context/CameraContext.h>
 RenderThread::RenderThread(QObject* parent) :QThread(parent)
 {
-    timer = new QTimer(this);
+    this->commandBufferList = std::vector< RenderCommandBuffer*>();
+    
+    //timer = new QTimer(this);
     GameObject* camera = new GameObject("Camera");
     configuration.sceneObject.AddChild(camera);
     camera->AddComponent(new PerspectiveCamera());
@@ -149,6 +151,41 @@ RenderThread::RenderThread(QObject* parent) :QThread(parent)
     //go134->transform.SetScale(glm::vec3(2, 2, 1));
     //go134->AddComponent(new MeshRenderer());
 }
+void RenderThread::SubmitCommandBuffer(RenderCommandBuffer& renderCommandBuffer)
+{
+    commandBufferMutex.lock();
+    if (commandBufferList.size() == commandBufferList.capacity())
+    {
+        commandBufferList.erase(commandBufferList.begin());
+
+    }
+    commandBufferList.push_back(&renderCommandBuffer);
+    commandBufferMutex.unlock();
+    commandBufferAvailable.wakeAll();
+}
+
+void RenderThread::run()
+{
+    commandBufferMutex.lock();
+    while (true)
+    {
+        if (!commandBufferList.empty())
+        {
+            RenderCommandBuffer* rcb = commandBufferList[0];
+            commandBufferList.erase(commandBufferList.begin());
+            commandBufferMutex.unlock();
+
+            Render(*rcb);
+            Display();
+            sleep(0);
+            commandBufferMutex.lock();
+        }
+        else
+        {
+            commandBufferAvailable.wait(&commandBufferMutex);
+        }
+    }
+}
 
 void RenderThread::Run()
 {
@@ -170,11 +207,11 @@ void RenderThread::Run()
     }
     for each (RenderItem<GameObject> renderItem in cameras)
     {
-        renderCommandBuffer.SetCamera(renderItem.item->FindComponent<Camera>("Camera"));
+        renderCommandBuffer.SetCamera(*renderItem.item->FindComponent<Camera>("Camera"));
         for each (RenderItem<GameObject> renderItem in renderers)
         {
             MeshRenderer* mr = renderItem.item->FindComponent<MeshRenderer>("MeshRenderer");
-            renderCommandBuffer.DrawMesh(mr->mesh, mr->gameObject->transform.worldMatrix, mr->material->Shader());
+            renderCommandBuffer.DrawMesh(mr->mesh, mr->gameObject->transform.worldMatrix, *mr->material);
         }
     }
     Render(renderCommandBuffer);
@@ -253,7 +290,7 @@ void RenderThread::GetLightsDFS(std::vector<RenderItem<GameObject>>& vector, Gam
     }
 }
 
-void RenderThread::Render(RenderCommandBuffer renderCommandBuffer)
+void RenderThread::Render(RenderCommandBuffer& renderCommandBuffer)
 {
     LightContext lightContext = LightContext();
     lightContext.lights = renderCommandBuffer.lights;
@@ -268,15 +305,15 @@ void RenderThread::Render(RenderCommandBuffer renderCommandBuffer)
         matrixContext.rasterizationMatrix = configuration.GetScreenMatrix();
         matrixContext.vpMatrix = matrixContext.projectionMatrix * matrixContext.viewMatrix;
 
-        for (RenderCommandBuffer::ShaderRenderWrap shaderRenderWrap : renderCommandBuffer.shaderRenderWrap)
+        for (RenderCommandBuffer::MaterialRenderWrap materialRenderWrap : renderCommandBuffer.materialRenderWrap)
         {
-            matrixContext.worldMatrix = shaderRenderWrap.worldMatrix;
+            matrixContext.worldMatrix = materialRenderWrap.worldMatrix;
             matrixContext.wvMatrix = matrixContext.viewMatrix * matrixContext.worldMatrix;
             matrixContext.wv_tiMatrix = glm::inverse(glm::transpose(matrixContext.wvMatrix));
             matrixContext.w_tiMatrix = glm::inverse(glm::transpose(matrixContext.worldMatrix));
             matrixContext.wvpMatrix = matrixContext.vpMatrix * matrixContext.worldMatrix;
 
-            Pipeline(&matrixContext, &lightContext, &cameraContext, &renderCommandBuffer.mesh[shaderRenderWrap.meshIndex], shaderRenderWrap.shader);
+            Pipeline(&matrixContext, &lightContext, &cameraContext, &renderCommandBuffer.mesh[materialRenderWrap.meshIndex], materialRenderWrap.material->Shader());
         }
     }
 }
@@ -372,6 +409,7 @@ void RenderThread::Pipeline(MatrixContext* matrixContext, LightContext* lightCon
     }
     delete shader;
 }
+
 
 void RenderThread::Render()
 {
