@@ -3,6 +3,7 @@
 #include <glm/ext.hpp>
 #include "include/utils/Color.h"
 #include <include/thread/LoadThread.h>
+#include <FreeImage.h>
 
 class Texture
 {
@@ -31,12 +32,16 @@ public:
 	WrapOption wrapOption;
 	MipMapOption mipMapOption;
 	LoadThread::LoadCommand loadCommand;
-	Color GetColor(glm::vec2 pos, void* texture, glm::ivec2& size);
+	glm::ivec2 size;
+	Color GetColor(glm::vec2 pos);
 	glm::vec2 Wrap(glm::vec2 uv);
-	Color Interpolate(glm::vec2& uv, void* texture, glm::ivec2& size);
+	Color Interpolate(glm::vec2& uv);
 	Texture();
 	Color Sample(glm::vec2& uv);
+	FIBITMAP* GetTexture();
 	glm::vec3 SampleNormal(glm::vec2& uv);
 	Texture(std::string filaPath, InterpolationOption interpolationOption, WrapOption wrapOption, MipMapOption mipMapOption);
+private:
+	FIBITMAP* bitmap;
 };
 
