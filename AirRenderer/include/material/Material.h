@@ -8,6 +8,8 @@ public:
 	TValue value;
 	Material(std::function<void(TValue&)> loadValue);
 	ShaderBase* Shader() override;
+	virtual MaterialBase* Clone()override = 0;
+
 	Material();
 };
 

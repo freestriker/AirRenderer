@@ -5,4 +5,5 @@ class NormalMaterial: public Material<NormalData, NormalShader>
 {
 public:
 	NormalMaterial(std::function<void(NormalData&)> loadValue);
+	MaterialBase* Clone();
 };
