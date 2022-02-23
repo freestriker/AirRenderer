@@ -13,18 +13,17 @@
 #include "include/context/FaceContext.h"
 #include <include/thread/LoadThread.h>
 #include <include/core_object/Global.h>
-#include <include/core_object/Mesh.h>
 #include <include/material/NormalMaterial.h>
 #include <include/texture/Texture.h>
 #include <include/utils/RegisterIndex.h>
 
-MeshRenderer::MeshRenderer():MeshRenderer("../../Resources/Model/Flat_Wall_Normal.ply")
+MeshRenderer::MeshRenderer():MeshRenderer("..\\Resources\\Model\\Flat_Wall_Normal.ply")
 {
 
 }
 MeshRenderer::MeshRenderer(std::string filePath):Component("MeshRenderer")
 {
-    this->loadCommand = global.loadThread->Load(filePath, LoadThread::ProcessOptions::MESH);
+    this->mesh = Mesh(filePath);
     material = new NormalMaterial([](NormalData& normalData)->void
     {
         normalData.ambientReflectance = 0.2;
@@ -40,22 +39,22 @@ void MeshRenderer::Render(MatrixContext* matrixContext, LightContext* lightConte
 {
     ShaderBase* shader = material->Shader();
     
-    Mesh* mesh = global.loadThread->GetResource<Mesh>(loadCommand);
+    ModelMesh* modelMesh = this->mesh.GetModelMesh();
     FaceContext faceContext = FaceContext();
 
-    for (Mesh::FaceIter f_it = mesh->faces_begin(); f_it != mesh->faces_end(); ++f_it)
+    for (ModelMesh::FaceIter f_it = modelMesh->faces_begin(); f_it != modelMesh->faces_end(); ++f_it)
     {
         VertexOutContext vertexOutContext[3] = { VertexOutContext(), VertexOutContext(), VertexOutContext() };
         VertexInContext vertexInContext = VertexInContext();
 
         int index = 0, inBoundryCount = 0;
-        for (Mesh::FaceVertexIter fv_it = mesh->fv_iter(f_it); fv_it.is_valid(); ++fv_it)
+        for (ModelMesh::FaceVertexIter fv_it = modelMesh->fv_iter(f_it); fv_it.is_valid(); ++fv_it)
         {
-            Mesh::Point p = mesh->point(fv_it);
-            Mesh::Point t = mesh->data(fv_it).tangent;
-            Mesh::Point n = mesh->normal(fv_it);
-            Mesh::TexCoord2D uv = mesh->texcoord2D(fv_it); 
-            Mesh::Color c = mesh->color(fv_it);
+            ModelMesh::Point p = modelMesh->point(fv_it);
+            ModelMesh::Point t = modelMesh->data(fv_it).tangent;
+            ModelMesh::Point n = modelMesh->normal(fv_it);
+            ModelMesh::TexCoord2D uv = modelMesh->texcoord2D(fv_it); 
+            ModelMesh::Color c = modelMesh->color(fv_it);
             vertexInContext.data[RegisterIndex::POSITION] = glm::vec4(p[0], p[1], p[2], 1);
             vertexInContext.data[RegisterIndex::NORMAL] = glm::vec4(n[0], n[1], n[2], 0);
             vertexInContext.data[RegisterIndex::TANGENT] = glm::vec4(t[0], t[1], t[2], 0);

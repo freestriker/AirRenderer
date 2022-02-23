@@ -6,10 +6,12 @@
 #include "include/context/LightContext.h"
 #include <include/thread/LoadThread.h>
 #include <include/context/CameraContext.h>
+#include <include/core_object/Mesh.h>
 class MeshRenderer: public Component
 {
 public:
-	LoadThread::LoadCommand loadCommand;
+	//LoadThread::LoadCommand loadCommand;
+	Mesh mesh;
 	MaterialBase* material;
 	MeshRenderer();
 	MeshRenderer(std::string filePath);
