@@ -9,6 +9,7 @@ public:
 	bool needPerspectiveCorrection;
 	virtual glm::mat4 ProjectionMatrix() = 0;
 	void UpdateSelf(void* data);
+	glm::mat4 WorldMatrix();
 	Camera(std::string cameraType);
 };
 

@@ -5,6 +5,5 @@ class LightContext
 {
 public:
 	std::vector<Light*> lights;
-	glm::vec3 cameraPosition;
 };
 

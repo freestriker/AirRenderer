@@ -3,13 +3,13 @@
 
 glm::vec3 PointLight::IncidentLight(glm::vec3& position, glm::mat4& viewMatrix)
 {
-    glm::vec4 lp = viewMatrix * gameObject->transform.worldMatrix * glm::vec4(0, 0, 0, 1);
+    glm::vec4 lp = viewMatrix * worldMatrix * glm::vec4(0, 0, 0, 1);
     return position - glm::vec3(lp);
 }
 
 glm::vec3 PointLight::IncidentLight(glm::vec3& position)
 {
-    glm::vec4 lp = gameObject->transform.worldMatrix * glm::vec4(0, 0, 0, 1);
+    glm::vec4 lp = worldMatrix * glm::vec4(0, 0, 0, 1);
     return position - glm::vec3(lp);
 }
 
@@ -38,5 +38,5 @@ Light* PointLight::Clone()
 {
     Light* light = new PointLight(*this);
     light->gameObject = nullptr;
-    return;
+    return light;
 }

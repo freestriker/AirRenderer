@@ -3,12 +3,12 @@
 #include "include/core_object/Configuration.h"
 #include "glm/mat4x4.hpp"
 #include "include/thread/RenderItem.h"
+#include <include/thread/RenderCommandBuffer.h>
 
 class RenderThread : public QThread
 {
 	Q_OBJECT
 public:
-
 	QTimer* timer;
 	void Run();
 	void GetCameras(std::vector<RenderItem<GameObject>>& vector);
@@ -19,5 +19,7 @@ public:
 	void GetLightsDFS(std::vector<RenderItem<GameObject>>& vector, GameObject* gameObject, glm::mat4 parentMatrix);
 	void Display();
 	RenderThread(QObject* parent);
+	void Render(RenderCommandBuffer renderCommandBuffer);
+	void Pipeline(MatrixContext* matrixContext, LightContext* lightContext, CameraContext* cameraContext, Mesh* mesh, ShaderBase* shader);
 	private slots:void Render();
 };
