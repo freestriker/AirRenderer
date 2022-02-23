@@ -11,5 +11,6 @@ public:
 	Color AmbintColorIntensity();
 
 	PointLight();
+	Light* Clone();
 };
 

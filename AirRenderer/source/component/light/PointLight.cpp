@@ -33,3 +33,10 @@ PointLight::PointLight():Light("PointLight")
     this->lightRadius = 10;
     this->intensity = 2;
 }
+
+Light* PointLight::Clone()
+{
+    Light* light = new PointLight(*this);
+    light->gameObject = nullptr;
+    return;
+}

@@ -19,3 +19,10 @@ DirectionalLight::DirectionalLight():Light("DirectionalLight")
 {
     intensity = 0.05;
 }
+
+Light* DirectionalLight::Clone()
+{
+    Light* light = new DirectionalLight(*this);
+    light->gameObject = nullptr;
+    return;
+}
