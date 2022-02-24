@@ -14,7 +14,7 @@ void LogicThread::run()
 {
     while (true)
     {
-        RenderCommandBuffer* renderCommandBuffer = new RenderCommandBuffer();
+        RenderCommandBufferBuilder renderCommandBufferBuilder = RenderCommandBufferBuilder();
         std::vector<RenderItem<GameObject>> cameras = std::vector<RenderItem<GameObject>>();
         std::vector<RenderItem<GameObject>> lights = std::vector<RenderItem<GameObject>>();
         std::vector<RenderItem<GameObject>> renderers = std::vector<RenderItem<GameObject>>();
@@ -23,19 +23,19 @@ void LogicThread::run()
         GetMeshRenderers(renderers);
         for each (RenderItem<GameObject> renderItem in lights)
         {
-            renderCommandBuffer->AddLight(*renderItem.item->FindComponent<Light>("Light"));
+            renderCommandBufferBuilder.AddLight(*renderItem.item->FindComponent<Light>("Light"));
         }
         for each (RenderItem<GameObject> renderItem in cameras)
         {
-            renderCommandBuffer->SetCamera(*renderItem.item->FindComponent<Camera>("Camera"));
+            renderCommandBufferBuilder.SetCamera(*renderItem.item->FindComponent<Camera>("Camera"));
             for each (RenderItem<GameObject> renderItem in renderers)
             {
                 MeshRenderer* mr = renderItem.item->FindComponent<MeshRenderer>("MeshRenderer");
-                renderCommandBuffer->DrawMesh(mr->mesh, mr->gameObject->transform.worldMatrix, *mr->material);
+                renderCommandBufferBuilder.DrawMesh(mr->mesh, mr->gameObject->transform.worldMatrix, *mr->material);
             }
         }
 
-        global.renderThread->SubmitCommandBuffer(*renderCommandBuffer);
+        global.renderThread->SubmitCommandBuffer(renderCommandBufferBuilder.BuildCommandBuffer());
         sleep(1);
     }
 }

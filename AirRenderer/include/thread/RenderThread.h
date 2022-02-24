@@ -20,13 +20,14 @@ public:
 	//void GetMeshRenderersDFS(std::vector<RenderItem<GameObject>>& vector, GameObject* gameObject, glm::mat4 parentMatrix);
 	//void GetLights(std::vector<RenderItem<GameObject>>& vector);
 	//void GetLightsDFS(std::vector<RenderItem<GameObject>>& vector, GameObject* gameObject, glm::mat4 parentMatrix);
-	void Display();
+	void SubmitCommandBuffer(std::shared_ptr<RenderCommandBuffer> RenderCommandBuffer);
 	RenderThread(QObject* parent);
-	void Render(RenderCommandBuffer& renderCommandBuffer);
+private:
+	void Display();
+	void Render(std::shared_ptr<RenderCommandBuffer> renderCommandBuffer);
 	void Pipeline(MatrixContext* matrixContext, LightContext* lightContext, CameraContext* cameraContext, Mesh* mesh, ShaderBase* shader);
 	QMutex commandBufferMutex;
 	QWaitCondition commandBufferAvailable;
-	std::vector< RenderCommandBuffer*> commandBufferList;
-	void SubmitCommandBuffer(RenderCommandBuffer& RenderCommandBuffer);
+	std::vector< std::shared_ptr<RenderCommandBuffer>> commandBufferList;
 //private slots:void Render();
 };

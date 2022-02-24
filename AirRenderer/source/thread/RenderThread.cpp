@@ -14,11 +14,11 @@
 #include <include/context/CameraContext.h>
 RenderThread::RenderThread(QObject* parent) :QThread(parent)
 {
-    this->commandBufferList = std::vector< RenderCommandBuffer*>(4);
+    this->commandBufferList = std::vector<std::shared_ptr<RenderCommandBuffer>>(8);
     commandBufferList.clear();
     
 }
-void RenderThread::SubmitCommandBuffer(RenderCommandBuffer& renderCommandBuffer)
+void RenderThread::SubmitCommandBuffer(std::shared_ptr<RenderCommandBuffer> renderCommandBuffer)
 {
     commandBufferMutex.lock();
     if (commandBufferList.size() == commandBufferList.capacity())
@@ -26,7 +26,7 @@ void RenderThread::SubmitCommandBuffer(RenderCommandBuffer& renderCommandBuffer)
         commandBufferList.erase(commandBufferList.begin());
 
     }
-    commandBufferList.push_back(&renderCommandBuffer);
+    commandBufferList.push_back(renderCommandBuffer);
     commandBufferMutex.unlock();
     commandBufferAvailable.wakeAll();
 }
@@ -38,11 +38,11 @@ void RenderThread::run()
     {
         if (!commandBufferList.empty())
         {
-            RenderCommandBuffer* rcb = commandBufferList[0];
+            std::shared_ptr<RenderCommandBuffer> rcb = commandBufferList[0];
             commandBufferList.erase(commandBufferList.begin());
             commandBufferMutex.unlock();
             qDebug() << "start render";
-            Render(*rcb);
+            Render(rcb);
             Display();
             qDebug() << "finish render";
             sleep(0);
@@ -56,12 +56,12 @@ void RenderThread::run()
 }
 
 
-void RenderThread::Render(RenderCommandBuffer& renderCommandBuffer)
+void RenderThread::Render(std::shared_ptr<RenderCommandBuffer> renderCommandBuffer)
 {
     LightContext lightContext = LightContext();
-    lightContext.lights = renderCommandBuffer.lights;
+    lightContext.lights = renderCommandBuffer->lightInstances;
 
-    for (RenderCommandBuffer::CameraRenderWrap cameraRenderWrap : renderCommandBuffer.cameraRenderWrap)
+    for (RenderCommandBuffer::CameraRenderWrap cameraRenderWrap : renderCommandBuffer->cameraRenderWraps)
     {
         CameraContext cameraContext = cameraRenderWrap.cameraContext;
         
@@ -71,15 +71,16 @@ void RenderThread::Render(RenderCommandBuffer& renderCommandBuffer)
         matrixContext.rasterizationMatrix = configuration.GetScreenMatrix();
         matrixContext.vpMatrix = matrixContext.projectionMatrix * matrixContext.viewMatrix;
 
-        for (RenderCommandBuffer::MaterialRenderWrap materialRenderWrap : renderCommandBuffer.materialRenderWrap)
+        for (RenderCommandBuffer::MaterialRenderWrap materialRenderWrap : renderCommandBuffer->materialRenderWraps)
         {
             matrixContext.worldMatrix = materialRenderWrap.worldMatrix;
             matrixContext.wvMatrix = matrixContext.viewMatrix * matrixContext.worldMatrix;
             matrixContext.wv_tiMatrix = glm::inverse(glm::transpose(matrixContext.wvMatrix));
             matrixContext.w_tiMatrix = glm::inverse(glm::transpose(matrixContext.worldMatrix));
             matrixContext.wvpMatrix = matrixContext.vpMatrix * matrixContext.worldMatrix;
-
-            Pipeline(&matrixContext, &lightContext, &cameraContext, &renderCommandBuffer.mesh[materialRenderWrap.meshIndex], materialRenderWrap.material->Shader());
+            ShaderBase* shader = materialRenderWrap.materialInstance->Shader();
+            Pipeline(&matrixContext, &lightContext, &cameraContext, &renderCommandBuffer->meshInstances[materialRenderWrap.meshInstanceIndex], shader);
+            delete shader;
         }
     }
 }
@@ -173,7 +174,6 @@ void RenderThread::Pipeline(MatrixContext* matrixContext, LightContext* lightCon
             }
         }
     }
-    delete shader;
 }
 
 void RenderThread::Display()
