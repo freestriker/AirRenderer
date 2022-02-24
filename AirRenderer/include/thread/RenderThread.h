@@ -13,13 +13,13 @@ class RenderThread : public QThread
 	void run() override;
 public:
 	//QTimer* timer;
-	void Run();
-	void GetCameras(std::vector<RenderItem<GameObject>>& vector);
-	void GetCamerasDFS(std::vector<RenderItem<GameObject>>& vector, GameObject* gameObject);
-	void GetMeshRenderers(std::vector<RenderItem<GameObject>>& vector);
-	void GetMeshRenderersDFS(std::vector<RenderItem<GameObject>>& vector, GameObject* gameObject, glm::mat4 parentMatrix);
-	void GetLights(std::vector<RenderItem<GameObject>>& vector);
-	void GetLightsDFS(std::vector<RenderItem<GameObject>>& vector, GameObject* gameObject, glm::mat4 parentMatrix);
+	//void Run();
+	//void GetCameras(std::vector<RenderItem<GameObject>>& vector);
+	//void GetCamerasDFS(std::vector<RenderItem<GameObject>>& vector, GameObject* gameObject);
+	//void GetMeshRenderers(std::vector<RenderItem<GameObject>>& vector);
+	//void GetMeshRenderersDFS(std::vector<RenderItem<GameObject>>& vector, GameObject* gameObject, glm::mat4 parentMatrix);
+	//void GetLights(std::vector<RenderItem<GameObject>>& vector);
+	//void GetLightsDFS(std::vector<RenderItem<GameObject>>& vector, GameObject* gameObject, glm::mat4 parentMatrix);
 	void Display();
 	RenderThread(QObject* parent);
 	void Render(RenderCommandBuffer& renderCommandBuffer);
@@ -28,5 +28,5 @@ public:
 	QWaitCondition commandBufferAvailable;
 	std::vector< RenderCommandBuffer*> commandBufferList;
 	void SubmitCommandBuffer(RenderCommandBuffer& RenderCommandBuffer);
-private slots:void Render();
+//private slots:void Render();
 };
