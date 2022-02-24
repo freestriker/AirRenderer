@@ -13,7 +13,7 @@ PixelIterator::PixelIterator(FaceContext& faceContext)
     {
         for (j = i == x ? y + 1 : pole.y; j <= pole.w; j++)
         {
-            if (CheckInTriangle(glm::ivec2(i, j)))
+            if (CheckInTriangle(glm::vec2(i, j)))
             {
                 x = i;
                 y = j;
@@ -33,7 +33,7 @@ PixelIterator& PixelIterator::operator++()
     {
         for (j = i == x ? y + 1 : pole.y; j <= pole.w; j++)
         {
-            if (CheckInTriangle(glm::ivec2(i, j)))
+            if (CheckInTriangle(glm::vec2(i, j)))
             {
                 x = i;
                 y = j;
@@ -52,7 +52,7 @@ PixelIterator PixelIterator::operator++(int)
     {
         for (j = i == x ? y + 1 : pole.y; j <= pole.w; j++)
         {
-            if (CheckInTriangle(glm::ivec2(i, j)))
+            if (CheckInTriangle(glm::vec2(i, j)))
             {
                 x = i;
                 y = j;
@@ -70,33 +70,33 @@ bool PixelIterator::CheckValid()
         && pole.y <= y && y <= pole.w;
 }
 
-int PixelIterator::Product(glm::ivec2 p1, glm::ivec2 p2, glm::ivec2 p3) {
+float PixelIterator::Product(glm::vec2 p1, glm::vec2 p2, glm::vec2 p3) {
     //首先根据坐标计算p1p2和p1p3的向量，然后再计算叉乘
     //p1p2 向量表示为 (p2.x-p1.x,p2.y-p1.y)
     //p1p3 向量表示为 (p3.x-p1.x,p3.y-p1.y)
     return (p2.x - p1.x) * (p3.y - p1.y) - (p2.y - p1.y) * (p3.x - p1.x);
 }
 
-bool PixelIterator::CheckInTriangle(glm::ivec2 pos1, glm::ivec2 pos2, glm::ivec2 pos3, glm::ivec2 pos)
+bool PixelIterator::CheckInTriangle(glm::vec2 pos1, glm::vec2 pos2, glm::vec2 pos3, glm::vec2 pos)
 {
-    if (Product(pos1, pos2, pos3) < 0) return CheckInTriangle(pos1, pos3, pos2, pos);
-    if (Product(pos1, pos2, pos) >= 0 && Product(pos2, pos3, pos) >= 0 && Product(pos3, pos1, pos) >= 0)
+    if (Product(pos1, pos2, pos3) < 0.0) return CheckInTriangle(pos1, pos3, pos2, pos);
+    if (Product(pos1, pos2, pos) >= 0.0 && Product(pos2, pos3, pos) >= 0.0 && Product(pos3, pos1, pos) >= 0.0)
         return true;
     return false;
-}bool PixelIterator::CheckInTriangle(glm::ivec2 position)
+}bool PixelIterator::CheckInTriangle(glm::vec2 position)
 {
     return CheckInTriangle(screenPosition[0], screenPosition[1], screenPosition[2], position);
 }
 bool PixelIterator::CheckInTriangle()
 {
-    return CheckInTriangle(screenPosition[0], screenPosition[1], screenPosition[2], glm::ivec2(x, y));
+    return CheckInTriangle(screenPosition[0], screenPosition[1], screenPosition[2], glm::vec2(x, y));
 }
 
 glm::dvec3 PixelIterator::GetInterpolationCoefficient(CameraContext* cameraContext)
 {
-    glm::ivec2 pos1 = screenPosition[0];
-    glm::ivec2 pos2 = screenPosition[1];
-    glm::ivec2 pos3 = screenPosition[2];
+    glm::vec2 pos1 = screenPosition[0];
+    glm::vec2 pos2 = screenPosition[1];
+    glm::vec2 pos3 = screenPosition[2];
     double ratio1 = double(-(x - pos2.x) * (pos3.y - pos2.y) + (y - pos2.y) * (pos3.x - pos2.x))
         / double(-(pos1.x - pos2.x) * (pos3.y - pos2.y) + (pos1.y - pos2.y) * (pos3.x - pos2.x));
     ratio1 = std::clamp(ratio1, 0.0, 1.0);

@@ -84,7 +84,7 @@ void MeshRenderer::Render(MatrixContext* matrixContext, LightContext* lightConte
             pos = matrixContext->rasterizationMatrix * pos;
 
             //Í¼Ôª×°Åä
-            faceContext.screenPosition[index] = glm::ivec2(pos.x + 0.5, pos.y + 0.5);
+            faceContext.screenPosition[index] = pos;
             //faceContext.z[index] = pos.z;
             faceContext.w[index] = w;
             faceContext.vertexIndex[index] = index;

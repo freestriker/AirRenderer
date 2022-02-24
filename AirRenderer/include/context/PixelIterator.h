@@ -5,8 +5,8 @@
 class PixelIterator {
     int x;
     int y;
-    glm::ivec4 pole;
-    glm::ivec2* screenPosition;
+    glm::vec4 pole;
+    glm::vec3* screenPosition;
     FaceContext* faceContext;
 public:
     PixelIterator(FaceContext& faceContext);
@@ -16,9 +16,9 @@ public:
     glm::dvec3 GetInterpolationCoefficient(CameraContext* cameraContext);
     glm::ivec2 GetScreenPosition();
 private:
-    int Product(glm::ivec2 p1, glm::ivec2 p2, glm::ivec2 p3);
-    bool CheckInTriangle(glm::ivec2 pos1, glm::ivec2 pos2, glm::ivec2 pos3, glm::ivec2 pos);
-    bool CheckInTriangle(glm::ivec2 position);
+    float Product(glm::vec2 p1, glm::vec2 p2, glm::vec2 p3);
+    bool CheckInTriangle(glm::vec2 pos1, glm::vec2 pos2, glm::vec2 pos3, glm::vec2 pos);
+    bool CheckInTriangle(glm::vec2 position);
     bool CheckInTriangle();
 };
 
