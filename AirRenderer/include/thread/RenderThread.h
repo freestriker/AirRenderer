@@ -25,7 +25,7 @@ public:
 private:
 	void Display();
 	void Render(std::shared_ptr<RenderCommandBuffer> renderCommandBuffer);
-	void Pipeline(MatrixContext* matrixContext, LightContext* lightContext, CameraContext* cameraContext, Mesh* mesh, ShaderBase* shader);
+	void Pipeline(MatrixContext* matrixContext, LightContext* lightContext, CameraContext* cameraContext, Mesh* mesh, std::shared_ptr<ShaderBase> shader);
 	QMutex commandBufferMutex;
 	QWaitCondition commandBufferAvailable;
 	std::vector< std::shared_ptr<RenderCommandBuffer>> commandBufferList;

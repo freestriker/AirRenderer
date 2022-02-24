@@ -78,13 +78,13 @@ void RenderThread::Render(std::shared_ptr<RenderCommandBuffer> renderCommandBuff
             matrixContext.wv_tiMatrix = glm::inverse(glm::transpose(matrixContext.wvMatrix));
             matrixContext.w_tiMatrix = glm::inverse(glm::transpose(matrixContext.worldMatrix));
             matrixContext.wvpMatrix = matrixContext.vpMatrix * matrixContext.worldMatrix;
-            ShaderBase* shader = materialRenderWrap.materialInstance->Shader();
-            Pipeline(&matrixContext, &lightContext, &cameraContext, &renderCommandBuffer->meshInstances[materialRenderWrap.meshInstanceIndex], shader);
-            delete shader;
+
+            Pipeline(&matrixContext, &lightContext, &cameraContext, &renderCommandBuffer->meshInstances[materialRenderWrap.meshInstanceIndex], std::shared_ptr<ShaderBase>(materialRenderWrap.materialInstance->Shader()));
+
         }
     }
 }
-void RenderThread::Pipeline(MatrixContext* matrixContext, LightContext* lightContext, CameraContext* cameraContext, Mesh* mesh, ShaderBase* shader)
+void RenderThread::Pipeline(MatrixContext* matrixContext, LightContext* lightContext, CameraContext* cameraContext, Mesh* mesh, std::shared_ptr<ShaderBase> shader)
 {
 
     ModelMesh* modelMesh = mesh->GetModelMesh();
@@ -138,6 +138,11 @@ void RenderThread::Pipeline(MatrixContext* matrixContext, LightContext* lightCon
             faceContext.vertexIndex[index] = index;
             index++;
         }
+        glm::vec3 v1 = glm::vec3(vertexOutContext[1].data[0] - vertexOutContext[0].data[0]);
+        glm::vec3 v2 = glm::vec3(vertexOutContext[2].data[0] - vertexOutContext[1].data[0]);
+        glm::vec3 fn = glm::cross(v1, v2);
+        float d = glm::dot(glm::vec3(0, 0, 1), fn);
+        if(d > 0.0001)
         //if (inBoundryCount > 0)
         {
             for (PixelIterator pixelIterator = PixelIterator(faceContext); pixelIterator.CheckValid(); pixelIterator++)
@@ -158,6 +163,11 @@ void RenderThread::Pipeline(MatrixContext* matrixContext, LightContext* lightCon
                             vertexOutContext[0].data[i] * float(interpolationCoefficient.x)
                             + vertexOutContext[1].data[i] * float(interpolationCoefficient.y)
                             + vertexOutContext[2].data[i] * float(interpolationCoefficient.z);
+                        if (isnan(pixelInContext.data[i]).x)
+                        {
+                            int m = 10;
+                            m += 5;
+                        }
                     }
                     pixelInContext.w = faceContext.w[0] * interpolationCoefficient.x + faceContext.w[1] * interpolationCoefficient.y + faceContext.w[2] * interpolationCoefficient.z;
 
