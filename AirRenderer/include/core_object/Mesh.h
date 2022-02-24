@@ -10,6 +10,10 @@ struct Traits : public OpenMesh::DefaultTraits
     public :
         Point tangent;
     };
+    FaceTraits
+    {
+        Point faceNormal;
+    };
 };
 class ModelMesh : public OpenMesh::TriMesh_ArrayKernelT<Traits>
 {
