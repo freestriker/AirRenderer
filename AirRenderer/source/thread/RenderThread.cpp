@@ -132,18 +132,13 @@ void RenderThread::Pipeline(MatrixContext* matrixContext, LightContext* lightCon
             pos = matrixContext->rasterizationMatrix * pos;
 
             //Í¼Ôª×°Åä
-            faceContext.screenPosition[index] = glm::ivec2(pos.x + 0.5, pos.y + 0.5);
+            faceContext.screenPosition[index] = pos;
             //faceContext.z[index] = pos.z;
             faceContext.w[index] = w;
             faceContext.vertexIndex[index] = index;
             index++;
         }
-        glm::vec3 v1 = glm::vec3(vertexOutContext[1].data[0] - vertexOutContext[0].data[0]);
-        glm::vec3 v2 = glm::vec3(vertexOutContext[2].data[0] - vertexOutContext[1].data[0]);
-        glm::vec3 fn = glm::cross(v1, v2);
-        float d = glm::dot(glm::vec3(0, 0, 1), fn);
-        if(d > 0.0001)
-        //if (inBoundryCount > 0)
+        if(CheckCullOption(shader->cullOption, faceContext.screenPosition))
         {
             for (PixelIterator pixelIterator = PixelIterator(faceContext); pixelIterator.CheckValid(); pixelIterator++)
             {
@@ -163,11 +158,6 @@ void RenderThread::Pipeline(MatrixContext* matrixContext, LightContext* lightCon
                             vertexOutContext[0].data[i] * float(interpolationCoefficient.x)
                             + vertexOutContext[1].data[i] * float(interpolationCoefficient.y)
                             + vertexOutContext[2].data[i] * float(interpolationCoefficient.z);
-                        if (isnan(pixelInContext.data[i]).x)
-                        {
-                            int m = 10;
-                            m += 5;
-                        }
                     }
                     pixelInContext.w = faceContext.w[0] * interpolationCoefficient.x + faceContext.w[1] * interpolationCoefficient.y + faceContext.w[2] * interpolationCoefficient.z;
 
@@ -199,4 +189,26 @@ void RenderThread::Display()
     configuration.label->setPixmap(QPixmap::fromImage(configuration.canvas));
     configuration.canvas.save("C:\\Users\\23174\\Desktop\\Out.png", "PNG", 100);
 
+}
+bool RenderThread::CheckCullOption(CullOption cullOption, glm::vec3* positions)
+{
+    glm::vec3 v1 = positions[1] - positions[0];
+    glm::vec3 v2 = positions[2] - positions[1];
+    glm::vec3 fn = glm::cross(v1, v2);
+    float d = glm::dot(glm::vec3(0, 0, -1), fn);
+    switch (cullOption)
+    {
+    case CullOption::CULL_BACK:
+    {
+        return d >= 0.000001;
+    }
+    case CullOption::CULL_FRONT:
+    {
+        return d <= -0.000001;
+    }
+    case CullOption::CULL_OFF:
+    {
+        return d <= -0.000001 || d >= 0.000001;
+    }
+    }
 }

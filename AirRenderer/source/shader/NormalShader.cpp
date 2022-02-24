@@ -36,7 +36,7 @@ void NormalShader::PixelShading(PixelInContext& pixelInContext, PixelOutContext&
 	{
 
 		glm::vec3 lightDir = light->IncidentLight(vPosition, matrixContext->viewMatrix);
-		if (glm::dot(-lightDir, vNormal) <= 0) continue;
+		//if (glm::dot(-lightDir, vNormal) <= 0) continue;
 		Color lc = light->ColorIntensity(lightDir);
 
 		al = al + light->AmbintColorIntensity();

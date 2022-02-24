@@ -24,6 +24,7 @@ public:
 	RenderThread(QObject* parent);
 private:
 	void Display();
+	bool CheckCullOption(CullOption cullOption, glm::vec3* positions);
 	void Render(std::shared_ptr<RenderCommandBuffer> renderCommandBuffer);
 	void Pipeline(MatrixContext* matrixContext, LightContext* lightContext, CameraContext* cameraContext, Mesh* mesh, std::shared_ptr<ShaderBase> shader);
 	QMutex commandBufferMutex;
