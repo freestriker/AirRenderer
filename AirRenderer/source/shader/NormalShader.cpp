@@ -53,6 +53,37 @@ void NormalShader::PixelShading(PixelInContext& pixelInContext, PixelOutContext&
 
 	pixelOutContext.color = c * (al * value->ambientReflectance + dl * value->diffuseReflectance + sl * value->specularReflectance);
 }
+void NormalShader::GeometryShading(PrimitiveContext& primitiveInContext, PrimitiveOutContextBuilder& primitiveOutContextBuilder, MatrixContext* matrixContext, LightContext* lightContext)
+{
+	PrimitiveContext primitiveOutContext = primitiveInContext;
+
+	primitiveOutContext.primitiveType = PrimitiveType::LINE;
+	primitiveOutContextBuilder.SubmitPrimitiveOutContext(primitiveOutContext);
+
+	int* indexes = primitiveInContext.vertexIndexes;
+
+	primitiveOutContext.vertexIndexes[0] = indexes[1];
+	primitiveOutContext.vertexIndexes[1] = indexes[2];
+	primitiveOutContextBuilder.SubmitPrimitiveOutContext(primitiveOutContext);
+
+	primitiveOutContext.vertexIndexes[0] = indexes[2];
+	primitiveOutContext.vertexIndexes[1] = indexes[0];
+	primitiveOutContextBuilder.SubmitPrimitiveOutContext(primitiveOutContext);
+
+	//primitiveOutContext.primitiveType = PrimitiveType::POINT;
+	//primitiveOutContextBuilder.SubmitPrimitiveOutContext(primitiveOutContext);
+
+	//int* indexes = primitiveInContext.vertexIndexes;
+
+	//primitiveOutContext.vertexIndexes[0] = indexes[1];
+	//primitiveOutContextBuilder.SubmitPrimitiveOutContext(primitiveOutContext);
+
+	//primitiveOutContext.vertexIndexes[0] = indexes[2];
+	//primitiveOutContextBuilder.SubmitPrimitiveOutContext(primitiveOutContext);
+
+	//primitiveOutContextBuilder.SubmitPrimitiveOutContext(primitiveInContext);
+
+}
 
 NormalShader::NormalShader():Shader<NormalData>()
 {

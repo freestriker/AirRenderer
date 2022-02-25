@@ -7,6 +7,7 @@ class PixelIterator {
     int y;
     glm::vec4 pole;
     glm::vec3 screenPosition[3];
+    PrimitiveType primitiveType;
     float w[3];
 
     //PrimitiveContext* primitiveContext;
@@ -22,6 +23,5 @@ private:
     float Product(glm::vec2 p1, glm::vec2 p2, glm::vec2 p3);
     bool CheckInTriangle(glm::vec2 pos1, glm::vec2 pos2, glm::vec2 pos3, glm::vec2 pos);
     bool CheckInTriangle(glm::vec2 position);
-    bool CheckInTriangle();
 };
 

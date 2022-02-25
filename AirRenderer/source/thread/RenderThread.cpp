@@ -165,7 +165,7 @@ void RenderThread::Pipeline(MatrixContext* matrixContext, LightContext* lightCon
         PrimitiveContext& primitiveContext = primitiveOutContexts[i];
         glm::vec3 screenPositions[3] = { vertexOutContexts[primitiveContext.vertexIndexes[0]].screenPosition, vertexOutContexts[primitiveContext.vertexIndexes[1]].screenPosition, vertexOutContexts[primitiveContext.vertexIndexes[2]].screenPosition };
         float ws[3] = { vertexOutContexts[primitiveContext.vertexIndexes[0]].w, vertexOutContexts[primitiveContext.vertexIndexes[1]].w, vertexOutContexts[primitiveContext.vertexIndexes[2]].w };
-        if (CheckCullOption(shader->cullOption, screenPositions))
+        if (CheckCullOption(primitiveContext, shader->cullOption, screenPositions))
         {
             for (PixelIterator pixelIterator = PixelIterator(primitiveContext, vertexOutContexts); pixelIterator.CheckValid(); pixelIterator++)
             {
@@ -216,25 +216,33 @@ void RenderThread::Display()
     configuration.canvas.save("C:\\Users\\23174\\Desktop\\Out.png", "PNG", 100);
 
 }
-bool RenderThread::CheckCullOption(CullOption cullOption, glm::vec3* positions)
+bool RenderThread::CheckCullOption(PrimitiveContext& primitiveContext, CullOption cullOption, glm::vec3* positions)
 {
-    glm::vec3 v1 = positions[1] - positions[0];
-    glm::vec3 v2 = positions[2] - positions[1];
-    glm::vec3 fn = glm::cross(v1, v2);
-    float d = glm::dot(glm::vec3(0, 0, -1), fn);
-    switch (cullOption)
+    
+    if (primitiveContext.primitiveType == PrimitiveType::TRIANGLE)
     {
-    case CullOption::CULL_BACK:
-    {
-        return d >= 0.000001;
+        glm::vec3 v1 = positions[1] - positions[0];
+        glm::vec3 v2 = positions[2] - positions[1];
+        glm::vec3 fn = glm::cross(v1, v2);
+        float d = glm::dot(glm::vec3(0, 0, -1), fn);
+        switch (cullOption)
+        {
+        case CullOption::CULL_BACK:
+        {
+            return d >= 0.000001;
+        }
+        case CullOption::CULL_FRONT:
+        {
+            return d <= -0.000001;
+        }
+        case CullOption::CULL_OFF:
+        {
+            return d <= -0.000001 || d >= 0.000001;
+        }
+        }
     }
-    case CullOption::CULL_FRONT:
+    else
     {
-        return d <= -0.000001;
-    }
-    case CullOption::CULL_OFF:
-    {
-        return d <= -0.000001 || d >= 0.000001;
-    }
+        return true;
     }
 }
