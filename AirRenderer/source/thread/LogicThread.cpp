@@ -166,7 +166,7 @@ LogicThread::LogicThread(QObject* parent):QThread(parent)
     GameObject* go133 = new GameObject("go133");
     go13->AddChild(go133);
     go133->transform.SetTranslation(glm::vec3(0, 0, -3));
-    go133->transform.SetScale(glm::vec3(18, 18, 1));
+    go133->transform.SetScale(glm::vec3(19, 19, 1));
     //go133->transform.SetRotation(glm::vec3(0.2617993877991494, 0.2617993877991494, 0.2617993877991494));
     //go133->transform.SetScale(glm::vec3(2, 2, 1));
     go133->AddComponent(new MeshRenderer("../../Resources/Model/Flat_Wall_Normal.ply"));

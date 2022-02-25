@@ -15,14 +15,40 @@ PixelIterator::PixelIterator(PrimitiveContext& primitiveContext, std::vector<Ver
     this->w[1] = vertexOutContexts[primitiveContext.vertexIndexes[1]].w;
     this->w[2] = vertexOutContexts[primitiveContext.vertexIndexes[2]].w;
 
+
+    Init();
+}
+void PixelIterator::Init()
+{
+    switch (primitiveType)
+    {
+    case PrimitiveType::POINT:
+    {
+        InitPoint();
+        break;
+    }
+    case PrimitiveType::LINE:
+    {
+        InitLine();
+        break;
+    }
+    case PrimitiveType::TRIANGLE:
+    {
+        InitTriangle();
+        break;
+    }
+    }
+}
+void PixelIterator::InitTriangle()
+{
     this->pole = GetFacePole(this->screenPosition);
+    this->roundPole = pole + glm::vec4(0.5, 0.5, 0.5, 0.5);
     this->x = this->pole.x;
     this->y = this->pole.y;
-
     int i = -1, j = -1;
-    for (i = pole.x; i <= pole.z; i++)
+    for (i = roundPole.x; i <= roundPole.z; i++)
     {
-        for (j = pole.y; j <= pole.w; j++)
+        for (j = roundPole.y; j <= roundPole.w; j++)
         {
             if (CheckInTriangle(glm::vec2(i, j)))
             {
@@ -35,79 +61,169 @@ PixelIterator::PixelIterator(PrimitiveContext& primitiveContext, std::vector<Ver
 Out:
     x = i;
     y = j;
+}
+void PixelIterator::InitLine()
+{
+    startPosition = glm::ivec2(screenPosition[0] + glm::vec3(0.5, 0.5, 0.5));
+    endPosition = glm::ivec2(screenPosition[1] + glm::vec3(0.5, 0.5, 0.5));
+    isSteep = false;
+    difference = endPosition - startPosition;
+    if (abs(difference.y) > abs(difference.x))
+    {
+        isSteep = true;
+
+        int t = startPosition.x;
+        startPosition.x = startPosition.y;
+        startPosition.y = t;
+
+        t = endPosition.x;
+        endPosition.x = endPosition.y;
+        endPosition.y = t;
+    }
+
+    if (endPosition.x < startPosition.x)
+    {
+        glm::ivec2 t = startPosition;
+        startPosition = endPosition;
+        endPosition = t;
+    }
+
+    difference = endPosition - startPosition;
+    deltaAbs2X = abs(difference.x) * 2;
+    deltaAbs2Y = abs(difference.y) * 2;
+    d = 0;
+    dy = difference.y > 0 ? 1 : -1;
+
+    lineX = startPosition.x;
+    lineY = startPosition.y;
+
 
 }
-glm::ivec4 PixelIterator::GetFacePole(glm::vec3* screenPosition)
+void PixelIterator::InitPoint()
 {
-    int index1 = 0, index2 = 0;
-    switch (primitiveType)
-    {
-        case PrimitiveType::POINT:
-        {
+    glm::ivec2 startPosition = glm::ivec2(screenPosition[0] + glm::vec3(0.5, 0.5, 0.5));
+    x = startPosition.x;
+    y = startPosition.y;
+}
 
-            break;
-        }
-        case PrimitiveType::LINE:
-        {
-            index1 = 1;
-            break;
-        }
-        case PrimitiveType::TRIANGLE:
-        {
-            index1 = 1;
-            index2 = 2;
-            break;
-        }
-    }
-    
-    int minX = std::min(screenPosition[0].x, std::min(screenPosition[index1].x, screenPosition[index2].x));
-    int minY = std::min(screenPosition[0].y, std::min(screenPosition[index1].y, screenPosition[index2].y));
-    int maxX = std::max(screenPosition[0].x, std::max(screenPosition[index1].x, screenPosition[index2].x));
-    int maxY = std::max(screenPosition[0].y, std::max(screenPosition[index1].y, screenPosition[index2].y));
+glm::ivec4 PixelIterator::GetFacePole(glm::vec3* screenPosition)
+{    
+    int minX = std::min(screenPosition[0].x, std::min(screenPosition[1].x, screenPosition[2].x));
+    int minY = std::min(screenPosition[0].y, std::min(screenPosition[1].y, screenPosition[2].y));
+    int maxX = std::max(screenPosition[0].x, std::max(screenPosition[1].x, screenPosition[2].x));
+    int maxY = std::max(screenPosition[0].y, std::max(screenPosition[1].y, screenPosition[2].y));
     return glm::ivec4(minX, minY, maxX, maxY);
 }
 PixelIterator& PixelIterator::operator++()
 {
-    int i =-1, j = -1;
-    for (i = x; i <= pole.z; i++)
-    {
-        for (j = i == x ? y + 1 : pole.y; j <= pole.w; j++)
-        {
-            if (CheckInTriangle(glm::vec2(i, j)))
-            {
-                x = i;
-                y = j;
-                return *this;
-            }
-        }
-    }
-    x = i;
-    y = j;
+    Next();
     return *this;
 }
 PixelIterator PixelIterator::operator++(int)
 {
-    int i = -1, j = -1;
-    for (i = x; i <= pole.z; i++)
+    Next();
+    return *this;
+}
+void PixelIterator::Next()
+{
+    switch (primitiveType)
     {
-        for (j = i == x ? y + 1 : pole.y; j <= pole.w; j++)
+    case PrimitiveType::POINT:
+    {
+        PointNext();
+        break;
+    }
+    case PrimitiveType::LINE:
+    {
+        LineNext();
+        break;
+    }
+    case PrimitiveType::TRIANGLE:
+    {
+        TriangleNext();
+        break;
+    }
+    }
+}
+void PixelIterator::TriangleNext()
+{
+    int i = -1, j = -1;
+    for (i = x; i <= roundPole.z; i++)
+    {
+        for (j = i == x ? y + 1 : roundPole.y; j <= pole.w; j++)
         {
             if (CheckInTriangle(glm::vec2(i, j)))
             {
                 x = i;
                 y = j;
-                return *this;
+                goto TriangleNextOut;
             }
         }
     }
+    TriangleNextOut:
     x = i;
     y = j;
-    return *this;
+}
+void PixelIterator::LineNext()
+{
+    if (isSteep)
+    {
+        d += deltaAbs2Y;
+        if (d > difference.x)
+        {
+            lineY += dy;
+            d -= deltaAbs2X;
+        }
+    }
+    else
+    {
+        d += deltaAbs2Y;
+        if (d > difference.x)
+        {
+            lineY += dy;
+            d -= deltaAbs2X;
+        }
+    }
+    lineX++;
+}
+void PixelIterator::PointNext()
+{
+    x = -1;
+    y = -1;
+}
+bool PixelIterator::CheckTriangleValid()
+{
+    return roundPole.x <= x && x <= roundPole.z
+        && roundPole.y <= y && y <= roundPole.w;
+}
+bool PixelIterator::CheckLineValid()
+{
+    return lineX <= endPosition.x;
+}
+bool PixelIterator::CheckPointValid()
+{
+    return x != -1 && y != -1;
 }
 bool PixelIterator::CheckValid()
 {
-    return pole.x <= x && x <= pole.z 
-        && pole.y <= y && y <= pole.w;
+    switch (primitiveType)
+    {
+    case PrimitiveType::POINT:
+    {
+        return CheckPointValid();
+        break;
+    }
+    case PrimitiveType::LINE:
+    {
+        return CheckLineValid();
+        break;
+    }
+    case PrimitiveType::TRIANGLE:
+    {
+        return CheckTriangleValid();
+        break;
+    }
+    }
 }
 
 float PixelIterator::Product(glm::vec2 p1, glm::vec2 p2, glm::vec2 p3) {
@@ -125,24 +241,7 @@ bool PixelIterator::CheckInTriangle(glm::vec2 pos1, glm::vec2 pos2, glm::vec2 po
     return false;
 }bool PixelIterator::CheckInTriangle(glm::vec2 position)
 {
-    switch (primitiveType)
-    {
-        case PrimitiveType::POINT:
-        {
-            return true;
-        }
-        case PrimitiveType::LINE:
-        {
-            
-            float d = glm::dot(glm::normalize(glm::vec2(screenPosition[0]) - position), glm::normalize(glm::vec2(screenPosition[1]) - position));
-            //qDebug() << d;
-            return -1.001 <= d && d <= -0.999;
-        }
-        case PrimitiveType::TRIANGLE:
-        {
-            return CheckInTriangle(screenPosition[0], screenPosition[1], screenPosition[2], position);
-        }
-    }
+    return CheckInTriangle(screenPosition[0], screenPosition[1], screenPosition[2], position);
 }
 
 glm::dvec3 PixelIterator::GetInterpolationCoefficient(CameraContext* cameraContext)
@@ -155,7 +254,7 @@ glm::dvec3 PixelIterator::GetInterpolationCoefficient(CameraContext* cameraConte
     }
     case PrimitiveType::LINE:
     {
-        if (pole.z - pole.x == 0)
+        if (isSteep)
         {
             double r2 = double(y - pole.y) / double(pole.w - pole.y);
             r2 = std::clamp(r2, 0.0, 1.0);
@@ -176,8 +275,8 @@ glm::dvec3 PixelIterator::GetInterpolationCoefficient(CameraContext* cameraConte
             if (cameraContext->needPerspectiveCorrection)
             {
                 double zn = 1 / (r1 / this->w[0] + r2 / this->w[1]);
-                r1 = std::clamp(zn * r1 / this->w[0], 0.0, 1.0);
-                r2 = std::clamp(1.0 - r1, 0.0, 1.0);
+                r2 = std::clamp(zn * r2 / this->w[1], 0.0, 1.0);
+                r1 = std::clamp(1.0 - r2, 0.0, 1.0);
             }
             return glm::dvec3(r1, r2, 0);
         }
@@ -210,5 +309,31 @@ glm::dvec3 PixelIterator::GetInterpolationCoefficient(CameraContext* cameraConte
 }
 glm::ivec2 PixelIterator::GetScreenPosition()
 {
-    return glm::ivec2(x, y);
+    switch (primitiveType)
+    {
+    case PrimitiveType::POINT:
+    {
+        return glm::ivec2(x, y);
+    }
+    case PrimitiveType::LINE:
+    {
+        
+        if (isSteep)
+        {
+            x = lineY;
+            y = lineX;
+
+        }
+        else
+        {
+            x = lineX;
+            y = lineY;
+        }
+        return glm::ivec2(x, y);
+    }
+    case PrimitiveType::TRIANGLE:
+    {
+        return glm::ivec2(x, y);
+    }
+    }
 }

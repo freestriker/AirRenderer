@@ -149,6 +149,7 @@ void RenderThread::Pipeline(MatrixContext* matrixContext, LightContext* lightCon
         //透视除法
         float w = pos.w;
         pos = pos / w;
+        pos.w = 1.0;
 
         //光栅化
         pos = matrixContext->rasterizationMatrix * pos;
