@@ -7,5 +7,7 @@ class VertexOutContext
 {
 public:
 	glm::vec4 data[8]{ glm::vec4(0, 0, 0, 0) };
+	float w;
+	glm::vec3 screenPosition;
 };
 

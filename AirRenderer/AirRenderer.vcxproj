@@ -134,7 +134,6 @@
     <ClCompile Include="source\utils\ChildBrotherTree.cpp" />
     <ClCompile Include="source\component\Component.cpp" />
     <ClCompile Include="source\component\light\DirectionalLight.cpp" />
-    <ClCompile Include="source\context\FaceContext.cpp" />
     <ClCompile Include="source\core_object\GameObject.cpp" />
     <ClCompile Include="source\component\light\Light.cpp" />
     <ClCompile Include="source\context\LightContext.cpp" />
@@ -157,6 +156,7 @@
     <ClInclude Include="include\component\camera\PerspectiveCamera.h" />
     <ClInclude Include="include\context\CameraContext.h" />
     <QtMoc Include="include\thread\LogicThread.h" />
+    <ClInclude Include="include\context\PrimitiveContext.h" />
     <ClInclude Include="include\thread\RenderCommandBuffer.h" />
     <ClInclude Include="include\shader\ShaderOptions.h" />
     <ClInclude Include="include\utils\OrientedBoundingBox.h" />
@@ -171,7 +171,6 @@
     <ClInclude Include="include\utils\ChildBrotherTree.h" />
     <ClInclude Include="include\component\Component.h" />
     <ClInclude Include="include\component\light\DirectionalLight.h" />
-    <ClInclude Include="include\context\FaceContext.h" />
     <ClInclude Include="include\core_object\GameObject.h" />
     <ClInclude Include="include\component\light\Light.h" />
     <ClInclude Include="include\context\LightContext.h" />

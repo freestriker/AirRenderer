@@ -4,7 +4,7 @@ void NormalShader::VertexShading(VertexInContext& vertexInContext, VertexOutCont
 {
 	vertexOutContext.data[RegisterIndex::POSITION] = matrixContext->wvpMatrix * vertexInContext.data[RegisterIndex::POSITION];
 
-	glm::vec3 normal = glm::normalize(glm::mat3(matrixContext->wv_tiMatrix) * glm::vec3(vertexInContext.data[RegisterIndex::NORMAL]));
+	glm::vec3 normal = glm::normalize(glm::mat3(matrixContext->wv_itMatrix) * glm::vec3(vertexInContext.data[RegisterIndex::NORMAL]));
 	vertexOutContext.data[RegisterIndex::NORMAL] = glm::vec4(normal.x, normal.y, normal.z, 0);
 
 	glm::vec3 tangent = glm::normalize(glm::mat3(matrixContext->wvMatrix) * glm::vec3(vertexInContext.data[RegisterIndex::TANGENT]));

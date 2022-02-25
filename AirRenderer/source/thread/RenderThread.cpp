@@ -12,6 +12,7 @@
 #include <include/component/camera/OrthographicCamera.h>
 #include <include/component/camera/PerspectiveCamera.h>
 #include <include/context/CameraContext.h>
+#include <include/context/PrimitiveContext.h>
 RenderThread::RenderThread(QObject* parent) :QThread(parent)
 {
     this->commandBufferList = std::vector<std::shared_ptr<RenderCommandBuffer>>(8);
@@ -75,8 +76,8 @@ void RenderThread::Render(std::shared_ptr<RenderCommandBuffer> renderCommandBuff
         {
             matrixContext.worldMatrix = materialRenderWrap.worldMatrix;
             matrixContext.wvMatrix = matrixContext.viewMatrix * matrixContext.worldMatrix;
-            matrixContext.wv_tiMatrix = glm::inverse(glm::transpose(matrixContext.wvMatrix));
-            matrixContext.w_tiMatrix = glm::inverse(glm::transpose(matrixContext.worldMatrix));
+            matrixContext.wv_itMatrix = glm::transpose(glm::inverse(matrixContext.wvMatrix));
+            matrixContext.w_itMatrix = glm::transpose(glm::inverse(matrixContext.worldMatrix));
             matrixContext.wvpMatrix = matrixContext.vpMatrix * matrixContext.worldMatrix;
 
             Pipeline(&matrixContext, &lightContext, &cameraContext, &renderCommandBuffer->meshInstances[materialRenderWrap.meshInstanceIndex], std::shared_ptr<ShaderBase>(materialRenderWrap.materialInstance->Shader()));
@@ -88,78 +89,103 @@ void RenderThread::Pipeline(MatrixContext* matrixContext, LightContext* lightCon
 {
 
     ModelMesh* modelMesh = mesh->GetModelMesh();
-    FaceContext faceContext = FaceContext();
 
-    for (ModelMesh::FaceIter f_it = modelMesh->faces_begin(); f_it != modelMesh->faces_end(); ++f_it)
+    //顶点阶段
+    std::vector<VertexOutContext> vertexOutContexts = std::vector<VertexOutContext>(modelMesh->vertices_end().handle().idx());
+    VertexInContext vertexInContext = VertexInContext();
+    for (ModelMesh::VertexIter v_it = modelMesh->vertices_sbegin(), v_end = modelMesh->vertices_end(); v_it != v_end; ++v_it)
     {
-        VertexOutContext vertexOutContext[3] = { VertexOutContext(), VertexOutContext(), VertexOutContext() };
-        VertexInContext vertexInContext = VertexInContext();
+        ModelMesh::Point p = modelMesh->point(v_it);
+        ModelMesh::Point t = modelMesh->data(v_it).tangent;
+        ModelMesh::Point n = modelMesh->normal(v_it);
+        ModelMesh::TexCoord2D uv = modelMesh->texcoord2D(v_it);
+        ModelMesh::Color c = modelMesh->color(v_it);
+        vertexInContext.data[RegisterIndex::POSITION] = glm::vec4(p[0], p[1], p[2], 1);
+        vertexInContext.data[RegisterIndex::NORMAL] = glm::vec4(n[0], n[1], n[2], 0);
+        vertexInContext.data[RegisterIndex::TANGENT] = glm::vec4(t[0], t[1], t[2], 0);
+        vertexInContext.data[RegisterIndex::COLOR] = glm::vec4(c[0], c[1], c[2], 1);
+        vertexInContext.data[RegisterIndex::TEXCOORD1] = glm::vec4(uv[0], uv[1], 0, 0);
 
-        int index = 0, inBoundryCount = 0;
+        int vertexIndex = v_it.handle().idx();
+        vertexInContext.vertexIndex = vertexIndex;
+
+        //顶点着色器
+        shader->VertexShading(vertexInContext, vertexOutContexts[vertexIndex], matrixContext, lightContext);
+    }
+
+    //几何阶段
+    PrimitiveContext primitiveInContext = PrimitiveContext();
+    primitiveInContext.primitiveType = PrimitiveType::TRIANGLE;
+    std::vector< PrimitiveContext> primitiveOutContexts = std::vector< PrimitiveContext>();
+    PrimitiveOutContextBuilder primitiveOutContextBuilder = PrimitiveOutContextBuilder(vertexOutContexts, primitiveOutContexts);
+    for (ModelMesh::FaceIter f_it = modelMesh->faces_begin(), f_end = modelMesh->faces_end(); f_it != f_end; ++f_it)
+    {
+        int index = 0;
         for (ModelMesh::FaceVertexIter fv_it = modelMesh->fv_iter(f_it); fv_it.is_valid(); ++fv_it)
         {
-            ModelMesh::Point p = modelMesh->point(fv_it);
-            ModelMesh::Point t = modelMesh->data(fv_it).tangent;
-            ModelMesh::Point n = modelMesh->normal(fv_it);
-            ModelMesh::TexCoord2D uv = modelMesh->texcoord2D(fv_it);
-            ModelMesh::Color c = modelMesh->color(fv_it);
-            vertexInContext.data[RegisterIndex::POSITION] = glm::vec4(p[0], p[1], p[2], 1);
-            vertexInContext.data[RegisterIndex::NORMAL] = glm::vec4(n[0], n[1], n[2], 0);
-            vertexInContext.data[RegisterIndex::TANGENT] = glm::vec4(t[0], t[1], t[2], 0);
-            vertexInContext.data[RegisterIndex::COLOR] = glm::vec4(c[0], c[1], c[2], 1);
-            vertexInContext.data[RegisterIndex::TEXCOORD1] = glm::vec4(uv[0], uv[1], 0, 0);
-
-            vertexInContext.vertexIndex = fv_it.handle().idx();
-
-            //顶点着色器
-            shader->VertexShading(vertexInContext, vertexOutContext[index], matrixContext, lightContext);
-
-            glm::vec4 pos = vertexOutContext[index].data[RegisterIndex::POSITION];
-
-            //测试剔除
-            if (-pos.w < pos.x && pos.x < pos.w
-                && -pos.w < pos.y && pos.y < pos.w
-                && 0 < pos.z && pos.z < pos.w)
-            {
-                inBoundryCount++;
-            }
-
-            //透视除法
-            float w = pos.w;
-            pos = pos / w;
-
-            //光栅化
-            pos = matrixContext->rasterizationMatrix * pos;
-
-            //图元装配
-            faceContext.screenPosition[index] = pos;
-            //faceContext.z[index] = pos.z;
-            faceContext.w[index] = w;
-            faceContext.vertexIndex[index] = index;
-            index++;
+            int vertexIndex = fv_it.handle().idx();
+            primitiveInContext.vertexIndexes[index] = vertexIndex;
+            ++index;
         }
-        if(CheckCullOption(shader->cullOption, faceContext.screenPosition))
+        //几何着色器
+        shader->GeometryShading(primitiveInContext, primitiveOutContextBuilder, matrixContext, lightContext);
+    }
+
+    //光栅化阶段
+    for (int i = 0, size = vertexOutContexts.size(); i < size; ++i)
+    {
+        VertexOutContext& vertexOutContext = vertexOutContexts[i];
+
+        glm::vec4 pos = vertexOutContext.data[RegisterIndex::POSITION];
+
+        ////测试剔除
+        //if (-pos.w < pos.x && pos.x < pos.w
+        //    && -pos.w < pos.y && pos.y < pos.w
+        //    && 0 < pos.z && pos.z < pos.w)
+        //{
+        //    inBoundryCount++;
+        //}
+
+        //透视除法
+        float w = pos.w;
+        pos = pos / w;
+
+        //光栅化
+        pos = matrixContext->rasterizationMatrix * pos;
+
+        vertexOutContext.w = w;
+        vertexOutContext.screenPosition = pos;
+    }
+
+    //像素阶段
+    PixelInContext pixelInContext = PixelInContext();
+    PixelOutContext pixelOutContext = PixelOutContext();
+    for (int i = 0, size = primitiveOutContexts.size(); i < size; ++i)
+    {
+        PrimitiveContext& primitiveContext = primitiveOutContexts[i];
+        glm::vec3 screenPositions[3] = { vertexOutContexts[primitiveContext.vertexIndexes[0]].screenPosition, vertexOutContexts[primitiveContext.vertexIndexes[1]].screenPosition, vertexOutContexts[primitiveContext.vertexIndexes[2]].screenPosition };
+        float ws[3] = { vertexOutContexts[primitiveContext.vertexIndexes[0]].w, vertexOutContexts[primitiveContext.vertexIndexes[1]].w, vertexOutContexts[primitiveContext.vertexIndexes[2]].w };
+        if (CheckCullOption(shader->cullOption, screenPositions))
         {
-            for (PixelIterator pixelIterator = PixelIterator(faceContext); pixelIterator.CheckValid(); pixelIterator++)
+            for (PixelIterator pixelIterator = PixelIterator(primitiveContext, vertexOutContexts); pixelIterator.CheckValid(); pixelIterator++)
             {
                 glm::ivec2 screenPosition = pixelIterator.GetScreenPosition();
 
                 if (0 <= screenPosition.x && screenPosition.x < configuration.resolution.width
                     && 0 <= screenPosition.y && screenPosition.y < configuration.resolution.height)
                 {
+                    //插值
                     glm::dvec3 interpolationCoefficient = pixelIterator.GetInterpolationCoefficient(cameraContext);
-                    PixelInContext pixelInContext = PixelInContext();
-                    PixelOutContext pixelOutContext = PixelOutContext();
                     pixelInContext.screenPosition = screenPosition;
 
                     for (int i = 0; i < 8; i++)
                     {
                         pixelInContext.data[i] =
-                            vertexOutContext[0].data[i] * float(interpolationCoefficient.x)
-                            + vertexOutContext[1].data[i] * float(interpolationCoefficient.y)
-                            + vertexOutContext[2].data[i] * float(interpolationCoefficient.z);
+                            vertexOutContexts[primitiveContext.vertexIndexes[0]].data[i] * float(interpolationCoefficient.x)
+                            + vertexOutContexts[primitiveContext.vertexIndexes[1]].data[i] * float(interpolationCoefficient.y)
+                            + vertexOutContexts[primitiveContext.vertexIndexes[2]].data[i] * float(interpolationCoefficient.z);
                     }
-                    pixelInContext.w = faceContext.w[0] * interpolationCoefficient.x + faceContext.w[1] * interpolationCoefficient.y + faceContext.w[2] * interpolationCoefficient.z;
+                    pixelInContext.w = ws[0] * interpolationCoefficient.x + ws[1] * interpolationCoefficient.y + ws[2] * interpolationCoefficient.z;
 
                     if (pixelInContext.z < configuration.depthBuffer->GetData(screenPosition.x, screenPosition.y))
                     {

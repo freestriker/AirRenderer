@@ -1,15 +1,18 @@
 #pragma once
 #include <glm/glm.hpp>
-#include "include/context/FaceContext.h"
 #include <include/context/CameraContext.h>
+#include <include/context/PrimitiveContext.h>
 class PixelIterator {
     int x;
     int y;
     glm::vec4 pole;
-    glm::vec3* screenPosition;
-    FaceContext* faceContext;
+    glm::vec3 screenPosition[3];
+    float w[3];
+
+    //PrimitiveContext* primitiveContext;
 public:
-    PixelIterator(FaceContext& faceContext);
+    PixelIterator(PrimitiveContext& primitiveContext, std::vector<VertexOutContext>& vertexOutContexts);
+    glm::ivec4 GetFacePole(glm::vec3* screenPosition);
     PixelIterator& operator++();
     PixelIterator operator++(int);
     bool CheckValid();

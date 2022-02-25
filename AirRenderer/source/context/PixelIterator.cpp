@@ -1,12 +1,20 @@
 #include "include/context/PixelIterator.h"
+#include <algorithm>
 
-PixelIterator::PixelIterator(FaceContext& faceContext)
+PixelIterator::PixelIterator(PrimitiveContext& primitiveContext, std::vector<VertexOutContext>& vertexOutContexts)
 {
-    this->screenPosition = faceContext.screenPosition;
-    this->pole = faceContext.GetFacePole();
+    //this->primitiveContext = &primitiveContext;
+    this->screenPosition[0] = vertexOutContexts[primitiveContext.vertexIndexes[0]].screenPosition;
+    this->screenPosition[1] = vertexOutContexts[primitiveContext.vertexIndexes[1]].screenPosition;
+    this->screenPosition[2] = vertexOutContexts[primitiveContext.vertexIndexes[2]].screenPosition;
+
+    this->w[0] = vertexOutContexts[primitiveContext.vertexIndexes[0]].w;
+    this->w[1] = vertexOutContexts[primitiveContext.vertexIndexes[1]].w;
+    this->w[2] = vertexOutContexts[primitiveContext.vertexIndexes[2]].w;
+
+    this->pole = GetFacePole(this->screenPosition);
     this->x = this->pole.x;
     this->y = this->pole.y;
-    this->faceContext = &faceContext;
 
     int i = -1, j = -1;
     for (i = x; i <= pole.z; i++)
@@ -21,12 +29,20 @@ PixelIterator::PixelIterator(FaceContext& faceContext)
             }
         }
     }
-    Out:
+Out:
     x = i;
     y = j;
 
 }
-PixelIterator& PixelIterator::operator++() 
+glm::ivec4 PixelIterator::GetFacePole(glm::vec3* screenPosition)
+{
+    int minX = std::min(screenPosition[0].x, std::min(screenPosition[1].x, screenPosition[2].x));
+    int minY = std::min(screenPosition[0].y, std::min(screenPosition[1].y, screenPosition[2].y));
+    int maxX = std::max(screenPosition[0].x, std::max(screenPosition[1].x, screenPosition[2].x));
+    int maxY = std::max(screenPosition[0].y, std::max(screenPosition[1].y, screenPosition[2].y));
+    return glm::ivec4(minX, minY, maxX, maxY);
+}
+PixelIterator& PixelIterator::operator++()
 {
     int i =-1, j = -1;
     for (i = x; i <= pole.z; i++)
@@ -108,9 +124,9 @@ glm::dvec3 PixelIterator::GetInterpolationCoefficient(CameraContext* cameraConte
 
     if (cameraContext->needPerspectiveCorrection)
     {
-        double zn = 1 / (ratio1 / faceContext->w[0] + ratio2 / faceContext->w[1] + ratio3 / faceContext->w[2]);
-        ratio1 = std::clamp(zn * ratio1 / faceContext->w[0], 0.0, 1.0);
-        ratio2 = std::clamp(zn * ratio2 / faceContext->w[1], 0.0, 1.0);
+        double zn = 1 / (ratio1 / this->w[0] + ratio2 / this->w[1] + ratio3 / this->w[2]);
+        ratio1 = std::clamp(zn * ratio1 / this->w[0], 0.0, 1.0);
+        ratio2 = std::clamp(zn * ratio2 / this->w[1], 0.0, 1.0);
         ratio3 = std::clamp(1.0 - ratio1 - ratio2, 0.0, 1.0);
     }
 
