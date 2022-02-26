@@ -81,7 +81,7 @@ void RenderThread::Render(std::shared_ptr<RenderCommandBuffer> renderCommandBuff
             matrixContext.wvpMatrix = matrixContext.vpMatrix * matrixContext.worldMatrix;
 
             ShaderBase* sb = materialRenderWrap.materialInstance->Shader();
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < MAX_SHADER_PASS_COUNT; i++)
             {
                 if (sb->activeTable[i])
                 {

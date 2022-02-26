@@ -6,7 +6,7 @@ class Shader:public ShaderBase
 {
 public:
 	TValue* value;
-	glm::vec3 SchmidtOrthogonalization(glm::vec3& v1, glm::vec3& v2);
+	static glm::vec3 SchmidtOrthogonalization(glm::vec3& v1, glm::vec3& v2);
 	void FillData(void* data)override;
 	Shader();
 };
