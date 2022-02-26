@@ -88,4 +88,11 @@ void NormalShader::GeometryShading(PrimitiveContext& primitiveInContext, Primiti
 
 NormalShader::NormalShader():Shader<NormalData>()
 {
+	this->activeTable[0] = true;
+	auto f = [this](VertexInContext& vertexInContext, VertexOutContext& vertexOutContext, MatrixContext* matrixContext, LightContext* lightContext) {
+		VertexShading(vertexInContext, vertexOutContext, matrixContext, lightContext);
+	};
+	this->shaderPasses[0].vertexShading = (ShaderPass::VertexShading)(&(this->VertexShading));
+	this->shaderPasses[0].pixelShading = (ShaderPass::PixelShading)(&NormalShader::PixelShading);
+	this->shaderPasses[0].geometryShading = (ShaderPass::GeometryShading)(&NormalShader::GeometryShading);
 }

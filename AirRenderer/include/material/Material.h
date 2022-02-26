@@ -6,6 +6,7 @@ class Material:public MaterialBase
 {
 public:
 	TValue value;
+	TShader shader;
 	Material(std::function<void(TValue&)> loadValue);
 	ShaderBase* Shader() override;
 	virtual MaterialBase* Clone()override = 0;
@@ -16,8 +17,6 @@ public:
 template<typename TValue, typename TShader>
 Material<TValue, TShader>::Material(std::function<void(TValue&)> loadValue)
 {
-	//static_assert(std::is_base_of<Shader<TValue>, TShader>::value,
-	//	"TShader must be a subclass of Shader<TValue>.");
 	loadValue(value);
 }
 

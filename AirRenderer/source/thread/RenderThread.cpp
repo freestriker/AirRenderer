@@ -80,12 +80,19 @@ void RenderThread::Render(std::shared_ptr<RenderCommandBuffer> renderCommandBuff
             matrixContext.w_itMatrix = glm::transpose(glm::inverse(matrixContext.worldMatrix));
             matrixContext.wvpMatrix = matrixContext.vpMatrix * matrixContext.worldMatrix;
 
-            Pipeline(&matrixContext, &lightContext, &cameraContext, &renderCommandBuffer->meshInstances[materialRenderWrap.meshInstanceIndex], std::shared_ptr<ShaderBase>(materialRenderWrap.materialInstance->Shader()));
+            ShaderBase* sb = materialRenderWrap.materialInstance->Shader();
+            for (int i = 0; i < 4; i++)
+            {
+                if (sb->activeTable[i])
+                {
+                    Pipeline(&matrixContext, &lightContext, &cameraContext, &renderCommandBuffer->meshInstances[materialRenderWrap.meshInstanceIndex], sb->shaderPasses[i]);
+                }
+            }
 
         }
     }
 }
-void RenderThread::Pipeline(MatrixContext* matrixContext, LightContext* lightContext, CameraContext* cameraContext, Mesh* mesh, std::shared_ptr<ShaderBase> shader)
+void RenderThread::Pipeline(MatrixContext* matrixContext, LightContext* lightContext, CameraContext* cameraContext, Mesh* mesh, ShaderPass& shaderPass)
 {
 
     ModelMesh* modelMesh = mesh->GetModelMesh();
@@ -110,7 +117,7 @@ void RenderThread::Pipeline(MatrixContext* matrixContext, LightContext* lightCon
         vertexInContext.vertexIndex = vertexIndex;
 
         //顶点着色器
-        shader->VertexShading(vertexInContext, vertexOutContexts[vertexIndex], matrixContext, lightContext);
+        shaderPass.vertexShading(vertexInContext, vertexOutContexts[vertexIndex], matrixContext, lightContext);
     }
 
     //几何阶段
@@ -128,7 +135,7 @@ void RenderThread::Pipeline(MatrixContext* matrixContext, LightContext* lightCon
             ++index;
         }
         //几何着色器
-        shader->GeometryShading(primitiveInContext, primitiveOutContextBuilder, matrixContext, lightContext);
+        shaderPass.geometryShading(primitiveInContext, primitiveOutContextBuilder, matrixContext, lightContext);
     }
 
     //光栅化阶段
@@ -166,7 +173,7 @@ void RenderThread::Pipeline(MatrixContext* matrixContext, LightContext* lightCon
         PrimitiveContext& primitiveContext = primitiveOutContexts[i];
         glm::vec3 screenPositions[3] = { vertexOutContexts[primitiveContext.vertexIndexes[0]].screenPosition, vertexOutContexts[primitiveContext.vertexIndexes[1]].screenPosition, vertexOutContexts[primitiveContext.vertexIndexes[2]].screenPosition };
         float ws[3] = { vertexOutContexts[primitiveContext.vertexIndexes[0]].w, vertexOutContexts[primitiveContext.vertexIndexes[1]].w, vertexOutContexts[primitiveContext.vertexIndexes[2]].w };
-        if (CheckCullOption(primitiveContext, shader->cullOption, screenPositions))
+        if (CheckCullOption(primitiveContext, shaderPass.cullOption, screenPositions))
         {
             for (PixelIterator pixelIterator = PixelIterator(primitiveContext, vertexOutContexts); pixelIterator.CheckValid(); pixelIterator++)
             {
@@ -193,7 +200,7 @@ void RenderThread::Pipeline(MatrixContext* matrixContext, LightContext* lightCon
                         configuration.depthBuffer->SetData(pixelInContext.z, screenPosition.x, screenPosition.y);
 
                         //像素着色器
-                        shader->PixelShading(pixelInContext, pixelOutContext, matrixContext, lightContext);
+                        shaderPass.pixelShading(pixelInContext, pixelOutContext, matrixContext, lightContext);
 
                         configuration.colorBuffer->SetData(pixelOutContext.color, screenPosition.x, screenPosition.y);
                     }
