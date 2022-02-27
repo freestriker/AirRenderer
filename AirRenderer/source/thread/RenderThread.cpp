@@ -102,6 +102,7 @@ void RenderThread::Pipeline(MatrixContext* matrixContext, LightContext* lightCon
     std::function<bool()> checkAlphaTest = CalulateAlphaTestOption(shaderPass.shaderOption);
     std::function<bool()> checkEarlyZ = CalulateEarlyZ(shaderPass.shaderOption);
     std::function<bool()> checkAutoZ = CalulateAutoZ(shaderPass.shaderOption);
+    std::function<Color(Color&, Color&)> alphaBlend = CalulateAlphaBlendOption(shaderPass.shaderOption);
     //¶¥µã½×¶Î
     std::vector<VertexOutContext> vertexOutContexts = std::vector<VertexOutContext>(modelMesh->vertices_end().handle().idx());
     VertexInContext vertexInContext = VertexInContext();
@@ -208,8 +209,9 @@ void RenderThread::Pipeline(MatrixContext* matrixContext, LightContext* lightCon
                     }
                     //ÏñËØ×ÅÉ«Æ÷
                     shaderPass.pixelShading(pixelInContext, pixelOutContext, matrixContext, lightContext);
-
-                    configuration.colorBuffer->SetData(pixelOutContext.color, screenPosition.x, screenPosition.y);
+                    Color c = configuration.colorBuffer->GetData(screenPosition.x, screenPosition.y);
+                    c = alphaBlend(pixelOutContext.color, c);
+                    configuration.colorBuffer->SetData(c, screenPosition.x, screenPosition.y);
                 }
             }
             else
@@ -219,6 +221,9 @@ void RenderThread::Pipeline(MatrixContext* matrixContext, LightContext* lightCon
                 {
                     continue;
                 }
+                Color c = configuration.colorBuffer->GetData(screenPosition.x, screenPosition.y);
+                c = alphaBlend(pixelOutContext.color, c);
+                configuration.colorBuffer->SetData(c, screenPosition.x, screenPosition.y);
                 if (checkAutoZ())
                 {
                     pixelOutContext.depth = pixelInContext.depth;
@@ -406,7 +411,7 @@ std::function<bool()> RenderThread::CalulateAlphaTestOption(ShaderOption shaderO
 }
 std::function<bool()> RenderThread::CalulateEarlyZ(ShaderOption shaderOption)
 {
-    if (shaderOption.zCalculateOption == ZCalculateOption::AUTO && shaderOption.alphaTestOption == AlphaTestOption::ALPHA_TEST_OFF)
+    if (shaderOption.zCalculateOption == ZCalculateOption::AUTO && shaderOption.alphaTestOption == AlphaTestOption::ALPHA_TEST_OFF && shaderOption.alphaBlendOption == AlphaBlendOption::OFF)
     {
         return []()->bool
         {
@@ -431,5 +436,27 @@ std::function<bool()> RenderThread::CalulateAutoZ(ShaderOption shaderOption)
     {
         return false;
     };
+}
+std::function<Color(Color&, Color&)> RenderThread::CalulateAlphaBlendOption(ShaderOption shaderOption)
+{
+    switch (shaderOption.alphaBlendOption)
+    {
+    case AlphaBlendOption::OFF:
+    {
+        return [](Color& srcColor, Color& colorInBufer)->Color
+        {
+            return Color(srcColor.r, srcColor.g, srcColor.b, 1);
+        };
+    }
+    case AlphaBlendOption::SRC_ALPHA_ONE_MINUS_SRC_ALPHA:
+    {
+        return [](Color& srcColor, Color& colorInBufer)->Color
+        {
+            Color c = srcColor * srcColor.a + colorInBufer * (1 - srcColor.a);
+            c.a = 1;
+            return c;
+        };
+    }
+    }
 }
 

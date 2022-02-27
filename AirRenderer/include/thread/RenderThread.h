@@ -30,6 +30,7 @@ private:
 	std::function<bool()> CalulateAlphaTestOption(ShaderOption shaderOption);
 	std::function<bool()> CalulateEarlyZ(ShaderOption shaderOption);
 	std::function<bool()> CalulateAutoZ(ShaderOption shaderOption);
+	std::function<Color(Color&, Color&)> CalulateAlphaBlendOption(ShaderOption shaderOption);
 	void Render(std::shared_ptr<RenderCommandBuffer> renderCommandBuffer);
 	void Pipeline(MatrixContext* matrixContext, LightContext* lightContext, CameraContext* cameraContext, Mesh* mesh, ShaderPass& shaderPass);
 	QMutex commandBufferMutex;

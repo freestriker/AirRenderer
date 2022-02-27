@@ -34,7 +34,11 @@ enum class ZCalculateOption
 	AUTO,
 	MANUAL
 };
-
+enum class AlphaBlendOption
+{
+	SRC_ALPHA_ONE_MINUS_SRC_ALPHA,
+	OFF
+};
 class ShaderOption
 {
 public:
@@ -44,6 +48,7 @@ public:
 	ZWriteOption zWriteOption;
 	AlphaTestOption alphaTestOption;
 	ZCalculateOption zCalculateOption;
+	AlphaBlendOption alphaBlendOption;
 	ShaderOption()
 	{
 		cullOption = CullOption::CULL_BACK;
@@ -52,5 +57,6 @@ public:
 		zWriteOption = ZWriteOption::Z_WRITE_ON;
 		alphaTestOption = AlphaTestOption::ALPHA_TEST_OFF;
 		zCalculateOption = ZCalculateOption::AUTO;
+		alphaBlendOption = AlphaBlendOption::OFF;
 	}
 };
