@@ -8,8 +8,8 @@ class PixelInContext
 {
 public:
     glm::ivec2 screenPosition;
-    float z;
-    float w;
+    float depth;
+    //float w;
     glm::vec4 data[8]{ glm::vec4(0, 0, 0, 0) };
 };
 

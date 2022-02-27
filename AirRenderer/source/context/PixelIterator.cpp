@@ -11,9 +11,9 @@ PixelIterator::PixelIterator(PrimitiveContext& primitiveContext, std::vector<Ver
     this->screenPosition[1] = vertexOutContexts[primitiveContext.vertexIndexes[1]].screenPosition;
     this->screenPosition[2] = vertexOutContexts[primitiveContext.vertexIndexes[2]].screenPosition;
 
-    this->w[0] = vertexOutContexts[primitiveContext.vertexIndexes[0]].w;
-    this->w[1] = vertexOutContexts[primitiveContext.vertexIndexes[1]].w;
-    this->w[2] = vertexOutContexts[primitiveContext.vertexIndexes[2]].w;
+    this->w[0] = vertexOutContexts[primitiveContext.vertexIndexes[0]].depth;
+    this->w[1] = vertexOutContexts[primitiveContext.vertexIndexes[1]].depth;
+    this->w[2] = vertexOutContexts[primitiveContext.vertexIndexes[2]].depth;
 
 
     Init();

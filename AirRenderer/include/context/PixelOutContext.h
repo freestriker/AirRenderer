@@ -4,5 +4,6 @@ class PixelOutContext
 {
 public:
 	Color color;
+	float depth;
 };
 
