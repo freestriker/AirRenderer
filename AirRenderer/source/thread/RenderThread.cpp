@@ -96,7 +96,12 @@ void RenderThread::Pipeline(MatrixContext* matrixContext, LightContext* lightCon
 {
 
     ModelMesh* modelMesh = mesh->GetModelMesh();
-
+    std::function<bool(PrimitiveContext&, glm::vec3*)> checkCull = CalulateCheckCullOption(shaderPass.shaderOption);
+    std::function<bool(float, float)> checkZTest = CalulateZTestOption(shaderPass.shaderOption);
+    std::function<bool()> checkZWrite = CalulateZWriteOption(shaderPass.shaderOption);
+    std::function<bool()> checkAlphaTest = CalulateAlphaTestOption(shaderPass.shaderOption);
+    std::function<bool()> checkEarlyZ = CalulateEarlyZ(shaderPass.shaderOption);
+    std::function<bool()> checkAutoZ = CalulateAutoZ(shaderPass.shaderOption);
     //顶点阶段
     std::vector<VertexOutContext> vertexOutContexts = std::vector<VertexOutContext>(modelMesh->vertices_end().handle().idx());
     VertexInContext vertexInContext = VertexInContext();
@@ -161,7 +166,7 @@ void RenderThread::Pipeline(MatrixContext* matrixContext, LightContext* lightCon
         //光栅化
         pos = matrixContext->rasterizationMatrix * pos;
 
-        vertexOutContext.w = w;
+        vertexOutContext.depth = w;
         vertexOutContext.screenPosition = pos;
     }
 
@@ -172,37 +177,58 @@ void RenderThread::Pipeline(MatrixContext* matrixContext, LightContext* lightCon
     {
         PrimitiveContext& primitiveContext = primitiveOutContexts[i];
         glm::vec3 screenPositions[3] = { vertexOutContexts[primitiveContext.vertexIndexes[0]].screenPosition, vertexOutContexts[primitiveContext.vertexIndexes[1]].screenPosition, vertexOutContexts[primitiveContext.vertexIndexes[2]].screenPosition };
-        float ws[3] = { vertexOutContexts[primitiveContext.vertexIndexes[0]].w, vertexOutContexts[primitiveContext.vertexIndexes[1]].w, vertexOutContexts[primitiveContext.vertexIndexes[2]].w };
-        if (CheckCullOption(primitiveContext, shaderPass.cullOption, screenPositions))
+        float depths[3] = { vertexOutContexts[primitiveContext.vertexIndexes[0]].depth, vertexOutContexts[primitiveContext.vertexIndexes[1]].depth, vertexOutContexts[primitiveContext.vertexIndexes[2]].depth };
+        if (!checkCull(primitiveContext, screenPositions))continue;
+        for (PixelIterator pixelIterator = PixelIterator(primitiveContext, vertexOutContexts); pixelIterator.CheckValid(); pixelIterator++)
         {
-            for (PixelIterator pixelIterator = PixelIterator(primitiveContext, vertexOutContexts); pixelIterator.CheckValid(); pixelIterator++)
+            glm::ivec2 screenPosition = pixelIterator.GetScreenPosition();
+
+            if (!(0 <= screenPosition.x && screenPosition.x < configuration.resolution.width
+                && 0 <= screenPosition.y && screenPosition.y < configuration.resolution.height)) continue;
+
+            //插值
+            glm::dvec3 interpolationCoefficient = pixelIterator.GetInterpolationCoefficient(cameraContext);
+            pixelInContext.screenPosition = screenPosition;
+            for (int i = 0; i < 8; i++)
             {
-                glm::ivec2 screenPosition = pixelIterator.GetScreenPosition();
+                pixelInContext.data[i] =
+                    vertexOutContexts[primitiveContext.vertexIndexes[0]].data[i] * float(interpolationCoefficient.x)
+                    + vertexOutContexts[primitiveContext.vertexIndexes[1]].data[i] * float(interpolationCoefficient.y)
+                    + vertexOutContexts[primitiveContext.vertexIndexes[2]].data[i] * float(interpolationCoefficient.z);
+            }
+            pixelInContext.depth = depths[0] * interpolationCoefficient.x + depths[1] * interpolationCoefficient.y + depths[2] * interpolationCoefficient.z;
 
-                if (0 <= screenPosition.x && screenPosition.x < configuration.resolution.width
-                    && 0 <= screenPosition.y && screenPosition.y < configuration.resolution.height)
+            if (checkEarlyZ())
+            {
+                if (checkZTest(pixelInContext.depth, configuration.depthBuffer->GetData(screenPosition.x, screenPosition.y)))
                 {
-                    //插值
-                    glm::dvec3 interpolationCoefficient = pixelIterator.GetInterpolationCoefficient(cameraContext);
-                    pixelInContext.screenPosition = screenPosition;
-
-                    for (int i = 0; i < 8; i++)
+                    if (checkZWrite())
                     {
-                        pixelInContext.data[i] =
-                            vertexOutContexts[primitiveContext.vertexIndexes[0]].data[i] * float(interpolationCoefficient.x)
-                            + vertexOutContexts[primitiveContext.vertexIndexes[1]].data[i] * float(interpolationCoefficient.y)
-                            + vertexOutContexts[primitiveContext.vertexIndexes[2]].data[i] * float(interpolationCoefficient.z);
+                        configuration.depthBuffer->SetData(pixelInContext.depth, screenPosition.x, screenPosition.y);
                     }
-                    pixelInContext.w = ws[0] * interpolationCoefficient.x + ws[1] * interpolationCoefficient.y + ws[2] * interpolationCoefficient.z;
+                    //像素着色器
+                    shaderPass.pixelShading(pixelInContext, pixelOutContext, matrixContext, lightContext);
 
-                    if (pixelInContext.z < configuration.depthBuffer->GetData(screenPosition.x, screenPosition.y))
+                    configuration.colorBuffer->SetData(pixelOutContext.color, screenPosition.x, screenPosition.y);
+                }
+            }
+            else
+            {
+                bool clip = shaderPass.pixelShading(pixelInContext, pixelOutContext, matrixContext, lightContext);
+                if (clip && checkAlphaTest())
+                {
+                    continue;
+                }
+                if (checkAutoZ())
+                {
+                    pixelOutContext.depth = pixelInContext.depth;
+                }
+                if (checkZTest(pixelOutContext.depth, configuration.depthBuffer->GetData(screenPosition.x, screenPosition.y)))
+                {
+                    configuration.colorBuffer->SetData(pixelOutContext.color, screenPosition.x, screenPosition.y);
+                    if (checkZWrite())
                     {
-                        configuration.depthBuffer->SetData(pixelInContext.z, screenPosition.x, screenPosition.y);
-
-                        //像素着色器
-                        shaderPass.pixelShading(pixelInContext, pixelOutContext, matrixContext, lightContext);
-
-                        configuration.colorBuffer->SetData(pixelOutContext.color, screenPosition.x, screenPosition.y);
+                        configuration.depthBuffer->SetData(pixelOutContext.depth, screenPosition.x, screenPosition.y);
                     }
                 }
             }
@@ -224,33 +250,186 @@ void RenderThread::Display()
     configuration.canvas.save("C:\\Users\\23174\\Desktop\\Out.png", "PNG", 100);
 
 }
-bool RenderThread::CheckCullOption(PrimitiveContext& primitiveContext, CullOption cullOption, glm::vec3* positions)
+std::function<bool(PrimitiveContext&, glm::vec3*)> RenderThread::CalulateCheckCullOption(ShaderOption shaderOption)
 {
-    
-    if (primitiveContext.primitiveType == PrimitiveType::TRIANGLE)
+    switch (shaderOption.cullOption)
     {
-        glm::vec3 v1 = positions[1] - positions[0];
-        glm::vec3 v2 = positions[2] - positions[1];
-        glm::vec3 fn = glm::cross(v1, v2);
-        float d = glm::dot(glm::vec3(0, 0, -1), fn);
-        switch (cullOption)
+        case CullOption::CULL_OFF:
         {
-        case CullOption::CULL_BACK:
-        {
-            return d >= 0.000001;
+            return [](PrimitiveContext& primitiveContext, glm::vec3* positions)->bool
+            {
+                if (primitiveContext.primitiveType == PrimitiveType::TRIANGLE)
+                {
+                    glm::vec3 v1 = positions[1] - positions[0];
+                    glm::vec3 v2 = positions[2] - positions[1];
+                    glm::vec3 fn = glm::cross(v1, v2);
+                    float d = glm::dot(glm::vec3(0, 0, -1), fn);
+                    return d <= -0.000001 || d >= 0.000001;
+                }
+                else
+                {
+                    return true;
+                }
+            };
         }
         case CullOption::CULL_FRONT:
         {
-            return d <= -0.000001;
+            return [](PrimitiveContext& primitiveContext, glm::vec3* positions)->bool
+            {
+                if (primitiveContext.primitiveType == PrimitiveType::TRIANGLE)
+                {
+                    glm::vec3 v1 = positions[1] - positions[0];
+                    glm::vec3 v2 = positions[2] - positions[1];
+                    glm::vec3 fn = glm::cross(v1, v2);
+                    float d = glm::dot(glm::vec3(0, 0, -1), fn);
+                    return d <= -0.000001;
+                }
+                else
+                {
+                    return true;
+                }
+            };
         }
-        case CullOption::CULL_OFF:
+        case CullOption::CULL_BACK:
         {
-            return d <= -0.000001 || d >= 0.000001;
+            return [](PrimitiveContext& primitiveContext, glm::vec3* positions)->bool
+            {
+                if (primitiveContext.primitiveType == PrimitiveType::TRIANGLE)
+                {
+                    glm::vec3 v1 = positions[1] - positions[0];
+                    glm::vec3 v2 = positions[2] - positions[1];
+                    glm::vec3 fn = glm::cross(v1, v2);
+                    float d = glm::dot(glm::vec3(0, 0, -1), fn);
+                    return d >= 0.000001;
+                }
+                else
+                {
+                    return true;
+                }
+            };
         }
-        }
-    }
-    else
-    {
-        return true;
     }
 }
+std::function<bool(float, float)> RenderThread::CalulateZTestOption(ShaderOption shaderOption)
+{
+    switch (shaderOption.zTestOption)
+    {
+        case ZTestOption::Z_TEST_ON:
+        {
+            switch (shaderOption.zTestCompareOption)
+            {
+            case ZTestCompareOption::EQUAL:
+            {
+                return [](float depth, float depthInBuffer)->bool
+                {
+                    return depth == depthInBuffer;
+                };
+            }
+            case ZTestCompareOption::LESS_EQUAL:
+            {
+                return [](float depth, float depthInBuffer)->bool
+                {
+                    return depth <= depthInBuffer;
+                };
+            }
+            case ZTestCompareOption::LESS:
+            {
+                return [](float depth, float depthInBuffer)->bool
+                {
+                    return depth < depthInBuffer;
+                };
+            }
+            case ZTestCompareOption::GREAT_EQUAL:
+            {
+                return [](float depth, float depthInBuffer)->bool
+                {
+                    return depth >= depthInBuffer;
+                };
+            }
+            case ZTestCompareOption::GREAT:
+            {
+                return [](float depth, float depthInBuffer)->bool
+                {
+                    return depth > depthInBuffer;
+                };
+            }
+            }
+        }
+        case ZTestOption::Z_TEST_OFF:
+        {
+            return [](float depth, float depthInBuffer)->bool
+            {
+                return true;
+            };
+        }
+    }
+}
+std::function<bool()> RenderThread::CalulateZWriteOption(ShaderOption shaderOption)
+{
+    switch (shaderOption.zWriteOption)
+    {
+        case ZWriteOption::Z_WRITE_ON:
+        {
+            return []()->bool
+            {
+                return true;
+            };
+        }
+        case ZWriteOption::Z_WRITE_OFF:
+        {
+            return []()->bool
+            {
+                return false;
+            };
+        }
+    }
+}
+std::function<bool()> RenderThread::CalulateAlphaTestOption(ShaderOption shaderOption)
+{
+    switch (shaderOption.alphaTestOption)
+    {
+        case AlphaTestOption::ALPHA_TEST_ON:
+        {
+            return []()->bool
+            {
+                return true;
+            };
+        }
+        case AlphaTestOption::ALPHA_TEST_OFF:
+        {
+            return []()->bool
+            {
+                return false;
+            };
+        }
+    }
+}
+std::function<bool()> RenderThread::CalulateEarlyZ(ShaderOption shaderOption)
+{
+    if (shaderOption.zCalculateOption == ZCalculateOption::AUTO && shaderOption.alphaTestOption == AlphaTestOption::ALPHA_TEST_OFF)
+    {
+        return []()->bool
+        {
+            return true;
+        };
+    }
+    return []()->bool
+    {
+        return false;
+    };
+}
+std::function<bool()> RenderThread::CalulateAutoZ(ShaderOption shaderOption)
+{
+    if (shaderOption.zCalculateOption == ZCalculateOption::AUTO)
+    {
+        return []()->bool
+        {
+            return true;
+        };
+    }
+    return []()->bool
+    {
+        return false;
+    };
+}
+

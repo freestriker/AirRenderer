@@ -9,6 +9,9 @@ public:
 	static glm::vec3 SchmidtOrthogonalization(glm::vec3& v1, glm::vec3& v2);
 	void FillData(void* data)override;
 	Shader();
+	void DefaultVertexShading(VertexInContext& vertexInContext, VertexOutContext& vertexOutContext, MatrixContext* matrixContext, LightContext* lightContext);
+	bool DefaultPixelShading(PixelInContext& pixelInContext, PixelOutContext& pixelOutContext, MatrixContext* matrixContext, LightContext* lightContext);
+	void DefaultGeometryShading(PrimitiveContext& primitiveInContext, PrimitiveOutContextBuilder& primitiveOutContextBuilder, MatrixContext* matrixContext, LightContext* lightContext);
 };
 
 template<typename TValue>
@@ -29,4 +32,23 @@ template<typename TValue>
 Shader<TValue>::Shader():ShaderBase()
 {
 	value = nullptr;
+}
+template<typename TValue>
+void Shader<TValue>::DefaultVertexShading(VertexInContext& vertexInContext, VertexOutContext& vertexOutContext, MatrixContext* matrixContext, LightContext* lightContext)
+{
+	vertexOutContext.data[RegisterIndex::POSITION] = matrixContext->wvpMatrix * vertexInContext.data[RegisterIndex::POSITION];
+
+	vertexOutContext.data[RegisterIndex::COLOR] = vertexInContext.data[RegisterIndex::COLOR];
+}
+template<typename TValue>
+bool Shader<TValue>::DefaultPixelShading(PixelInContext& pixelInContext, PixelOutContext& pixelOutContext, MatrixContext* matrixContext, LightContext* lightContext)
+{
+	pixelOutContext.color = Color(pixelInContext.data[RegisterIndex::COLOR]);
+	pixelOutContext.depth = pixelInContext.depth;
+	return false;
+}
+template<typename TValue>
+void Shader<TValue>::DefaultGeometryShading(PrimitiveContext& primitiveInContext, PrimitiveOutContextBuilder& primitiveOutContextBuilder, MatrixContext* matrixContext, LightContext* lightContext)
+{
+	primitiveOutContextBuilder.SubmitPrimitiveOutContext(primitiveInContext);
 }

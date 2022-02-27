@@ -24,7 +24,12 @@ public:
 	RenderThread(QObject* parent);
 private:
 	void Display();
-	bool CheckCullOption(PrimitiveContext& primitiveContext, CullOption cullOption, glm::vec3* positions);
+	std::function<bool(PrimitiveContext&, glm::vec3*)> CalulateCheckCullOption(ShaderOption shaderOption);
+	std::function<bool(float, float)> CalulateZTestOption(ShaderOption shaderOption);
+	std::function<bool()> CalulateZWriteOption(ShaderOption shaderOption);
+	std::function<bool()> CalulateAlphaTestOption(ShaderOption shaderOption);
+	std::function<bool()> CalulateEarlyZ(ShaderOption shaderOption);
+	std::function<bool()> CalulateAutoZ(ShaderOption shaderOption);
 	void Render(std::shared_ptr<RenderCommandBuffer> renderCommandBuffer);
 	void Pipeline(MatrixContext* matrixContext, LightContext* lightContext, CameraContext* cameraContext, Mesh* mesh, ShaderPass& shaderPass);
 	QMutex commandBufferMutex;

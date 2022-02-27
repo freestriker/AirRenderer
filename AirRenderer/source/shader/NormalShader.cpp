@@ -17,7 +17,7 @@ void NormalShader::VertexShading(VertexInContext& vertexInContext, VertexOutCont
 	vertexOutContext.data[RegisterIndex::TEXCOORD2] = matrixContext->wvMatrix * vertexInContext.data[RegisterIndex::POSITION];
 }
 
-void NormalShader::PixelShading(PixelInContext& pixelInContext, PixelOutContext& pixelOutContext, MatrixContext* matrixContext, LightContext* lightContext)
+bool NormalShader::PixelShading(PixelInContext& pixelInContext, PixelOutContext& pixelOutContext, MatrixContext* matrixContext, LightContext* lightContext)
 {
 	glm::vec2 uv = glm::vec2(pixelInContext.data[RegisterIndex::TEXCOORD1]);
 	Color c = Color(pixelInContext.data[RegisterIndex::COLOR]) * value->texture.Sample(uv);
@@ -54,15 +54,19 @@ void NormalShader::PixelShading(PixelInContext& pixelInContext, PixelOutContext&
 
 
 	pixelOutContext.color = c * (al * value->ambientReflectance + dl * value->diffuseReflectance + sl * value->specularReflectance);
+	pixelOutContext.depth = pixelInContext.depth;
+	return false;
 }
 void NormalShader::GeometryShading(PrimitiveContext& primitiveInContext, PrimitiveOutContextBuilder& primitiveOutContextBuilder, MatrixContext* matrixContext, LightContext* lightContext)
 {
 	primitiveOutContextBuilder.SubmitPrimitiveOutContext(primitiveInContext);
 }
 
-void NormalShader::WireframePixelShading(PixelInContext& pixelInContext, PixelOutContext& pixelOutContext, MatrixContext* matrixContext, LightContext* lightContext)
+bool NormalShader::WireframePixelShading(PixelInContext& pixelInContext, PixelOutContext& pixelOutContext, MatrixContext* matrixContext, LightContext* lightContext)
 {
 	pixelOutContext.color = Color::green;
+	pixelOutContext.depth = pixelInContext.depth;
+	return false;
 }
 
 void NormalShader::WireframeGeometryShading(PrimitiveContext& primitiveInContext, PrimitiveOutContextBuilder& primitiveOutContextBuilder, MatrixContext* matrixContext, LightContext* lightContext)
@@ -82,9 +86,11 @@ void NormalShader::WireframeGeometryShading(PrimitiveContext& primitiveInContext
 	primitiveOutContext.vertexIndexes[1] = indexes[0];
 	primitiveOutContextBuilder.SubmitPrimitiveOutContext(primitiveOutContext);
 }
-void NormalShader::NormalPixelShading(PixelInContext& pixelInContext, PixelOutContext& pixelOutContext, MatrixContext* matrixContext, LightContext* lightContext)
+bool NormalShader::NormalPixelShading(PixelInContext& pixelInContext, PixelOutContext& pixelOutContext, MatrixContext* matrixContext, LightContext* lightContext)
 {
 	pixelOutContext.color = Color::red;
+	pixelOutContext.depth = pixelInContext.depth;
+	return false;
 }
 
 void NormalShader::NormalGeometryShading(PrimitiveContext& primitiveInContext, PrimitiveOutContextBuilder& primitiveOutContextBuilder, MatrixContext* matrixContext, LightContext* lightContext)
@@ -111,15 +117,17 @@ void NormalShader::NormalGeometryShading(PrimitiveContext& primitiveInContext, P
 NormalShader::NormalShader():Shader<NormalData>()
 {
 	this->activeTable[0] = true;
-	this->shaderPasses[0].vertexShading = std::bind(&NormalShader::VertexShading, *this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
+	this->shaderPasses[0].vertexShading = std::bind(&NormalShader::VertexShading, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
 	this->shaderPasses[0].pixelShading = std::bind(&NormalShader::NormalPixelShading, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
-	this->shaderPasses[0].geometryShading = std::bind(&NormalShader::NormalGeometryShading, *this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
+	this->shaderPasses[0].geometryShading = std::bind(&NormalShader::NormalGeometryShading, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
+	
 	this->activeTable[1] = true;
-	this->shaderPasses[1].vertexShading = std::bind(&NormalShader::VertexShading, *this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
-	this->shaderPasses[1].pixelShading = std::bind(&NormalShader::WireframePixelShading, *this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
-	this->shaderPasses[1].geometryShading = std::bind(&NormalShader::WireframeGeometryShading, *this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
+	this->shaderPasses[1].vertexShading = std::bind(&NormalShader::VertexShading, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
+	this->shaderPasses[1].pixelShading = std::bind(&NormalShader::WireframePixelShading, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
+	this->shaderPasses[1].geometryShading = std::bind(&NormalShader::WireframeGeometryShading, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
+	
 	this->activeTable[2] = true;
-	this->shaderPasses[2].vertexShading = std::bind(&NormalShader::VertexShading, *this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
+	this->shaderPasses[2].vertexShading = std::bind(&NormalShader::VertexShading, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
 	this->shaderPasses[2].pixelShading = std::bind(&NormalShader::PixelShading, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
-	this->shaderPasses[2].geometryShading = std::bind(&NormalShader::GeometryShading, *this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
+	this->shaderPasses[2].geometryShading = std::bind(&NormalShader::GeometryShading, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
 }

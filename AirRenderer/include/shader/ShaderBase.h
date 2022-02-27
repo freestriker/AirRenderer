@@ -14,9 +14,9 @@ constexpr int MAX_SHADER_PASS_COUNT = 4;
 class ShaderPass
 {
 public:
-	CullOption cullOption;
+	ShaderOption shaderOption;
 	std::function<void(VertexInContext&, VertexOutContext&, MatrixContext*, LightContext*)> vertexShading;
-	std::function<void(PixelInContext&, PixelOutContext&, MatrixContext*, LightContext*)> pixelShading;
+	std::function<bool(PixelInContext&, PixelOutContext&, MatrixContext*, LightContext*)> pixelShading;
 	std::function<void(PrimitiveContext&, PrimitiveOutContextBuilder&, MatrixContext*, LightContext*)> geometryShading;
 
 	ShaderPass();

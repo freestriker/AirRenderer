@@ -10,7 +10,7 @@ ShaderBase::ShaderBase()
 
 ShaderPass::ShaderPass()
 {
-	cullOption = CullOption::CULL_BACK;
+	shaderOption = ShaderOption();
 	vertexShading = nullptr;
 	pixelShading = nullptr;
 	geometryShading = nullptr;
