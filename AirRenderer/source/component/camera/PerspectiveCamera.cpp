@@ -17,7 +17,7 @@ glm::mat4 PerspectiveCamera::ProjectionMatrix()
         return glm::mat4(
         cot / aspectRatio, 0, 0, 0,
         0, cot, 0, 0,
-        0, 0, -farFlat / (farFlat - nearFlat), -1,
+        0, 0, farFlat / (farFlat - nearFlat), -1,
         0, 0, -nearFlat * farFlat / (farFlat - nearFlat), 0
     );
 }
