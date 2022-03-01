@@ -23,6 +23,11 @@ public:
 		this->vertexOutContexts = &vertexOutContexts;
 		this->primitiveOutContexts = &primitiveOutContexts;
 	}
+	PrimitiveOutContextBuilder()
+	{
+		this->vertexOutContexts = nullptr;
+		this->primitiveOutContexts = nullptr;
+	}
 	VertexOutContext GetVectorOutContext(int vertexIndex)
 	{
 		return vertexOutContexts->operator[](vertexIndex);

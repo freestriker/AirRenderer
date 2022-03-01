@@ -282,6 +282,9 @@
     <ClInclude Include="include\context\PrimitiveContext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\utils\Clip.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\thread\RenderThread.h">

@@ -19,6 +19,9 @@ public:
 			cameraContext.needPerspectiveCorrection = camera.needPerspectiveCorrection;
 			cameraContext.projectionMatrix = camera.ProjectionMatrix();
 			cameraContext.worldMatrix = camera.WorldMatrix();
+			cameraContext.aspectRatio = camera.aspectRatio;
+			cameraContext.nearFlat = camera.nearFlat;
+			cameraContext.farFlat = camera.farFlat;
 			materialInstanceIndex = std::vector<int>();
 		}
 	};

@@ -12,7 +12,7 @@ glm::mat4 OrthographicCamera::ProjectionMatrix()
     return glm::mat4(
         1.0 / (aspectRatio * size), 0, 0, 0,
         0, 1.0 / size, 0, 0,
-        0, 0, -1.0 / (farFlat - nearFlat), 0,
-        0, 0, -nearFlat / (farFlat - nearFlat), 1
+        0, 0, -1.0 / (farFlat/* - nearFlat*/), 0,
+        0, 0, -nearFlat / (farFlat/* - nearFlat*/), 1
     );
 }

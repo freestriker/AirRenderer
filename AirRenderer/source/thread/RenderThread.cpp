@@ -13,6 +13,7 @@
 #include <include/component/camera/PerspectiveCamera.h>
 #include <include/context/CameraContext.h>
 #include <include/context/PrimitiveContext.h>
+#include <include/utils/Clip.h>
 RenderThread::RenderThread(QObject* parent) :QThread(parent)
 {
     this->commandBufferList = std::vector<std::shared_ptr<RenderCommandBuffer>>(8);
@@ -79,6 +80,7 @@ void RenderThread::Render(std::shared_ptr<RenderCommandBuffer> renderCommandBuff
             matrixContext.wv_itMatrix = glm::transpose(glm::inverse(matrixContext.wvMatrix));
             matrixContext.w_itMatrix = glm::transpose(glm::inverse(matrixContext.worldMatrix));
             matrixContext.wvpMatrix = matrixContext.vpMatrix * matrixContext.worldMatrix;
+            Log::LogMatrix("projectionMatrix", matrixContext.wvpMatrix);
 
             ShaderBase* sb = materialRenderWrap.materialInstance->Shader();
             for (int i = 0; i < MAX_SHADER_PASS_COUNT; i++)
@@ -143,6 +145,14 @@ void RenderThread::Pipeline(MatrixContext* matrixContext, LightContext* lightCon
         //几何着色器
         shaderPass.geometryShading(primitiveInContext, primitiveOutContextBuilder, matrixContext, lightContext);
     }
+    //剔除
+    std::vector< PrimitiveContext> primitiveClipOutContexts = std::vector< PrimitiveContext>();
+    std::vector<VertexOutContext> vertexClipOutContexts = std::vector<VertexOutContext>();
+    glm::vec4 clipPlanes[6] = { glm::vec4(1, 0, 0, 1), glm::vec4(-1, 0, 0, 1), glm::vec4(0, 1, 0, 1), glm::vec4(0, -1, 0, 1), glm::vec4(0, 0, -cameraContext->nearFlat / cameraContext->farFlat, 1), glm::vec4(0, 0, -1, 1) };
+    Clip clipBuilder = Clip(clipPlanes, 6, vertexOutContexts, primitiveOutContexts, vertexClipOutContexts, primitiveClipOutContexts);
+    clipBuilder.ClipToNewPrimitive();
+    vertexOutContexts = vertexClipOutContexts;
+    primitiveOutContexts = primitiveClipOutContexts;
 
     //光栅化阶段
     for (int i = 0, size = vertexOutContexts.size(); i < size; ++i)
