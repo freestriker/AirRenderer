@@ -6,4 +6,7 @@ public:
 	bool needPerspectiveCorrection;
 	glm::mat4 projectionMatrix;
 	glm::mat4 worldMatrix;
+	float nearFlat;
+	float farFlat;
+	float aspectRatio;
 };

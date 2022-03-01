@@ -5,6 +5,9 @@
 class Camera: public Component
 {
 public:
+	float nearFlat;
+	float farFlat;
+	float aspectRatio;
 	std::string cameraType;
 	bool needPerspectiveCorrection;
 	virtual glm::mat4 ProjectionMatrix() = 0;
