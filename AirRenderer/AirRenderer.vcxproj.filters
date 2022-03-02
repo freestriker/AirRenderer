@@ -282,7 +282,7 @@
     <ClInclude Include="include\context\PrimitiveContext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\utils\Clip.h">
+    <ClInclude Include="include\utils\PrimitiveCliper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

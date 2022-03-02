@@ -4,10 +4,9 @@
 #include <glm/glm.hpp>
 #include <include/context/PrimitiveContext.h>
 #include <include/context/VertexOutContext.h>
-class Clip
+class PrimitiveCliper
 {
-public:
-	glm::vec4* clipPlanes;
+	glm::vec4 clipPlanes[6];
 	int clipPlaneCount;
 	PrimitiveOutContextBuilder primitiveBuilder;
 	std::vector<int> vertexIndexes;
@@ -16,23 +15,6 @@ public:
 	std::vector<PrimitiveContext>* clipInPrimitiveContext;
 	std::vector<VertexOutContext>* clipOutVertexContext;
 	std::vector<PrimitiveContext>* clipOutPrimitiveContext;
-
-	Clip(glm::vec4* clipPlanes, int clipPlaneCount, std::vector<VertexOutContext>& clipInVertexContext, std::vector<PrimitiveContext>& clipInPrimitiveContext, std::vector<VertexOutContext>& clipOutVertexContext, std::vector<PrimitiveContext>& clipOutPrimitiveContext)
-	{
-		primitiveBuilder = PrimitiveOutContextBuilder(clipOutVertexContext, clipOutPrimitiveContext);
-		this->clipPlanes = clipPlanes;
-		this->clipPlaneCount = clipPlaneCount;
-		vertexIndexes = std::vector<int>(6);
-		this->clipInVertexContext = &clipInVertexContext;
-		this->clipInPrimitiveContext = &clipInPrimitiveContext;
-		this->clipOutVertexContext = &clipOutVertexContext;
-		this->clipOutPrimitiveContext = &clipOutPrimitiveContext;
-		clipInVertexOutCodes = std::vector< uint8_t>(clipInVertexContext.size());
-		for (int i = 0, size = clipInVertexOutCodes.size(); i < size; i++)
-		{
-			clipInVertexOutCodes[i] = GetOutCode(clipInVertexContext[i].data[0], 0);
-		}
-	}
 	uint8_t GetOutCode(const glm::vec4& v, const int startPlaneIndex)
 	{
 		uint8_t code = 0;
@@ -252,45 +234,79 @@ public:
 		}
 	}
 
-	void ClipToNewPrimitive()
-	{
-		for each (PrimitiveContext primitiveContext in *clipInPrimitiveContext)
+	public:
+		void ClipPrimitive()
 		{
-			ClipPrimitive(primitiveContext);
-		}
-	}
-	void ClipPrimitive(PrimitiveContext& primitiveContext)
-	{
-		vertexIndexes.clear();
-		switch (primitiveContext.primitiveType)
-		{
-			case PrimitiveType::POINT:
+			for each (PrimitiveContext primitiveContext in *clipInPrimitiveContext)
 			{
-				glm::vec4 v = primitiveBuilder.vertexOutContexts->operator[](primitiveContext.vertexIndexes[0]).data[0];
-				if (GetOutCode(v, 0) == 0)
+				vertexIndexes.clear();
+				switch (primitiveContext.primitiveType)
 				{
-					primitiveBuilder.SubmitPrimitiveOutContext(primitiveContext);
-				}
-				break;
-			}
-			case PrimitiveType::LINE:
-			{
-				ClipLine(primitiveContext.vertexIndexes[0], primitiveContext.vertexIndexes[1]);
-				if (vertexIndexes.size() == 2)
+				case PrimitiveType::POINT:
 				{
-					PrimitiveContext pc = PrimitiveContext();
-					pc.primitiveType = PrimitiveType::LINE;
-					pc.vertexIndexes[0] = vertexIndexes[0];
-					pc.vertexIndexes[1] = vertexIndexes[1];
-					primitiveBuilder.SubmitPrimitiveOutContext(pc);
+					glm::vec4 v = primitiveBuilder.vertexOutContexts->operator[](primitiveContext.vertexIndexes[0]).data[0];
+					if (GetOutCode(v, 0) == 0)
+					{
+						primitiveBuilder.SubmitPrimitiveOutContext(primitiveContext);
+					}
+					break;
 				}
-				break;
-			}
-			case PrimitiveType::TRIANGLE:
-			{
-				ClipTriangle(primitiveContext.vertexIndexes);
-				break;
+				case PrimitiveType::LINE:
+				{
+					ClipLine(primitiveContext.vertexIndexes[0], primitiveContext.vertexIndexes[1]);
+					if (vertexIndexes.size() == 2)
+					{
+						PrimitiveContext pc = PrimitiveContext();
+						pc.primitiveType = PrimitiveType::LINE;
+						pc.vertexIndexes[0] = vertexIndexes[0];
+						pc.vertexIndexes[1] = vertexIndexes[1];
+						primitiveBuilder.SubmitPrimitiveOutContext(pc);
+					}
+					break;
+				}
+				case PrimitiveType::TRIANGLE:
+				{
+					ClipTriangle(primitiveContext.vertexIndexes);
+					break;
+				}
+				}
 			}
 		}
+		PrimitiveCliper()
+	{
+		this->clipPlaneCount = 0;
+		vertexIndexes = std::vector<int>(6);
+		this->clipInVertexContext = nullptr;
+		this->clipInPrimitiveContext = nullptr;
+		this->clipOutVertexContext = nullptr;
+		this->clipOutPrimitiveContext = nullptr;
+		clipInVertexOutCodes = std::vector< uint8_t>();
 	}
+	PrimitiveCliper(glm::vec4* clipPlanes, int clipPlaneCount)
+	{
+		for (int i = 0; i < clipPlaneCount; i++)
+		{
+			this->clipPlanes[i] = clipPlanes[i];
+		}
+		this->clipPlaneCount = clipPlaneCount;
+		vertexIndexes = std::vector<int>(6);
+		this->clipInVertexContext = nullptr;
+		this->clipInPrimitiveContext = nullptr;
+		this->clipOutVertexContext = nullptr;
+		this->clipOutPrimitiveContext = nullptr;
+		clipInVertexOutCodes = std::vector< uint8_t>();
+	}
+	void Bind(std::vector<VertexOutContext>& clipInVertexContext, std::vector<PrimitiveContext>& clipInPrimitiveContext, std::vector<VertexOutContext>& clipOutVertexContext, std::vector<PrimitiveContext>& clipOutPrimitiveContext)
+	{
+		primitiveBuilder = PrimitiveOutContextBuilder(clipOutVertexContext, clipOutPrimitiveContext);
+		this->clipInVertexContext = &clipInVertexContext;
+		this->clipInPrimitiveContext = &clipInPrimitiveContext;
+		this->clipOutVertexContext = &clipOutVertexContext;
+		this->clipOutPrimitiveContext = &clipOutPrimitiveContext;
+		for (int i = 0, size = clipInVertexContext.size(); i < size; i++)
+		{
+			clipInVertexOutCodes.push_back(GetOutCode(clipInVertexContext[i].data[0], 0));
+		}
+	}
+
 };

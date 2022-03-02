@@ -13,7 +13,7 @@
 #include <include/component/camera/PerspectiveCamera.h>
 #include <include/context/CameraContext.h>
 #include <include/context/PrimitiveContext.h>
-#include <include/utils/Clip.h>
+#include <include/utils/PrimitiveCliper.h>
 RenderThread::RenderThread(QObject* parent) :QThread(parent)
 {
     this->commandBufferList = std::vector<std::shared_ptr<RenderCommandBuffer>>(8);
@@ -148,9 +148,12 @@ void RenderThread::Pipeline(MatrixContext* matrixContext, LightContext* lightCon
     //ÌÞ³ý
     std::vector< PrimitiveContext> primitiveClipOutContexts = std::vector< PrimitiveContext>();
     std::vector<VertexOutContext> vertexClipOutContexts = std::vector<VertexOutContext>();
-    glm::vec4 clipPlanes[6] = { glm::vec4(1, 0, 0, 1), glm::vec4(-1, 0, 0, 1), glm::vec4(0, 1, 0, 1), glm::vec4(0, -1, 0, 1), glm::vec4(0, 0, -cameraContext->nearFlat / cameraContext->farFlat, 1), glm::vec4(0, 0, -1, 1) };
-    Clip clipBuilder = Clip(clipPlanes, 6, vertexOutContexts, primitiveOutContexts, vertexClipOutContexts, primitiveClipOutContexts);
-    clipBuilder.ClipToNewPrimitive();
+    //glm::vec4 clipPlanes[6] = { glm::vec4(1, 0, 0, 1), glm::vec4(-1, 0, 0, 1), glm::vec4(0, 1, 0, 1), glm::vec4(0, -1, 0, 1), glm::vec4(0, 0, -cameraContext->nearFlat / cameraContext->farFlat, 1), glm::vec4(0, 0, -1, 1) };
+    //Clip clipBuilder = Clip(clipPlanes, 6);
+    //clipBuilder.Bind(vertexOutContexts, primitiveOutContexts, vertexClipOutContexts, primitiveClipOutContexts);
+    //clipBuilder.ClipPrimitive();
+    cameraContext->primitiveCliper.Bind(vertexOutContexts, primitiveOutContexts, vertexClipOutContexts, primitiveClipOutContexts);
+    cameraContext->primitiveCliper.ClipPrimitive();
     vertexOutContexts = vertexClipOutContexts;
     primitiveOutContexts = primitiveClipOutContexts;
 
@@ -160,14 +163,6 @@ void RenderThread::Pipeline(MatrixContext* matrixContext, LightContext* lightCon
         VertexOutContext& vertexOutContext = vertexOutContexts[i];
 
         glm::vec4 pos = vertexOutContext.data[RegisterIndex::POSITION];
-
-        ////²âÊÔÌÞ³ý
-        //if (-pos.w < pos.x && pos.x < pos.w
-        //    && -pos.w < pos.y && pos.y < pos.w
-        //    && 0 < pos.z && pos.z < pos.w)
-        //{
-        //    inBoundryCount++;
-        //}
 
         //Í¸ÊÓ³ý·¨
         float w = pos.w;
