@@ -1,15 +1,20 @@
 #include <include/utils/OrientedBoundingBox.h>
-glm::mat3 OrientedBoundingBox::computeCovarianceMatrix(glm::vec3* pVertices, int numVertices)
+glm::mat3 OrientedBoundingBox::computeCovarianceMatrix(ModelMesh& modelMesh)
 {
     glm::mat3 covariance = glm::mat3();
-    std::vector<glm::vec3> pVectors = std::vector<glm::vec3>(numVertices);
+    std::vector<glm::vec3> pVectors = std::vector<glm::vec3>();
 
     //Compute the average x,y,z  
     glm::vec3 avg = glm::vec3(0.0, 0.0, 0.0);
-    for (int i = 0; i < numVertices; i++) {
-        pVectors[i] = pVertices[i];
-        avg = avg + pVertices[i];
+    int i = 0;
+    for (ModelMesh::VertexIter v_itr = modelMesh.vertices_sbegin(), v_end_itr = modelMesh.vertices_end(); v_itr != v_end_itr; ++v_itr)
+    {
+        ModelMesh::Point pos = modelMesh.point(v_itr);
+        glm::vec3 p = glm::vec3(pos[0], pos[1], pos[2]);
+        pVectors.push_back(p);
+        avg = avg + p;
     }
+    int numVertices = pVectors.size();
     avg = avg / float(numVertices);
     for (int i = 0; i < numVertices; i++)
         pVectors[i] -= avg;
@@ -160,4 +165,31 @@ void OrientedBoundingBox::schmidtOrthogonal(glm::vec3& v0, glm::vec3& v1, glm::v
     v1 = v1 - glm::dot(v0, v1) * v0;
     glm::normalize(v1);
     v2 = glm::normalize(glm::cross(v0, v1));
+}
+OrientedBoundingBox::OrientedBoundingBox(ModelMesh& modelMesh)
+{
+    glm::mat3 covariance = computeCovarianceMatrix(modelMesh);
+    float eigenValues[3]{ 0 };
+
+    jacobiSolver(covariance, eigenValues, directions);
+    schmidtOrthogonal(directions[0], directions[1], directions[2]);
+    float maxX = FLT_MIN, maxY = FLT_MIN, maxZ = FLT_MIN;
+    float minX = FLT_MAX, minY = FLT_MAX, minZ = FLT_MAX;
+    for (ModelMesh::VertexIter v_itr = modelMesh.vertices_sbegin(), v_end_itr = modelMesh.vertices_end(); v_itr != v_end_itr; ++v_itr)
+    {
+        ModelMesh::Point pos = modelMesh.point(v_itr);
+        glm::vec3 p = glm::vec3(pos[0], pos[1], pos[2]);
+
+        maxX = std::max(maxX, glm::dot(directions[0], p));
+        maxY = std::max(maxY, glm::dot(directions[1], p));
+        maxZ = std::max(maxZ, glm::dot(directions[2], p));
+
+        minX = std::min(minX, glm::dot(directions[0], p));
+        minY = std::min(minY, glm::dot(directions[1], p));
+        minZ = std::min(minZ, glm::dot(directions[2], p));
+
+    }
+    this->halfEdgeLength = glm::vec3((maxX - minX) / 2.0, (maxY - minY) / 2.0, (maxZ - minZ) / 2.0);
+    glm::vec3 c = glm::vec3((maxX + minX) / 2.0, (maxY + minY) / 2.0, (maxZ + minZ) / 2.0);
+    this->center = directions[0] * c.x + directions[1] * c.y + directions[2] * c.z;
 }
