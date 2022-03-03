@@ -4,6 +4,7 @@
 #include <map>
 #include <QWaitCondition>
 #include <QMutex>
+#include <include/utils/OrientedBoundingBox.h>
 
 class LoadThread : public QThread
 {
@@ -32,6 +33,12 @@ public:
     public:
         void* resource;
         int referenceCount;
+    };
+    class MeshWrap
+    {
+    public:
+        ModelMesh* modelMesh;
+        OrientedBoundingBox* orientedBoundingBox;
     };
     LoadCommand Load(std::string path, ProcessOptions processOption);
     LoadCommand Load(LoadCommand& resourceKey);

@@ -146,10 +146,16 @@ LoadThread::ResourceWrap* LoadThread::LoadTexture(std::string path)
 
 LoadThread::ResourceWrap* LoadThread::LoadMesh(std::string path)
 {
+	MeshWrap* wrap = new MeshWrap();
+	OrientedBoundingBox* box = new OrientedBoundingBox();
 	ModelMesh* mesh = new ModelMesh();
+
+	wrap->modelMesh = mesh;
+	wrap->orientedBoundingBox = box;
+
 	LoadThread::ResourceWrap* resourceWrap = new LoadThread::ResourceWrap();
 	resourceWrap->referenceCount = 1;
-	resourceWrap->resource = mesh;
+	resourceWrap->resource = wrap;
 
 	std::string s = (QCoreApplication::applicationDirPath() + "/" + QString::fromStdString(path)).toStdString();
 	OpenMesh::IO::Options o = OpenMesh::IO::Options::ColorFloat + OpenMesh::IO::Options::VertexColor + OpenMesh::IO::Options::ColorAlpha + OpenMesh::IO::Options::VertexTexCoord + OpenMesh::IO::Options::VertexNormal;
@@ -202,5 +208,7 @@ LoadThread::ResourceWrap* LoadThread::LoadMesh(std::string path)
 
 		mesh->data(v_it).tangent = ModelMesh::Point(tangent.x, tangent.y, tangent.z);
 	}
+
+	box->BuildBoundingBox(*mesh);
 	return resourceWrap;
 }

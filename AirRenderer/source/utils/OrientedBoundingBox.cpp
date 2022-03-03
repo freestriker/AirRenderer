@@ -1,4 +1,5 @@
 #include <include/utils/OrientedBoundingBox.h>
+#include <include/core_object/Mesh.h>
 glm::mat3 OrientedBoundingBox::computeCovarianceMatrix(ModelMesh& modelMesh)
 {
     glm::mat3 covariance = glm::mat3();
@@ -166,6 +167,42 @@ void OrientedBoundingBox::schmidtOrthogonal(glm::vec3& v0, glm::vec3& v1, glm::v
     glm::normalize(v1);
     v2 = glm::normalize(glm::cross(v0, v1));
 }
+void OrientedBoundingBox::BuildBoundingBox(ModelMesh& modelMesh)
+{
+    glm::mat3 covariance = computeCovarianceMatrix(modelMesh);
+    float eigenValues[3]{ 0 };
+
+    jacobiSolver(covariance, eigenValues, directions);
+    schmidtOrthogonal(directions[0], directions[1], directions[2]);
+    float maxX = FLT_MIN, maxY = FLT_MIN, maxZ = FLT_MIN;
+    float minX = FLT_MAX, minY = FLT_MAX, minZ = FLT_MAX;
+    for (ModelMesh::VertexIter v_itr = modelMesh.vertices_sbegin(), v_end_itr = modelMesh.vertices_end(); v_itr != v_end_itr; ++v_itr)
+    {
+        ModelMesh::Point pos = modelMesh.point(v_itr);
+        glm::vec3 p = glm::vec3(pos[0], pos[1], pos[2]);
+
+        maxX = std::max(maxX, glm::dot(directions[0], p));
+        maxY = std::max(maxY, glm::dot(directions[1], p));
+        maxZ = std::max(maxZ, glm::dot(directions[2], p));
+
+        minX = std::min(minX, glm::dot(directions[0], p));
+        minY = std::min(minY, glm::dot(directions[1], p));
+        minZ = std::min(minZ, glm::dot(directions[2], p));
+
+    }
+    this->halfEdgeLength = glm::vec3((maxX - minX) / 2.0, (maxY - minY) / 2.0, (maxZ - minZ) / 2.0);
+    glm::vec3 c = glm::vec3((maxX + minX) / 2.0, (maxY + minY) / 2.0, (maxZ + minZ) / 2.0);
+    this->center = directions[0] * c.x + directions[1] * c.y + directions[2] * c.z;
+
+    this->boundryVertexes[0] = center + directions[0] * halfEdgeLength[0] + directions[1] * halfEdgeLength[1] + directions[2] * halfEdgeLength[2];
+    this->boundryVertexes[1] = center + directions[0] * halfEdgeLength[0] + directions[1] * halfEdgeLength[1] - directions[2] * halfEdgeLength[2];
+    this->boundryVertexes[2] = center + directions[0] * halfEdgeLength[0] - directions[1] * halfEdgeLength[1] + directions[2] * halfEdgeLength[2];
+    this->boundryVertexes[3] = center + directions[0] * halfEdgeLength[0] - directions[1] * halfEdgeLength[1] - directions[2] * halfEdgeLength[2];
+    this->boundryVertexes[4] = center - directions[0] * halfEdgeLength[0] + directions[1] * halfEdgeLength[1] + directions[2] * halfEdgeLength[2];
+    this->boundryVertexes[5] = center - directions[0] * halfEdgeLength[0] + directions[1] * halfEdgeLength[1] - directions[2] * halfEdgeLength[2];
+    this->boundryVertexes[6] = center - directions[0] * halfEdgeLength[0] - directions[1] * halfEdgeLength[1] + directions[2] * halfEdgeLength[2];
+    this->boundryVertexes[7] = center - directions[0] * halfEdgeLength[0] - directions[1] * halfEdgeLength[1] - directions[2] * halfEdgeLength[2];
+}
 OrientedBoundingBox::OrientedBoundingBox(ModelMesh& modelMesh)
 {
     glm::mat3 covariance = computeCovarianceMatrix(modelMesh);
@@ -192,4 +229,17 @@ OrientedBoundingBox::OrientedBoundingBox(ModelMesh& modelMesh)
     this->halfEdgeLength = glm::vec3((maxX - minX) / 2.0, (maxY - minY) / 2.0, (maxZ - minZ) / 2.0);
     glm::vec3 c = glm::vec3((maxX + minX) / 2.0, (maxY + minY) / 2.0, (maxZ + minZ) / 2.0);
     this->center = directions[0] * c.x + directions[1] * c.y + directions[2] * c.z;
+
+    this->boundryVertexes[0] = center + directions[0] * halfEdgeLength[0] + directions[1] * halfEdgeLength[1] + directions[2] * halfEdgeLength[2];
+    this->boundryVertexes[1] = center + directions[0] * halfEdgeLength[0] + directions[1] * halfEdgeLength[1] - directions[2] * halfEdgeLength[2];
+    this->boundryVertexes[2] = center + directions[0] * halfEdgeLength[0] - directions[1] * halfEdgeLength[1] + directions[2] * halfEdgeLength[2];
+    this->boundryVertexes[3] = center + directions[0] * halfEdgeLength[0] - directions[1] * halfEdgeLength[1] - directions[2] * halfEdgeLength[2];
+    this->boundryVertexes[4] = center - directions[0] * halfEdgeLength[0] + directions[1] * halfEdgeLength[1] + directions[2] * halfEdgeLength[2];
+    this->boundryVertexes[5] = center - directions[0] * halfEdgeLength[0] + directions[1] * halfEdgeLength[1] - directions[2] * halfEdgeLength[2];
+    this->boundryVertexes[6] = center - directions[0] * halfEdgeLength[0] - directions[1] * halfEdgeLength[1] + directions[2] * halfEdgeLength[2];
+    this->boundryVertexes[7] = center - directions[0] * halfEdgeLength[0] - directions[1] * halfEdgeLength[1] - directions[2] * halfEdgeLength[2];
+}
+
+OrientedBoundingBox::OrientedBoundingBox()
+{
 }
