@@ -21,3 +21,15 @@ glm::mat4 PerspectiveCamera::ProjectionMatrix()
         0, 0, -nearFlat/* * farFlat / (farFlat - nearFlat)*/, 0
     );
 }
+
+void PerspectiveCamera::ClipPlanes(glm::vec4* planes)
+{
+    double pi = std::acos(-1.0);
+    double halfFov = fovAngle * pi / 360.0;
+    planes[0] = glm::vec4(-nearFlat, 0, -nearFlat * std::tan(halfFov), 0);
+    planes[1] = glm::vec4(nearFlat, 0, -nearFlat * std::tan(halfFov), 0);
+    planes[2] = glm::vec4(-nearFlat, 0, -aspectRatio * nearFlat * std::tan(halfFov), 0);
+    planes[3] = glm::vec4(nearFlat, 0, -aspectRatio * nearFlat * std::tan(halfFov), 0);
+    planes[4] = glm::vec4(0, 0, -1, -nearFlat);
+    planes[5] = glm::vec4(0, 0, 1, farFlat);
+}

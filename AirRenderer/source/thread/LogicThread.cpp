@@ -10,6 +10,7 @@
 #include <include/core_object/Configuration.h>
 #include <include/thread/RenderCommandBuffer.h>
 #include <include/thread/RenderThread.h>
+#include <include/utils/IntersectionTester.h>
 void LogicThread::run()
 {
     while (true)
@@ -27,11 +28,33 @@ void LogicThread::run()
         }
         for each (RenderItem<GameObject> renderItem in cameras)
         {
-            renderCommandBufferBuilder.SetCamera(*renderItem.item->FindComponent<Camera>("Camera"));
+            Camera* camera = renderItem.item->FindComponent<Camera>("Camera");
+            renderCommandBufferBuilder.SetCamera(*camera);
+            glm::vec4 clipPlanes[6]{glm::vec4(0, 0, 0, 0)};
+            camera->ClipPlanes(clipPlanes);
+            //for (int i = 0; i < 6; i++)
+            //{
+            //    Log::LogVector("", clipPlanes[i]);
+            //}
+            IntersectionTester intersectionTester = IntersectionTester(clipPlanes, 6);
+            glm::mat4 viewMatrix = glm::inverse(camera->gameObject->transform.worldMatrix);
+            //Log::LogMatrix("viewMatrix", viewMatrix);
             for each (RenderItem<GameObject> renderItem in renderers)
             {
                 MeshRenderer* mr = renderItem.item->FindComponent<MeshRenderer>("MeshRenderer");
-                renderCommandBufferBuilder.DrawMesh(mr->mesh, mr->gameObject->transform.worldMatrix, *mr->material);
+                //Log::LogMatrix("worldMatrix", mr->gameObject->transform.worldMatrix);
+                glm::mat4 wvMatrix = viewMatrix * mr->gameObject->transform.worldMatrix;
+                //Log::LogMatrix("wvMatrix", viewMatrix * mr->gameObject->transform.worldMatrix);
+                mr->mesh.WaitForLoad();
+                if (intersectionTester.Check(mr->mesh.boundingBox->boundryVertexes, 8, wvMatrix))
+                {
+                    renderCommandBufferBuilder.DrawMesh(mr->mesh, mr->gameObject->transform.worldMatrix, *mr->material);
+                }
+                else
+                {
+                    std::string s = "Clip the gameobject called: " + mr->gameObject->name + ".";
+                    qDebug() << QString::fromStdString(s);
+                }
             }
         }
 
@@ -172,11 +195,10 @@ LogicThread::LogicThread(QObject* parent):QThread(parent)
     go133->AddComponent(new MeshRenderer("../../Resources/Model/Flat_Wall_Normal.ply"));
     //go133->AddComponent(new MeshRenderer("../../Resources/Model/Triangle_Wall_Normal.ply"));
 
-    //GameObject* go134 = new GameObject("go134");
-    //go13->AddChild(go133);
-    //go134->transform.SetTranslation(glm::vec3(0, 0, 0));
-    //go134->transform.SetScale(glm::vec3(2, 2, 1));
-    //go134->AddComponent(new MeshRenderer());
+    GameObject* go134 = new GameObject("go134");
+    go13->AddChild(go134);
+    go134->transform.SetTranslation(glm::vec3(0, 0, 100));
+    go134->AddComponent(new MeshRenderer("../../Resources/Model/Cube_Wall_Normal.ply"));
 
 }
 void LogicThread::GetCameras(std::vector<RenderItem<GameObject>>& vector)

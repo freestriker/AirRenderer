@@ -80,7 +80,6 @@ void RenderThread::Render(std::shared_ptr<RenderCommandBuffer> renderCommandBuff
             matrixContext.wv_itMatrix = glm::transpose(glm::inverse(matrixContext.wvMatrix));
             matrixContext.w_itMatrix = glm::transpose(glm::inverse(matrixContext.worldMatrix));
             matrixContext.wvpMatrix = matrixContext.vpMatrix * matrixContext.worldMatrix;
-            Log::LogMatrix("projectionMatrix", matrixContext.wvpMatrix);
 
             ShaderBase* sb = materialRenderWrap.materialInstance->Shader();
             for (int i = 0; i < MAX_SHADER_PASS_COUNT; i++)

@@ -6,4 +6,5 @@ public:
 	float size;
 	OrthographicCamera();
 	glm::mat4 ProjectionMatrix() override;
+	void ClipPlanes(glm::vec4* planes)override;
 };

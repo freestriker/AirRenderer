@@ -7,7 +7,6 @@ glm::mat3 OrientedBoundingBox::computeCovarianceMatrix(ModelMesh& modelMesh)
 
     //Compute the average x,y,z  
     glm::vec3 avg = glm::vec3(0.0, 0.0, 0.0);
-    int i = 0;
     for (ModelMesh::VertexIter v_itr = modelMesh.vertices_sbegin(), v_end_itr = modelMesh.vertices_end(); v_itr != v_end_itr; ++v_itr)
     {
         ModelMesh::Point pos = modelMesh.point(v_itr);

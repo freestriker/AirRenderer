@@ -21,10 +21,9 @@ class ModelMesh : public OpenMesh::TriMesh_ArrayKernelT<Traits>
 };
 class Mesh
 {
-private:
+public:
     ModelMesh* modelMesh;
     OrientedBoundingBox* boundingBox;
-public:
     LoadThread::LoadCommand loadCommand;
     Mesh(std::string filePath)
     {
@@ -45,5 +44,11 @@ public:
             this->boundingBox = mw->orientedBoundingBox;
         }
         return this->modelMesh;
+    }
+    void WaitForLoad()
+    {
+        LoadThread::MeshWrap* mw = global.loadThread->GetResource<LoadThread::MeshWrap>(loadCommand);
+        this->modelMesh = mw->modelMesh;
+        this->boundingBox = mw->orientedBoundingBox;
     }
 };

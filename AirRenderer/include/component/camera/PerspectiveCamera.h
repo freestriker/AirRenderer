@@ -6,4 +6,6 @@ public:
 	float fovAngle;
 	PerspectiveCamera();
 	glm::mat4 ProjectionMatrix() override;
+	void ClipPlanes(glm::vec4* planes)override;
+
 };

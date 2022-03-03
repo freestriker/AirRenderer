@@ -3,6 +3,7 @@
 #include <vector>
 class IntersectionTester
 {
+public:
 	std::vector<glm::vec4> intersectPlanes;
 	bool Check(glm::vec3* vertexes, int vertexCount)
 	{
@@ -22,6 +23,34 @@ class IntersectionTester
 			{
 				return false;
 			}
+		}
+		return true;
+	}
+	bool Check(glm::vec3* vertexes, int vertexCount, glm::mat4 matrix)
+	{
+		std::vector<glm::vec4> wvBoundryVertexes = std::vector<glm::vec4>(vertexCount);
+		std::vector<int> inPlaneVertexes = std::vector<int>(vertexCount, 0);
+		for (int i = 0; i < vertexCount; i++)
+		{
+			//Log::LogVector("", glm::vec4(vertexes[i], 1.0));
+			wvBoundryVertexes[i] = matrix * glm::vec4(vertexes[i], 1.0);
+			//Log::LogVector("", wvBoundryVertexes[i]);
+
+		}
+		int planeCount = intersectPlanes.size();
+		for (int j = 0; j < planeCount; j++)
+		{
+			int outCount = 0;
+			for (int i = 0; i < vertexCount; i++)
+			{
+				if (glm::dot(wvBoundryVertexes[i], intersectPlanes[j]) >= 0)
+				{
+					goto Out;
+				}
+			}
+			return false;
+		Out:
+			continue;
 		}
 		return true;
 	}
