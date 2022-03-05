@@ -10,10 +10,11 @@
 #include <include/shader/ShaderOptions.h>
 #include <include/context/PrimitiveContext.h>
 #include <functional>
-constexpr int MAX_SHADER_PASS_COUNT = 4;
+
 class ShaderPass
 {
 public:
+	std::string passName;
 	ShaderOption shaderOption;
 	std::function<void(VertexInContext&, VertexOutContext&, MatrixContext*, LightContext*)> vertexShading;
 	std::function<bool(PixelInContext&, PixelOutContext&, MatrixContext*, LightContext*)> pixelShading;
@@ -25,8 +26,7 @@ class ShaderBase
 {
 public:
 	virtual void FillData(void* data) = 0;
-	ShaderPass shaderPasses[MAX_SHADER_PASS_COUNT];
-	bool activeTable[MAX_SHADER_PASS_COUNT];
+	std::vector< ShaderPass> shaderPasses;
 
 	ShaderBase();
 };

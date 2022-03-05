@@ -7,6 +7,7 @@
 #include <include/thread/LoadThread.h>
 #include <include/context/CameraContext.h>
 #include <include/core_object/Mesh.h>
+#include <include/thread/RenderCommandBuffer.h>
 class MeshRenderer: public Component
 {
 public:
@@ -15,6 +16,6 @@ public:
 	MaterialBase* material;
 	MeshRenderer();
 	MeshRenderer(std::string filePath);
-	void Render(MatrixContext* matrixContext, LightContext* lightContext, CameraContext* cameraContext);
+	void Render(RenderCommandBufferBuilder& commandBuilder);
 };
 

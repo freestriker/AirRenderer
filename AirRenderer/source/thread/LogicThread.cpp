@@ -32,27 +32,20 @@ void LogicThread::run()
             renderCommandBufferBuilder.SetCamera(*camera);
             glm::vec4 clipPlanes[6]{glm::vec4(0, 0, 0, 0)};
             camera->ClipPlanes(clipPlanes);
-            //for (int i = 0; i < 6; i++)
-            //{
-            //    Log::LogVector("", clipPlanes[i]);
-            //}
             IntersectionTester intersectionTester = IntersectionTester(clipPlanes, 6);
             glm::mat4 viewMatrix = glm::inverse(camera->gameObject->transform.worldMatrix);
-            //Log::LogMatrix("viewMatrix", viewMatrix);
             for each (RenderItem<GameObject> renderItem in renderers)
             {
                 MeshRenderer* mr = renderItem.item->FindComponent<MeshRenderer>("MeshRenderer");
-                //Log::LogMatrix("worldMatrix", mr->gameObject->transform.worldMatrix);
                 glm::mat4 wvMatrix = viewMatrix * mr->gameObject->transform.worldMatrix;
-                //Log::LogMatrix("wvMatrix", viewMatrix * mr->gameObject->transform.worldMatrix);
                 mr->mesh.WaitForLoad();
                 if (intersectionTester.Check(mr->mesh.boundingBox->boundryVertexes, 8, wvMatrix))
                 {
-                    renderCommandBufferBuilder.DrawMesh(mr->mesh, mr->gameObject->transform.worldMatrix, *mr->material);
+                    mr->Render(renderCommandBufferBuilder);
                 }
                 else
                 {
-                    std::string s = "Clip the gameobject called: " + mr->gameObject->name + ".";
+                    std::string s = "Cull the gameobject called: " + mr->gameObject->name + ".";
                     qDebug() << QString::fromStdString(s);
                 }
             }
@@ -64,7 +57,6 @@ void LogicThread::run()
 }
 LogicThread::LogicThread(QObject* parent):QThread(parent)
 {
-    //timer = new QTimer(this);
     GameObject* camera = new GameObject("Camera");
     configuration.sceneObject.AddChild(camera);
     camera->AddComponent(new PerspectiveCamera());

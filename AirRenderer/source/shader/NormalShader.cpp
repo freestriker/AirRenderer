@@ -116,17 +116,18 @@ void NormalShader::NormalGeometryShading(PrimitiveContext& primitiveInContext, P
 
 NormalShader::NormalShader():Shader<NormalData>()
 {
-	this->activeTable[0] = true;
+	this->shaderPasses = std::vector<ShaderPass>(3);
+	this->shaderPasses[0].passName = "Normal Pass";
 	this->shaderPasses[0].vertexShading = std::bind(&NormalShader::VertexShading, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
 	this->shaderPasses[0].pixelShading = std::bind(&NormalShader::NormalPixelShading, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
 	this->shaderPasses[0].geometryShading = std::bind(&NormalShader::NormalGeometryShading, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
 	
-	this->activeTable[1] = true;
+	this->shaderPasses[1].passName = "Wireframe Pass";
 	this->shaderPasses[1].vertexShading = std::bind(&NormalShader::VertexShading, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
 	this->shaderPasses[1].pixelShading = std::bind(&NormalShader::WireframePixelShading, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
 	this->shaderPasses[1].geometryShading = std::bind(&NormalShader::WireframeGeometryShading, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
 	
-	this->activeTable[2] = true;
+	this->shaderPasses[2].passName = "Color Pass";
 	this->shaderPasses[2].vertexShading = std::bind(&NormalShader::VertexShading, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
 	this->shaderPasses[2].pixelShading = std::bind(&NormalShader::PixelShading, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
 	this->shaderPasses[2].geometryShading = std::bind(&NormalShader::GeometryShading, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
