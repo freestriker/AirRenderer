@@ -43,10 +43,10 @@ void RenderThread::run()
             std::shared_ptr<RenderCommandBuffer> rcb = commandBufferList[0];
             commandBufferList.erase(commandBufferList.begin());
             commandBufferMutex.unlock();
-            qDebug() << "start render";
+            qDebug() << "-----Start render-----";
             Render(rcb);
             Display();
-            qDebug() << "finish render";
+            qDebug() << "-----Finish render-----";
             sleep(0);
             commandBufferMutex.lock();
         }
@@ -82,12 +82,13 @@ void RenderThread::Render(std::shared_ptr<RenderCommandBuffer> renderCommandBuff
             matrixContext.wvpMatrix = matrixContext.vpMatrix * matrixContext.worldMatrix;
 
             ShaderBase* sb = materialRenderWrap.materialInstance->Shader();
-            for (int i = 0; i < MAX_SHADER_PASS_COUNT; i++)
+            int i = materialRenderWrap.passIndex == -1 ? 0 : materialRenderWrap.passIndex;
+            int size = materialRenderWrap.passIndex == -1 ? sb->shaderPasses.size() : materialRenderWrap.passIndex + 1;
+            for ( ; i < size; i++)
             {
-                if (sb->activeTable[i])
-                {
-                    Pipeline(&matrixContext, &lightContext, &cameraContext, &renderCommandBuffer->meshInstances[materialRenderWrap.meshInstanceIndex], sb->shaderPasses[i]);
-                }
+                std::string ps = sb->shaderPasses[i].passName + ": ";
+                qDebug() << QString::fromStdString(ps);
+                Pipeline(&matrixContext, &lightContext, &cameraContext, &renderCommandBuffer->meshInstances[materialRenderWrap.meshInstanceIndex], sb->shaderPasses[i]);
             }
 
         }
@@ -126,6 +127,8 @@ void RenderThread::Pipeline(MatrixContext* matrixContext, LightContext* lightCon
         //顶点着色器
         shaderPass.vertexShading(vertexInContext, vertexOutContexts[vertexIndex], matrixContext, lightContext);
     }
+    //std::string vs = "Shading " + std::to_string(modelMesh->vertices_end().handle().idx()) + " vertexes.";
+    //qDebug() << QString::fromStdString(vs);
 
     //几何阶段
     PrimitiveContext primitiveInContext = PrimitiveContext();
@@ -144,6 +147,9 @@ void RenderThread::Pipeline(MatrixContext* matrixContext, LightContext* lightCon
         //几何着色器
         shaderPass.geometryShading(primitiveInContext, primitiveOutContextBuilder, matrixContext, lightContext);
     }
+    std::string ps = "Generate " + std::to_string(primitiveOutContexts.size()) + " primitives from original " + std::to_string(modelMesh->faces_end().handle().idx()) + " primitives.";
+    qDebug() << QString::fromStdString(ps);
+
     //剔除
     std::vector< PrimitiveContext> primitiveClipOutContexts = std::vector< PrimitiveContext>();
     std::vector<VertexOutContext> vertexClipOutContexts = std::vector<VertexOutContext>();
@@ -153,6 +159,9 @@ void RenderThread::Pipeline(MatrixContext* matrixContext, LightContext* lightCon
     //clipBuilder.ClipPrimitive();
     cameraContext->primitiveCliper.Bind(vertexOutContexts, primitiveOutContexts, vertexClipOutContexts, primitiveClipOutContexts);
     cameraContext->primitiveCliper.ClipPrimitive();
+    std::string cs = "Clip original " + std::to_string(primitiveOutContexts.size()) + " primitives to " + std::to_string(primitiveClipOutContexts.size()) + " primitives.";
+    qDebug() << QString::fromStdString(cs);
+
     vertexOutContexts = vertexClipOutContexts;
     primitiveOutContexts = primitiveClipOutContexts;
 
