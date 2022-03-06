@@ -7,7 +7,7 @@ RenderCommandBuffer::CameraRenderWrap::CameraRenderWrap(Camera& camera)
 	cameraContext.aspectRatio = camera.aspectRatio;
 	cameraContext.nearFlat = camera.nearFlat;
 	cameraContext.farFlat = camera.farFlat;
-	glm::vec4 clipPlanes[6] = { glm::vec4(1, 0, 0, 1), glm::vec4(-1, 0, 0, 1), glm::vec4(0, 1, 0, 1), glm::vec4(0, -1, 0, 1), glm::vec4(0, 0, -camera.nearFlat / camera.farFlat, 1), glm::vec4(0, 0, -1, 1) };
+	glm::vec4 clipPlanes[6] = { glm::vec4(1, 0, 0, 1), glm::vec4(-1, 0, 0, 1), glm::vec4(0, 1, 0, 1), glm::vec4(0, -1, 0, 1), glm::vec4(0, 0, 1, -camera.nearFlat / camera.farFlat), glm::vec4(0, 0, -1, 1) };
 	cameraContext.primitiveCliper = PrimitiveCliper(clipPlanes, 6);
 	materialInstanceIndex = std::vector<int>();
 }
