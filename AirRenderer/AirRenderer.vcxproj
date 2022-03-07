@@ -55,12 +55,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\ThirdParty\OpenMesh\include;..\ThirdParty\FreeImage\include;..\ThirdParty\Glm\include;..\AirRenderer;..\ThirdParty\NlohmannJson\include</IncludePath>
-    <LibraryPath>..\ThirdParty\OpenMesh\lib;..\ThirdParty\FreeImage\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\ThirdParty\OpenMesh\include;..\ThirdParty\FreeImage\include;..\ThirdParty\Glm\include;..\AirRenderer;..\ThirdParty\NlohmannJson\include;..\ThirdParty\V8\include;</IncludePath>
+    <LibraryPath>..\ThirdParty\OpenMesh\lib;..\ThirdParty\FreeImage\lib;..\ThirdParty\V8\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\ThirdParty\OpenMesh\include;..\ThirdParty\FreeImage\include;..\ThirdParty\Glm\include;..\AirRenderer;..\ThirdParty\NlohmannJson\include</IncludePath>
-    <LibraryPath>..\ThirdParty\OpenMesh\lib;..\ThirdParty\FreeImage\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..\ThirdParty\OpenMesh\include;..\ThirdParty\FreeImage\include;..\ThirdParty\Glm\include;..\AirRenderer;..\ThirdParty\NlohmannJson\include;..\ThirdParty\V8\include;</IncludePath>
+    <LibraryPath>..\ThirdParty\OpenMesh\lib;..\ThirdParty\FreeImage\lib;..\ThirdParty\V8\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -71,7 +71,7 @@
     <Link>
       <AdditionalLibraryDirectories>
       </AdditionalLibraryDirectories>
-      <AdditionalDependencies>OpenMeshCored.lib;OpenMeshToolsd.lib;OpenMeshCore.lib;OpenMeshTools.lib;FreeImage.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>OpenMeshCored.lib;OpenMeshToolsd.lib;OpenMeshCore.lib;OpenMeshTools.lib;FreeImage.lib;v8.dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
