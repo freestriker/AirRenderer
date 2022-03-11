@@ -12,6 +12,10 @@ Light::Light(std::string lightTypeName):Component("Light")
 	this->intensity = 0.8;
 }
 
+Light::~Light()
+{
+}
+
 void Light::UpdateSelf(void* data)
 {
 	this->worldMatrix = this->gameObject->transform.worldMatrix;

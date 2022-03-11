@@ -7,6 +7,9 @@ OrthographicCamera::OrthographicCamera(): Camera("Orthographic")
     this->aspectRatio = 16.0 / 9.0;
     this->size = 9;
 }
+OrthographicCamera::~OrthographicCamera()
+{
+}
 glm::mat4 OrthographicCamera::ProjectionMatrix()
 {
     return glm::mat4(

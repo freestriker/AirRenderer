@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 template<class T>
 class ChildBrotherTree
 {
@@ -82,7 +83,6 @@ public:
     T* parent;
 	T* child;
 	T* brother;
-    int childCount;
 
     virtual void OnAddedAsChild(void* data);
 
@@ -95,7 +95,9 @@ public:
 	void AddChild(T* child);
 	T* AddBrother();
 	void AddBrother(T* brother);
-
+    T* RemoveSelf();
+    void GetAllChildren(std::vector<T*>& vector);
+    void GetAllChildrenDFS(std::vector<T*>& vector, T* gameObject);
     ChildIterator GetStartChildIterator()
     {
         return ChildIterator(static_cast<T*>(this));
@@ -184,4 +186,66 @@ void ChildBrotherTree<T>::AddBrother(T* brother)
     }
     static_cast<ChildBrotherTree<T>*>(brother)->OnAddedAsChild(this->parent);
 }
+
+template<class T>
+T* ChildBrotherTree<T>::RemoveSelf()
+{
+    if (this->parent)
+    {
+        T* pre = nullptr;
+        ChildBrotherTree<T>* o = static_cast<ChildBrotherTree<T>*>(this->parent);
+        for (ChildIterator start = o->GetStartChildIterator(), end = o->GetEndChildIterator(); start != end; ++start)
+        {
+            if ((*start) == static_cast<T*>(this))
+            {
+                break;
+            }
+            pre = *start;
+        }
+        if (pre)
+        {
+            static_cast<ChildBrotherTree<T>*>(pre)->brother = this->brother;
+            this->parent = nullptr;
+            this->brother = nullptr;
+        }
+        else
+        {
+            static_cast<ChildBrotherTree<T>*>(static_cast<ChildBrotherTree<T>*>(this)->parent)->child = this->brother;
+        }
+        this->parent = nullptr;
+        this->brother = nullptr;
+        return static_cast<T*>(this);
+    }
+    else
+    {
+        this->parent = nullptr;
+        this->brother = nullptr;
+        return static_cast<T*>(this);
+    }
+    return nullptr;
+}
+
+template<class T>
+void ChildBrotherTree<T>::GetAllChildren(std::vector<T*>& vector)
+{
+    vector.clear();
+    for (ChildIterator i = static_cast<ChildBrotherTree<T>*>(this)->GetStartChildIterator(), end = static_cast<ChildBrotherTree<T>*>(this)->GetEndChildIterator(); i != end; i++)
+    {
+        GetAllChildrenDFS(vector, *i);
+    }
+
+}
+
+template<class T>
+void ChildBrotherTree<T>::GetAllChildrenDFS(std::vector<T*>& vector, T* gameObject)
+{
+    for (ChildIterator i = static_cast<ChildBrotherTree<T>*>(gameObject)->GetStartChildIterator(), end = static_cast<ChildBrotherTree<T>*>(gameObject)->GetEndChildIterator(); i != end; i++)
+    {
+        GetAllChildrenDFS(vector, *i);
+    }
+
+    vector.push_back(gameObject);
+
+}
+
 

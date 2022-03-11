@@ -19,6 +19,10 @@ MeshRenderer::MeshRenderer():MeshRenderer("..\\Resources\\Model\\Flat_Wall_Norma
 {
 
 }
+MeshRenderer::~MeshRenderer()
+{
+
+}
 MeshRenderer::MeshRenderer(std::string filePath):Component("MeshRenderer")
 {
     this->mesh = Mesh(filePath);

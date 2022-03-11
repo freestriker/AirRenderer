@@ -9,6 +9,10 @@ PerspectiveCamera::PerspectiveCamera() : Camera("Perspective")
     this->needPerspectiveCorrection = true;
 }
 
+PerspectiveCamera::~PerspectiveCamera()
+{
+}
+
 glm::mat4 PerspectiveCamera::ProjectionMatrix()
 {	
     double pi = std::acos(-1.0);

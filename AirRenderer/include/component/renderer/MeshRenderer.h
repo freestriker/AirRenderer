@@ -15,6 +15,7 @@ public:
 	Mesh mesh;
 	MaterialBase* material;
 	MeshRenderer();
+	~MeshRenderer();
 	MeshRenderer(std::string filePath);
 	void Render(RenderCommandBufferBuilder& commandBuilder);
 };

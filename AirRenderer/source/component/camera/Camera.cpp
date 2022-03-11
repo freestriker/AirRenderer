@@ -1,6 +1,10 @@
 #include "include/component/camera/Camera.h"
 #include <include/core_object/GameObject.h>
 
+Camera::~Camera()
+{
+}
+
 void Camera::UpdateSelf(void* data)
 {
 }

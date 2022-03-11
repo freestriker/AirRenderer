@@ -20,6 +20,10 @@ DirectionalLight::DirectionalLight():Light("DirectionalLight")
     intensity = 0.05;
 }
 
+DirectionalLight::~DirectionalLight()
+{
+}
+
 Light* DirectionalLight::Clone()
 {
     Light* light = new DirectionalLight(*this);

@@ -16,6 +16,7 @@ public:
 	virtual Color AmbintColorIntensity();
 	virtual Light* Clone() = 0;
 	Light(std::string lightTypeName);
+	virtual ~Light();
 	void UpdateSelf(void* data)override;
 };
 

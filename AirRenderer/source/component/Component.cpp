@@ -6,6 +6,16 @@ Component::Component(std::string typeName): Object(typeName)
 	
 }
 
+Component::~Component()
+{
+	gameObject = nullptr;
+}
+
 void Component::UpdateSelf(void* data)
 {
+}
+
+void Component::Destory(Component* component)
+{
+	delete component;
 }

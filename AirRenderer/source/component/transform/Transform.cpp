@@ -110,6 +110,10 @@ Transform::Transform():Transform(glm::vec3(0, 0, 0), glm::quat(1, 0, 0, 0), glm:
 
 }
 
+Transform::~Transform()
+{
+}
+
 Transform::Transform(glm::vec3 translation, glm::quat rotation, glm::vec3 scale):Component("Transform")
 {
     this->translation = translation;

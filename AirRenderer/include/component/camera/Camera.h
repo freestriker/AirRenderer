@@ -12,6 +12,7 @@ public:
 	bool needPerspectiveCorrection;
 	virtual glm::mat4 ProjectionMatrix() = 0;
 	virtual void ClipPlanes(glm::vec4* planes) = 0;
+	virtual ~Camera();
 	void UpdateSelf(void* data);
 	glm::mat4 WorldMatrix();
 	Camera(std::string cameraType);

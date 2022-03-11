@@ -34,6 +34,10 @@ PointLight::PointLight():Light("PointLight")
     this->intensity = 2;
 }
 
+PointLight::~PointLight()
+{
+}
+
 Light* PointLight::Clone()
 {
     Light* light = new PointLight(*this);

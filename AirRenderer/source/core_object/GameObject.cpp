@@ -4,18 +4,21 @@ GameObject::GameObject():GameObject("New GameObject")
 {
 
 }
+GameObject::~GameObject()
+{
+}
 GameObject::GameObject(std::string name):Object("GameObject")
 {
 	this->transform = Transform();
 	this->transform.gameObject = this;
 	this->name = name;
-	components = new std::vector<Component*>();
+	components = std::vector<Component*>();
 }
 
 void GameObject::UpdateSelf(void* data)
 {
 	transform.UpdateSelf(data);
-	for each (Component* component in *components)
+	for each (Component* component in components)
 	{
 		component->UpdateSelf(data);
 	}
@@ -34,34 +37,31 @@ void GameObject::OnAddedAsChild(void* data)
 }
 void GameObject::UpdateSelfWithoutTransform(void* data)
 {
-	for each (Component * component in *components)
+	for each (Component * component in components)
 	{
 		component->UpdateSelf(data);
 	}
 }
-void GameObject::AddComponent(Component* component)
+
+void GameObject::Destory(GameObject* gameObject)
 {
-	components->push_back(component);
-	component->gameObject = this;
-	component->UpdateSelf(this->parent ? this->parent : nullptr);
+	gameObject->RemoveSelf();
+	std::vector<GameObject*> vector = std::vector<GameObject*>();
+	gameObject->GetAllChildren(vector);
+	for (int i = 0; i < vector.size(); i++)
+	{
+		DestorySelf(vector[i]);
+	}
+	DestorySelf(gameObject);
 }
-void GameObject::DestoryComponent(std::string typeName)
+void GameObject::DestorySelf(GameObject* gameObject)
 {
-	int index = -1;
-	for (int i = 0; i < components->size(); i++)
+	for (int i = 0; i < gameObject->components.size(); i++)
 	{
-		if (components->operator[](i)->typeName == typeName)
-		{
-			index = i;
-			break;
-		}
+		Component::Destory(gameObject->components[i]);
 	}
-	if (index >= 0)
-	{
-		Component* c = components->operator[](index);
-		components->erase(components->begin() + index);
-		delete c;
-	}
+	gameObject->components.clear();	
+	delete gameObject;
 }
 
 

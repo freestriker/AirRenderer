@@ -192,6 +192,12 @@ LogicThread::LogicThread(QObject* parent):QThread(parent)
     go134->transform.SetTranslation(glm::vec3(0, 0, 100));
     go134->AddComponent(new MeshRenderer("../../Resources/Model/Cube_Wall_Normal.ply"));
 
+    GameObject::Destory(go134);
+    go134 = new GameObject("go134");
+    go13->AddChild(go134);
+    go134->transform.SetTranslation(glm::vec3(0, 0, 100));
+    go134->AddComponent(new MeshRenderer("../../Resources/Model/Cube_Wall_Normal.ply"));
+
 }
 void LogicThread::GetCameras(std::vector<RenderItem<GameObject>>& vector)
 {
