@@ -1,7 +1,8 @@
 #pragma once
 #include "include/utils/Object.h"
+#include <include/utils/CrossLinkedList.h>
 class GameObject;
-class Component: public Object
+class Component: public Object, public CrossLinkedNode
 {
 public:
 	GameObject* gameObject;

@@ -7,6 +7,7 @@ public:
 	std::string typeName;
 	virtual void UpdateSelf(void* data);
 	Object();
+	virtual ~Object();
 	Object(std::string name);
 };
 

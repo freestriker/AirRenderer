@@ -11,8 +11,9 @@ public:
 	std::string name;
 	Transform transform;
 	std::vector<Component*> components;
+	CrossLinkedRowHead linkedComponents;
 	GameObject();
-	~GameObject();
+	virtual ~GameObject();
 	GameObject(std::string name);
 	void UpdateSelf(void* data);
 	void UpdateSelfWithoutTransform(void* data);
@@ -31,44 +32,41 @@ public:
 template<typename T>
 T* GameObject::FindComponent(std::string typeName)
 {
-	T* t = nullptr;
-	for each (Component * component in components)
+	for (CrossLinkedNodeRowItertor rowIter = linkedComponents.GetItertor(); rowIter.IsVaild(); ++rowIter)
 	{
+		Component* component = rowIter.Node<Component>();
 		if (component->typeName == typeName)
 		{
-			t = static_cast<T*>(component);
-			break;
+			return static_cast<T*>(component);
 		}
 	}
-	return t;
+	return nullptr;
 }
 template<typename T>
 void GameObject::AddComponent(T* component)
 {
 	Component* t = static_cast<Component*>(component);
-	components.push_back(t);
+	linkedComponents.AddNode(t);
 	t->gameObject = this;
 	t->UpdateSelf(this->parent);
 }
 template<typename T>
 T* GameObject::RemoveComponent(std::string typeName)
 {
-	int index = -1;
-	for (int i = 0; i < components.size(); i++)
+	Component* target = nullptr;
+	for (CrossLinkedNodeRowItertor rowIter = linkedComponents.GetItertor(); rowIter.IsVaild(); ++rowIter)
 	{
-		if (components.operator[](i)->typeName == typeName)
+		Component* component = rowIter.Node<Component>();
+		if (component->typeName == typeName)
 		{
-			index = i;
+			target = component;
 			break;
 		}
 	}
-	if (index >= 0)
+	if (target)
 	{
-		Component* t = components.operator[](index);
-		components.erase(components->begin() + index);
-		t->gameObject = nullptr;
-		
-		return static_cast<T*>(t);
+		linkedComponents.RemoveNode(target);
+		return target;
 	}
 	else
 	{

@@ -9,6 +9,10 @@ Object::Object()
 	active = true;
 	typeName = "Unknown";
 }
+Object::~Object()
+{
+	active = false;
+}
 Object::Object(std::string name)
 {
 	active = true;

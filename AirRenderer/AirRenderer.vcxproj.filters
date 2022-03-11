@@ -291,6 +291,9 @@
     <ClInclude Include="include\utils\IntersectionTester.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\utils\CrossLinkedList.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="include\thread\RenderThread.h">

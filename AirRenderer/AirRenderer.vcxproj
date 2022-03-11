@@ -160,6 +160,7 @@
     <ClInclude Include="include\context\PrimitiveContext.h" />
     <ClInclude Include="include\thread\RenderCommandBuffer.h" />
     <ClInclude Include="include\shader\ShaderOptions.h" />
+    <ClInclude Include="include\utils\CrossLinkedList.h" />
     <ClInclude Include="include\utils\IntersectionTester.h" />
     <ClInclude Include="include\utils\PrimitiveCliper.h" />
     <ClInclude Include="include\utils\OrientedBoundingBox.h" />

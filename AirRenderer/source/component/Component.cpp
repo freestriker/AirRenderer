@@ -1,9 +1,8 @@
 #include "include/component/Component.h"
 
-Component::Component(std::string typeName): Object(typeName)
+Component::Component(std::string typeName): Object(typeName), CrossLinkedNode()
 {
-	gameObject = nullptr;
-	
+	gameObject = nullptr;	
 }
 
 Component::~Component()

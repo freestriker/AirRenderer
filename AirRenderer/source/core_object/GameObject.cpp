@@ -13,14 +13,18 @@ GameObject::GameObject(std::string name):Object("GameObject")
 	this->transform.gameObject = this;
 	this->name = name;
 	components = std::vector<Component*>();
+	this->linkedComponents = CrossLinkedRowHead();
+	this->linkedComponents.Init();
 }
 
 void GameObject::UpdateSelf(void* data)
 {
 	transform.UpdateSelf(data);
-	for each (Component* component in components)
+	for (CrossLinkedNodeRowItertor rowIter = linkedComponents.GetItertor(); rowIter.IsVaild(); ++rowIter)
 	{
+		Component* component = rowIter.Node<Component>();
 		component->UpdateSelf(data);
+
 	}
 }
 void GameObject::CascadeUpdate(void* data)
@@ -37,8 +41,9 @@ void GameObject::OnAddedAsChild(void* data)
 }
 void GameObject::UpdateSelfWithoutTransform(void* data)
 {
-	for each (Component * component in components)
+	for (CrossLinkedNodeRowItertor rowIter = linkedComponents.GetItertor(); rowIter.IsVaild(); ++rowIter)
 	{
+		Component* component = rowIter.Node<Component>();
 		component->UpdateSelf(data);
 	}
 }
