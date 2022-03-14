@@ -43,4 +43,5 @@ T* LogicThread::RemoveComponent(T* component)
     Component* t = static_cast<Component*>(component);
     CrossLinkedColHead* head = componentListMap[t->typeName];
     head->RemoveNode(t);
+    return static_cast<T*>(t);
 }

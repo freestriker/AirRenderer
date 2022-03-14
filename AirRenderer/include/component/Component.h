@@ -11,16 +11,16 @@ public:
 	virtual void UpdateSelf(void* data);
 	static void Destory(Component* component);
 	template<typename T>
-	static T* FindComponent(CrossLinkedRowHead linkedComponents, std::string typeName);
+	static T* FindComponent(CrossLinkedRowHead& linkedComponents, std::string typeName);
 	template<typename T>
-	static void AddComponent(CrossLinkedRowHead linkedComponents, T* component);
+	static void AddComponent(CrossLinkedRowHead& linkedComponents, T* component);
 	template<typename T>
-	static T* RemoveComponent(CrossLinkedRowHead linkedComponents, std::string typeName);
+	static T* RemoveComponent(CrossLinkedRowHead& linkedComponents, std::string typeName);
 
 };
 
 template<typename T>
-T* Component::FindComponent(CrossLinkedRowHead linkedComponents, std::string typeName)
+T* Component::FindComponent(CrossLinkedRowHead& linkedComponents, std::string typeName)
 {
 	for (CrossLinkedNodeRowItertor rowIter = linkedComponents.GetItertor(); rowIter.IsVaild(); ++rowIter)
 	{
@@ -34,14 +34,14 @@ T* Component::FindComponent(CrossLinkedRowHead linkedComponents, std::string typ
 }
 
 template<typename T>
-void Component::AddComponent(CrossLinkedRowHead linkedComponents, T* component)
+void Component::AddComponent(CrossLinkedRowHead& linkedComponents, T* component)
 {
 	Component* t = static_cast<Component*>(component);
 	linkedComponents.AddNode(t);
 }
 
 template<typename T>
-T* Component::RemoveComponent(CrossLinkedRowHead linkedComponents, std::string typeName)
+T* Component::RemoveComponent(CrossLinkedRowHead& linkedComponents, std::string typeName)
 {
 	Component* target = nullptr;
 	for (CrossLinkedNodeRowItertor rowIter = linkedComponents.GetItertor(); rowIter.IsVaild(); ++rowIter)
@@ -56,7 +56,7 @@ T* Component::RemoveComponent(CrossLinkedRowHead linkedComponents, std::string t
 	if (target)
 	{
 		linkedComponents.RemoveNode(target);
-		return target;
+		return static_cast<T*>(target);
 	}
 	else
 	{

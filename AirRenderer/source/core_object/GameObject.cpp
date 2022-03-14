@@ -7,14 +7,11 @@ GameObject::GameObject():GameObject("New GameObject")
 GameObject::~GameObject()
 {
 }
-GameObject::GameObject(std::string name):Object("GameObject")
+GameObject::GameObject(std::string name):Object("GameObject"), linkedComponents()
 {
 	this->transform = Transform();
 	this->transform.gameObject = this;
 	this->name = name;
-	components = std::vector<Component*>();
-	this->linkedComponents = CrossLinkedRowHead();
-	this->linkedComponents.Init();
 }
 
 void GameObject::UpdateSelf(void* data)

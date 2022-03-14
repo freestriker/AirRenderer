@@ -49,7 +49,7 @@ T* GameObject::RemoveComponent(std::string typeName)
 {
 	T* t = Component::RemoveComponent<T>(linkedComponents, typeName);
 	Component* c = static_cast<Component*>(t);
-	global::logicThread->RemoveComponent(c);
+	global.logicThread->RemoveComponent(c);
 
 	c->gameObject = nullptr;
 	return t;

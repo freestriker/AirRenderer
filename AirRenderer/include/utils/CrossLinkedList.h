@@ -58,22 +58,21 @@ public:
 	T* Node() { return static_cast<T*>(curNode); }
 
 };
-class CrossLinkedRowHead: public CrossLinkedNode
+class CrossLinkedRowHead
 {
 private:
+	CrossLinkedNode head;
 	CrossLinkedNode* end;
 public:
-	CrossLinkedRowHead():CrossLinkedNode()
+	CrossLinkedRowHead()
 	{
-		this->end = nullptr;
+		head = CrossLinkedNode();
+		end = &head;
 	}
 	virtual ~CrossLinkedRowHead()
 	{
-		this->end = nullptr;
-	}
-	void Init()
-	{
-		this->end = this;
+		head = CrossLinkedNode();
+		end = nullptr;
 	}
 	template<typename T>
 	void AddNode(T* node)
@@ -92,7 +91,7 @@ public:
 	{
 		static_assert(std::is_base_of< CrossLinkedNode, T>::value, "RemoveNode can only remove the sub class of CrossLinkedNode.");
 		CrossLinkedNode* removeNode = static_cast<CrossLinkedNode*>(node);
-		CrossLinkedNode* start = this;
+		CrossLinkedNode* start = &head;
 		while (start != end)
 		{
 			if (start->right == removeNode)
@@ -118,36 +117,8 @@ public:
 	}
 	CrossLinkedNodeRowItertor GetItertor()
 	{
-		return CrossLinkedNodeRowItertor(this->right);
+		return CrossLinkedNodeRowItertor(head.right);
 	}
-	//CrossLinkedNode* RemoveNode(int index)
-	//{
-	//	CrossLinkedNode* start = this;
-	//	int i = -1;
-	//	while (start != end)
-	//	{
-	//		if (++i == index)
-	//		{
-	//			CrossLinkedNode* removeNode = start->right;
-	//			if (removeNode == end)
-	//			{
-	//				start->right = nullptr;
-	//				end = start;
-	//				removeNode->left = nullptr;
-	//			}
-	//			else
-	//			{
-	//				start->right = removeNode->right;
-	//				removeNode->right->left = start;
-	//				removeNode->left = nullptr;
-	//				removeNode->right = nullptr;
-	//			}
-	//			return removeNode;
-	//		}
-	//		start = start->right;
-	//	}
-	//	return nullptr;
-	//}
 };
 class CrossLinkedNodeColItertor
 {
@@ -180,18 +151,21 @@ public:
 	T* Node() { return static_cast<T*>(curNode); }
 
 };
-class CrossLinkedColHead: public CrossLinkedNode
+class CrossLinkedColHead
 {
 private:
 	CrossLinkedNode* end;
+	CrossLinkedNode head;
 public:
-	CrossLinkedColHead():CrossLinkedNode()
+	CrossLinkedColHead()
 	{
-		end = this;
+		head = CrossLinkedNode();
+		end = &head;
 	}
 	virtual ~CrossLinkedColHead()
 	{
 		end = nullptr;
+		head = CrossLinkedNode();
 	}
 	template<typename T>
 	void AddNode(T* node)
@@ -210,7 +184,7 @@ public:
 	{
 		static_assert(std::is_base_of< CrossLinkedNode, T>::value, "RemoveNode can only remove the sub class of CrossLinkedNode.");
 		CrossLinkedNode* removeNode = static_cast<CrossLinkedNode*>(node);
-		CrossLinkedNode* start = this;
+		CrossLinkedNode* start = &head;
 		while (start != end)
 		{
 			if (start->down == removeNode)
@@ -236,6 +210,6 @@ public:
 	}
 	CrossLinkedNodeColItertor GetItertor()
 	{
-		return CrossLinkedNodeColItertor(this->down);
+		return CrossLinkedNodeColItertor(head.down);
 	}
 };

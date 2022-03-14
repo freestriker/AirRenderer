@@ -122,6 +122,7 @@ void LogicThread::Init()
     configuration.sceneObject.AddChild(go0);
     go0->transform.SetTranslationRotationScale(glm::vec3(0, 0, 0), glm::quat(glm::vec3(1.5707963267948966, 0, 0)), glm::vec3(5, 5, 5));
     go0->AddComponent(new MeshRenderer("../../Resources/Model/Sphere_Wall_Normal.ply"));
+    go0->RemoveComponent<MeshRenderer>("MeshRenderer");
     //go0->AddComponent(new MeshRenderer("../../Resources/Model/Cube_Wall_Normal.ply"));
     //GameObject* go01 = new GameObject("go01");
     //configuration.sceneObject.AddChild(go01);
