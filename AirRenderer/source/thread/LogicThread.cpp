@@ -16,38 +16,41 @@ void LogicThread::run()
     while (true)
     {
         RenderCommandBufferBuilder renderCommandBufferBuilder = RenderCommandBufferBuilder();
-        std::vector<RenderItem<GameObject>> cameras = std::vector<RenderItem<GameObject>>();
-        std::vector<RenderItem<GameObject>> lights = std::vector<RenderItem<GameObject>>();
-        std::vector<RenderItem<GameObject>> renderers = std::vector<RenderItem<GameObject>>();
-        GetCameras(cameras);
-        GetLights(lights);
-        GetMeshRenderers(renderers);
-        for each (RenderItem<GameObject> renderItem in lights)
+        if (componentListMap.count("Light"))
         {
-            Light* light = renderItem.item->FindComponent<Light>("Light");
-            renderCommandBufferBuilder.AddLight(*light);
-        }
-        for each (RenderItem<GameObject> renderItem in cameras)
-        {
-            Camera* camera = renderItem.item->FindComponent<Camera>("Camera");
-            renderCommandBufferBuilder.SetCamera(*camera);
-            glm::vec4 clipPlanes[6]{glm::vec4(0, 0, 0, 0)};
-            camera->ClipPlanes(clipPlanes);
-            IntersectionTester intersectionTester = IntersectionTester(clipPlanes, 6);
-            glm::mat4 viewMatrix = glm::inverse(camera->gameObject->transform.worldMatrix);
-            for each (RenderItem<GameObject> renderItem in renderers)
+            for (CrossLinkedNodeColItertor iter = componentListMap["Light"]->GetItertor(); iter.IsVaild(); ++iter)
             {
-                MeshRenderer* mr = renderItem.item->FindComponent<MeshRenderer>("MeshRenderer");
-                glm::mat4 wvMatrix = viewMatrix * mr->gameObject->transform.worldMatrix;
-                mr->mesh.WaitForLoad();
-                if (intersectionTester.Check(mr->mesh.boundingBox->boundryVertexes, 8, wvMatrix))
+                Light* light = iter.Node<Light>();
+                renderCommandBufferBuilder.AddLight(*light);
+
+            }
+        }
+        if (componentListMap.count("Camera") && componentListMap.count("MeshRenderer"))
+        {
+            CrossLinkedColHead* cameraHead = componentListMap["Camera"];
+            CrossLinkedColHead* meshRendererHead = componentListMap["MeshRenderer"];
+            for (CrossLinkedNodeColItertor iter = cameraHead->GetItertor(); iter.IsVaild(); ++iter)
+            {
+                Camera* camera = iter.Node<Camera>();
+                renderCommandBufferBuilder.SetCamera(*camera);
+                glm::vec4 clipPlanes[6]{ glm::vec4(0, 0, 0, 0) };
+                camera->ClipPlanes(clipPlanes);
+                IntersectionTester intersectionTester = IntersectionTester(clipPlanes, 6);
+                glm::mat4 viewMatrix = glm::inverse(camera->gameObject->transform.worldMatrix);
+                for (CrossLinkedNodeColItertor iter = meshRendererHead->GetItertor(); iter.IsVaild(); ++iter)
                 {
-                    mr->Render(renderCommandBufferBuilder);
-                }
-                else
-                {
-                    std::string s = "Cull the gameobject called: " + mr->gameObject->name + ".";
-                    qDebug() << QString::fromStdString(s);
+                    MeshRenderer* mr = iter.Node<MeshRenderer>();
+                    glm::mat4 wvMatrix = viewMatrix * mr->gameObject->transform.worldMatrix;
+                    mr->mesh.WaitForLoad();
+                    if (intersectionTester.Check(mr->mesh.boundingBox->boundryVertexes, 8, wvMatrix))
+                    {
+                        mr->Render(renderCommandBufferBuilder);
+                    }
+                    else
+                    {
+                        std::string s = "Cull the gameobject called: " + mr->gameObject->name + ".";
+                        qDebug() << QString::fromStdString(s);
+                    }
                 }
             }
         }
@@ -57,6 +60,11 @@ void LogicThread::run()
     }
 }
 LogicThread::LogicThread(QObject* parent):QThread(parent)
+{
+    componentListMap = std::map<std::string, CrossLinkedColHead*>();
+}
+
+void LogicThread::Init()
 {
     GameObject* camera = new GameObject("Camera");
     configuration.sceneObject.AddChild(camera);
@@ -192,76 +200,5 @@ LogicThread::LogicThread(QObject* parent):QThread(parent)
     go13->AddChild(go134);
     go134->transform.SetTranslation(glm::vec3(0, 0, 100));
     go134->AddComponent(new MeshRenderer("../../Resources/Model/Cube_Wall_Normal.ply"));
-}
-void LogicThread::GetCameras(std::vector<RenderItem<GameObject>>& vector)
-{
-    vector.clear();
-    for (GameObject::ChildIterator i = configuration.sceneObject.GetStartChildIterator(), end = configuration.sceneObject.GetEndChildIterator(); i != end; i++)
-    {
-        GetCamerasDFS(vector, *i);
-    }
 
-}
-void LogicThread::GetCamerasDFS(std::vector<RenderItem<GameObject>>& vector, GameObject* gameObject)
-{
-    for (GameObject::ChildIterator i = gameObject->GetStartChildIterator(), end = gameObject->GetEndChildIterator(); i != end; i++)
-    {
-        GetCamerasDFS(vector, *i);
-    }
-    if (gameObject->FindComponent<Camera>("Camera"))
-    {
-        GameObject* parent = gameObject;
-        glm::mat4 m = glm::mat4(1);
-        while (parent)
-        {
-            m = parent->transform.TranslationMatrix() * parent->transform.RotationMatrix() * m;
-            parent = parent->parent;
-        }
-        vector.push_back(RenderItem<GameObject>(gameObject, m));
-    }
-}
-
-void LogicThread::GetMeshRenderers(std::vector<RenderItem<GameObject>>& vector)
-{
-    vector.clear();
-    for (GameObject::ChildIterator i = configuration.sceneObject.GetStartChildIterator(), end = configuration.sceneObject.GetEndChildIterator(); i != end; i++)
-    {
-        GetMeshRenderersDFS(vector, *i, glm::mat4(1));
-    }
-
-}
-void LogicThread::GetMeshRenderersDFS(std::vector<RenderItem<GameObject>>& vector, GameObject* gameObject, glm::mat4 parentMatrix)
-{
-    glm::mat4 matrix = parentMatrix * gameObject->transform.TranslationMatrix() * gameObject->transform.RotationMatrix() * gameObject->transform.ScaleMatrix();
-    for (GameObject::ChildIterator i = gameObject->GetStartChildIterator(), end = gameObject->GetEndChildIterator(); i != end; i++)
-    {
-        GetMeshRenderersDFS(vector, *i, matrix);
-    }
-    MeshRenderer* meshRenderer = gameObject->FindComponent<MeshRenderer>("MeshRenderer");
-    if (meshRenderer)
-    {
-        vector.push_back(RenderItem<GameObject>(gameObject, meshRenderer->gameObject->transform.worldMatrix));
-        //Utils::LogMatrix("MeshRenderer World", meshRenderer->gameObject->transform.worldMatrix);
-    }
-}
-void LogicThread::GetLights(std::vector<RenderItem<GameObject>>& vector)
-{
-    vector.clear();
-    for (GameObject::ChildIterator i = configuration.sceneObject.GetStartChildIterator(), end = configuration.sceneObject.GetEndChildIterator(); i != end; i++)
-    {
-        GetLightsDFS(vector, *i, glm::mat4(1));
-    }
-
-}
-void LogicThread::GetLightsDFS(std::vector<RenderItem<GameObject>>& vector, GameObject* gameObject, glm::mat4 parentMatrix)
-{
-    for (GameObject::ChildIterator i = gameObject->GetStartChildIterator(), end = gameObject->GetEndChildIterator(); i != end; i++)
-    {
-        GetLightsDFS(vector, *i, parentMatrix);
-    }
-    Light* light = gameObject->FindComponent<Light>("Light");
-    if (light)
-    {
-        vector.push_back(RenderItem<GameObject>(gameObject, parentMatrix));
-    }
 }

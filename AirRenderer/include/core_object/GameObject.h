@@ -32,44 +32,25 @@ public:
 template<typename T>
 T* GameObject::FindComponent(std::string typeName)
 {
-	for (CrossLinkedNodeRowItertor rowIter = linkedComponents.GetItertor(); rowIter.IsVaild(); ++rowIter)
-	{
-		Component* component = rowIter.Node<Component>();
-		if (component->typeName == typeName)
-		{
-			return static_cast<T*>(component);
-		}
-	}
-	return nullptr;
+	return Component::FindComponent<T>(linkedComponents, typeName);
 }
 template<typename T>
 void GameObject::AddComponent(T* component)
 {
+	Component::AddComponent<T>(linkedComponents, component);
+	global.logicThread->AddComponent(component);
+
 	Component* t = static_cast<Component*>(component);
-	linkedComponents.AddNode(t);
 	t->gameObject = this;
 	t->UpdateSelf(this->parent);
 }
 template<typename T>
 T* GameObject::RemoveComponent(std::string typeName)
 {
-	Component* target = nullptr;
-	for (CrossLinkedNodeRowItertor rowIter = linkedComponents.GetItertor(); rowIter.IsVaild(); ++rowIter)
-	{
-		Component* component = rowIter.Node<Component>();
-		if (component->typeName == typeName)
-		{
-			target = component;
-			break;
-		}
-	}
-	if (target)
-	{
-		linkedComponents.RemoveNode(target);
-		return target;
-	}
-	else
-	{
-		return nullptr;
-	}
+	T* t = Component::RemoveComponent<T>(linkedComponents, typeName);
+	Component* c = static_cast<Component*>(t);
+	global::logicThread->RemoveComponent(c);
+
+	c->gameObject = nullptr;
+	return t;
 }
