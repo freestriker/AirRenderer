@@ -12,6 +12,7 @@ Object::Object()
 Object::~Object()
 {
 	active = false;
+	typeName = "Destoried";
 }
 Object::Object(std::string name)
 {

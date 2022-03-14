@@ -10,6 +10,8 @@ class LogicThread : public QThread
     Q_OBJECT
     void run() override;
     std::map<std::string, CrossLinkedColHead*> componentListMap;
+    std::vector<GameObject*> destoryGameObjectVector;
+    std::vector<Component *> destoryComponentVector;
 public:
     LogicThread(QObject* parent);
 
@@ -18,6 +20,9 @@ public:
     template<typename T>
     T* RemoveComponent(T* component);
     void Init();
+    void Destory();
+    static void Destory(Component* component);
+    static void Destory(GameObject* gameObject);
 };
 
 template<typename T>

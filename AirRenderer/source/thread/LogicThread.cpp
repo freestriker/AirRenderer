@@ -56,6 +56,7 @@ void LogicThread::run()
         }
 
         global.renderThread->SubmitCommandBuffer(renderCommandBufferBuilder.BuildCommandBuffer());
+        Destory();
         sleep(1);
     }
 }
@@ -122,7 +123,7 @@ void LogicThread::Init()
     configuration.sceneObject.AddChild(go0);
     go0->transform.SetTranslationRotationScale(glm::vec3(0, 0, 0), glm::quat(glm::vec3(1.5707963267948966, 0, 0)), glm::vec3(5, 5, 5));
     go0->AddComponent(new MeshRenderer("../../Resources/Model/Sphere_Wall_Normal.ply"));
-    go0->RemoveComponent<MeshRenderer>("MeshRenderer");
+    //go0->RemoveComponent<MeshRenderer>("MeshRenderer");
     //go0->AddComponent(new MeshRenderer("../../Resources/Model/Cube_Wall_Normal.ply"));
     //GameObject* go01 = new GameObject("go01");
     //configuration.sceneObject.AddChild(go01);
@@ -201,5 +202,36 @@ void LogicThread::Init()
     go13->AddChild(go134);
     go134->transform.SetTranslation(glm::vec3(0, 0, 100));
     go134->AddComponent(new MeshRenderer("../../Resources/Model/Cube_Wall_Normal.ply"));
+
+}
+void LogicThread::Destory()
+{
+    for (int i = 0; i < destoryComponentVector.size(); i++)
+    {
+        delete destoryComponentVector[i];
+    }
+    destoryComponentVector.clear();
+    for (int i = 0; i < destoryGameObjectVector.size(); i++)
+    {
+        delete destoryGameObjectVector[i];
+    }
+    destoryGameObjectVector.clear();
+}
+
+void LogicThread::Destory(Component* component)
+{
+    global.logicThread->destoryComponentVector.push_back(component);
+}
+
+void LogicThread::Destory(GameObject* gameObject)
+{
+    std::vector<Component*> cs = std::vector<Component*>();
+    gameObject->RemoveAllComponent<Component>(cs);
+    for each (Component * component in cs)
+    {
+        global.logicThread->componentListMap[component->typeName]->RemoveNode(component);
+    }
+    global.logicThread->destoryComponentVector.insert(global.logicThread->destoryComponentVector.begin(), cs.begin(), cs.end());
+    global.logicThread->destoryGameObjectVector.push_back(gameObject);
 
 }

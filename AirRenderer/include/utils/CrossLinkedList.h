@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 class CrossLinkedNode
 {
 public:
@@ -115,6 +116,31 @@ public:
 			start = start->right;
 		}
 	}
+	template<typename T>
+	void RemoveAllNode(std::vector<T*>& vector)
+	{
+		static_assert(std::is_base_of< CrossLinkedNode, T>::value, "RemoveAllNode can only remove the sub class of CrossLinkedNode.");
+		CrossLinkedNode* i = end;
+		while (&head != i)
+		{
+			vector.push_back(static_cast<T*>(i));
+			i->left->right = nullptr;
+			end = i->left;
+			i->left = nullptr;
+			i = end;
+		}
+	}
+	void RemoveAllNode()
+	{
+		CrossLinkedNode* i = end;
+		while (&head != i)
+		{
+			i->left->right = nullptr;
+			end = i->left;
+			i->left = nullptr;
+			i = end;
+		}
+	}
 	CrossLinkedNodeRowItertor GetItertor()
 	{
 		return CrossLinkedNodeRowItertor(head.right);
@@ -208,6 +234,32 @@ public:
 			start = start->down;
 		}
 	}
+	template<typename T>
+	void RemoveAllNode(std::vector<T*>& vector)
+	{
+		static_assert(std::is_base_of< CrossLinkedNode, T>::value, "RemoveAllNode can only remove the sub class of CrossLinkedNode.");
+		CrossLinkedNode* i = end;
+		while (&head != i)
+		{
+			vector.push_back(static_cast<T*>(i));
+			i->top->down = nullptr;
+			end = i->top;
+			i->top = nullptr;
+			i = end;
+		}
+	}
+	void RemoveAllNode()
+	{
+		CrossLinkedNode* i = end;
+		while (&head != i)
+		{
+			i->top->down = nullptr;
+			end = i->top;
+			i->top = nullptr;
+			i = end;
+		}
+	}
+
 	CrossLinkedNodeColItertor GetItertor()
 	{
 		return CrossLinkedNodeColItertor(head.down);

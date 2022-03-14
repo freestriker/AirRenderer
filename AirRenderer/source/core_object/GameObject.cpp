@@ -45,25 +45,3 @@ void GameObject::UpdateSelfWithoutTransform(void* data)
 	}
 }
 
-void GameObject::Destory(GameObject* gameObject)
-{
-	gameObject->RemoveSelf();
-	std::vector<GameObject*> vector = std::vector<GameObject*>();
-	gameObject->GetAllChildren(vector);
-	for (int i = 0; i < vector.size(); i++)
-	{
-		DestorySelf(vector[i]);
-	}
-	DestorySelf(gameObject);
-}
-void GameObject::DestorySelf(GameObject* gameObject)
-{
-	for (int i = 0; i < gameObject->components.size(); i++)
-	{
-		Component::Destory(gameObject->components[i]);
-	}
-	gameObject->components.clear();	
-	delete gameObject;
-}
-
-

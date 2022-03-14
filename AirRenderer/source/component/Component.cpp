@@ -13,8 +13,3 @@ Component::~Component()
 void Component::UpdateSelf(void* data)
 {
 }
-
-void Component::Destory(Component* component)
-{
-	delete component;
-}

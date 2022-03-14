@@ -9,14 +9,14 @@ public:
 	Component(std::string typeName);
 	virtual ~Component();
 	virtual void UpdateSelf(void* data);
-	static void Destory(Component* component);
 	template<typename T>
 	static T* FindComponent(CrossLinkedRowHead& linkedComponents, std::string typeName);
 	template<typename T>
 	static void AddComponent(CrossLinkedRowHead& linkedComponents, T* component);
 	template<typename T>
 	static T* RemoveComponent(CrossLinkedRowHead& linkedComponents, std::string typeName);
-
+	template<typename T>
+	static void RemoveAllComponent(CrossLinkedRowHead& linkedComponents, std::vector<T*>& vector);
 };
 
 template<typename T>
@@ -62,4 +62,10 @@ T* Component::RemoveComponent(CrossLinkedRowHead& linkedComponents, std::string 
 	{
 		return nullptr;
 	}
+}
+
+template<typename T>
+void Component::RemoveAllComponent(CrossLinkedRowHead& linkedComponents, std::vector<T*>& vector)
+{
+	linkedComponents.RemoveAllNode<T>(vector);
 }

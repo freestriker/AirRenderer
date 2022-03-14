@@ -25,8 +25,8 @@ public:
 	void AddComponent(T* component);
 	template<typename T>
 	T* RemoveComponent(std::string typeName);
-	static void Destory(GameObject* gameObject);
-	static void DestorySelf(GameObject* gameObject);
+	template<typename T>
+	void RemoveAllComponent(std::vector<T*>& vector);
 };
 
 template<typename T>
@@ -53,4 +53,10 @@ T* GameObject::RemoveComponent(std::string typeName)
 
 	c->gameObject = nullptr;
 	return t;
+}
+
+template<typename T>
+void GameObject::RemoveAllComponent(std::vector<T*>& vector)
+{
+	Component::RemoveAllComponent<T>(linkedComponents, vector);
 }
