@@ -21,19 +21,18 @@ MeshRenderer::MeshRenderer():MeshRenderer("..\\Resources\\Model\\Flat_Wall_Norma
 }
 MeshRenderer::~MeshRenderer()
 {
-
+    delete material;
 }
-MeshRenderer::MeshRenderer(std::string filePath):Component("MeshRenderer")
+MeshRenderer::MeshRenderer(std::string filePath):Component("MeshRenderer"), mesh(filePath)
 {
-    this->mesh = Mesh(filePath);
     material = new NormalMaterial([](NormalData& normalData)->void
     {
         normalData.ambientReflectance = 0.2;
         normalData.convergenceExponent = 19;
         normalData.diffuseReflectance = 1;
         normalData.specularReflectance = 4;
-        normalData.texture = Texture("..\\Resources\\Texture\\Wall.png", Texture::InterpolationOption::BILINERA, Texture::WrapOption::CLAMP, Texture::MipMapOption::NONE);
-        normalData.normalMap = Texture("..\\Resources\\Texture\\Wall_Normal.png", Texture::InterpolationOption::BILINERA, Texture::WrapOption::CLAMP, Texture::MipMapOption::NONE);
+        normalData.texture = new Texture("..\\Resources\\Texture\\Wall.png", Texture::InterpolationOption::BILINERA, Texture::WrapOption::CLAMP, Texture::MipMapOption::NONE);
+        normalData.normalMap = new Texture("..\\Resources\\Texture\\Wall_Normal.png", Texture::InterpolationOption::BILINERA, Texture::WrapOption::CLAMP, Texture::MipMapOption::NONE);
     });
 }
 

@@ -14,6 +14,7 @@ Light::Light(std::string lightTypeName):Component("Light")
 
 Light::~Light()
 {
+	lightTypeName = "DestoriedLight";
 }
 
 void Light::UpdateSelf(void* data)

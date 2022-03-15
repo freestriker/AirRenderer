@@ -20,7 +20,7 @@ void NormalShader::VertexShading(VertexInContext& vertexInContext, VertexOutCont
 bool NormalShader::PixelShading(PixelInContext& pixelInContext, PixelOutContext& pixelOutContext, MatrixContext* matrixContext, LightContext* lightContext)
 {
 	glm::vec2 uv = glm::vec2(pixelInContext.data[RegisterIndex::TEXCOORD1]);
-	Color c = Color(pixelInContext.data[RegisterIndex::COLOR]) * value->texture.Sample(uv);
+	Color c = Color(pixelInContext.data[RegisterIndex::COLOR]) * value->texture->Sample(uv);
 	Color al = Color::black;
 	Color dl = Color::black;
 	Color sl = Color::black;
@@ -31,7 +31,7 @@ bool NormalShader::PixelShading(PixelInContext& pixelInContext, PixelOutContext&
 	glm::vec3 vTangent = pixelInContext.data[RegisterIndex::TANGENT];
 	vTangent = glm::normalize(vTangent);
 	glm::vec3 vBitangent = SchmidtOrthogonalization(vNormal, vTangent);
-	glm::vec3 tNormal = value->normalMap.SampleNormal(uv);
+	glm::vec3 tNormal = value->normalMap->SampleNormal(uv);
 	glm::mat3 tbnMatrix = glm::mat3(vTangent, vBitangent, vNormal);
 	vNormal = glm::normalize((tbnMatrix * tNormal) + vNormal);
 	for each (Light * light in lightContext->lights)

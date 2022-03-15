@@ -27,7 +27,7 @@ public:
 	void UpdateGameObject(void* data);
 
 	Transform();
-	~Transform();
+	virtual ~Transform();
 	Transform(glm::vec3 translation, glm::quat rotation, glm::vec3 scale);
 };
 

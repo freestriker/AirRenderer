@@ -118,6 +118,7 @@
     </QtMoc>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="include\material\MaterialBase.cpp" />
     <ClCompile Include="source\component\camera\OrthographicCamera.cpp" />
     <ClCompile Include="source\component\camera\PerspectiveCamera.cpp" />
     <ClCompile Include="source\context\CameraContext.cpp" />

@@ -7,17 +7,25 @@ class Material:public MaterialBase
 public:
 	TValue value;
 	TShader shader;
+	std::function<void(TValue&)> initer;
 	Material(std::function<void(TValue&)> loadValue);
 	ShaderBase* Shader() override;
 	virtual MaterialBase* Clone()override = 0;
 
 	Material();
+	virtual ~Material();
 };
 
 template<typename TValue, typename TShader>
-Material<TValue, TShader>::Material(std::function<void(TValue&)> loadValue)
+Material<TValue, TShader>::Material(std::function<void(TValue&)> initer) :MaterialBase()
 {
-	loadValue(value);
+	this->initer = initer;
+	initer(value);
+}
+template<typename TValue, typename TShader>
+Material<TValue, TShader>::~Material()
+{
+
 }
 
 template<typename TValue, typename TShader>

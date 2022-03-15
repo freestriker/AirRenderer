@@ -3,6 +3,7 @@
 
 Camera::~Camera()
 {
+    cameraType = "destoriedCamera";
 }
 
 void Camera::UpdateSelf(void* data)

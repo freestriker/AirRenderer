@@ -88,7 +88,7 @@ void RenderThread::Render(std::shared_ptr<RenderCommandBuffer> renderCommandBuff
             {
                 std::string ps = sb->shaderPasses[i].passName + ": ";
                 qDebug() << QString::fromStdString(ps);
-                Pipeline(&matrixContext, &lightContext, &cameraContext, &renderCommandBuffer->meshInstances[materialRenderWrap.meshInstanceIndex], sb->shaderPasses[i]);
+                Pipeline(&matrixContext, &lightContext, &cameraContext, renderCommandBuffer->meshInstances[materialRenderWrap.meshInstanceIndex], sb->shaderPasses[i]);
             }
 
         }

@@ -24,9 +24,14 @@ public:
     class LoadCommand
     {
     public:
+        bool valid;
         LoadOption loadOption;
         ProcessOptions processOption;
         std::string path;
+        LoadCommand()
+        {
+            valid = false;
+        }
     };
     class ResourceWrap
     {

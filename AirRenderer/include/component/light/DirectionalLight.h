@@ -7,7 +7,7 @@ public:
 	glm::vec3 IncidentLight(glm::vec3& position);
 	Color ColorIntensity(glm::vec3& incidentLight);
 	DirectionalLight();
-	~DirectionalLight();
+	virtual ~DirectionalLight();
 	Light* Clone();
 };
 

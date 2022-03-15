@@ -10,8 +10,23 @@ const glm::vec2 Texture::fone = glm::vec2(1, 1);
 const glm::ivec2 Texture::izero = glm::ivec2(0, 0);
 const glm::ivec2 Texture::ione = glm::ivec2(1, 1);
 
-Texture::Texture() :Texture("..\\Resources\\Texture\\DefaultTexture.png", InterpolationOption::NEAREST, WrapOption::CLAMP, MipMapOption::NONE)
+Texture::Texture():Object("Texture"), loadCommand()
 {
+    this->bitmap = nullptr;
+}
+Texture::Texture(std::string filePath, InterpolationOption interpolationOption, WrapOption wrapOption, MipMapOption mipMapOption) : Object("Texture")
+{
+    this->interpolationOption = interpolationOption;
+    this->wrapOption = wrapOption;
+    this->mipMapOption = mipMapOption;
+    this->loadCommand = global.loadThread->Load(filePath, LoadThread::ProcessOptions::TEXTURE);
+    this->bitmap = nullptr;
+}
+
+Texture::~Texture()
+{
+    global.loadThread->Unload(loadCommand);
+    typeName = "DestoriedTexture";
 }
 
 Color Texture::Sample(glm::vec2& uv)
@@ -28,17 +43,9 @@ Color Texture::Sample(glm::vec2& uv)
 }
 FIBITMAP* Texture::GetTexture()
 {
-    return global.loadThread->GetResource<FIBITMAP>(loadCommand);
+    return loadCommand.valid ? global.loadThread->GetResource<FIBITMAP>(loadCommand) : nullptr;
 }
 
-Texture::Texture(std::string filePath, InterpolationOption interpolationOption, WrapOption wrapOption, MipMapOption mipMapOption)
-{
-    this->interpolationOption = interpolationOption;
-    this->wrapOption = wrapOption;
-    this->mipMapOption = mipMapOption;
-    this->loadCommand = global.loadThread->Load(filePath, LoadThread::ProcessOptions::TEXTURE);
-    this->bitmap = nullptr;
-}
 
 
 glm::vec3 Texture::SampleNormal(glm::vec2& uv)

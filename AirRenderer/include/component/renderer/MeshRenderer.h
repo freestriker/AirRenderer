@@ -11,11 +11,10 @@
 class MeshRenderer: public Component
 {
 public:
-	//LoadThread::LoadCommand loadCommand;
 	Mesh mesh;
 	MaterialBase* material;
 	MeshRenderer();
-	~MeshRenderer();
+	virtual ~MeshRenderer();
 	MeshRenderer(std::string filePath);
 	void Render(RenderCommandBufferBuilder& commandBuilder);
 };

@@ -28,11 +28,12 @@ public:
 
 	std::vector< CameraRenderWrap> cameraRenderWraps;
 	std::vector< MaterialRenderWrap> materialRenderWraps;
-	std::vector<Mesh> meshInstances;
+	std::vector<Mesh*> meshInstances;
 	std::vector<Light*> lightInstances;
 
 
 	RenderCommandBuffer();
+	~RenderCommandBuffer();
 
 };
 class RenderCommandBufferBuilder
@@ -43,7 +44,7 @@ class RenderCommandBufferBuilder
 
 	std::vector< RenderCommandBuffer::CameraRenderWrap> cameraRenderWraps;
 	std::vector< RenderCommandBuffer::MaterialRenderWrap> materialRenderWraps;
-	std::vector<Mesh> meshInstances;
+	std::vector<Mesh*> meshInstances;
 	std::vector<Light*> lightInstances;
 public:
 	RenderCommandBufferBuilder();

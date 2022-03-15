@@ -4,8 +4,9 @@
 #include "include/utils/Color.h"
 #include <include/thread/LoadThread.h>
 #include <FreeImage.h>
+#include <include/utils/Object.h>
 
-class Texture
+class Texture:public Object
 {
 public:
 	enum class InterpolationOption
@@ -37,6 +38,7 @@ public:
 	glm::vec2 Wrap(glm::vec2 uv);
 	Color Interpolate(glm::vec2& uv);
 	Texture();
+	virtual ~Texture();
 	Color Sample(glm::vec2& uv);
 	FIBITMAP* GetTexture();
 	glm::vec3 SampleNormal(glm::vec2& uv);

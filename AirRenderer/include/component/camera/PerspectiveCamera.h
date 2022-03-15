@@ -5,7 +5,7 @@ class PerspectiveCamera : public Camera
 public:
 	float fovAngle;
 	PerspectiveCamera();
-	~PerspectiveCamera();
+	virtual ~PerspectiveCamera();
 	glm::mat4 ProjectionMatrix() override;
 	void ClipPlanes(glm::vec4* planes)override;
 

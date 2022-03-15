@@ -22,8 +22,17 @@ RenderCommandBuffer::RenderCommandBuffer()
 {
 	cameraRenderWraps = std::vector< CameraRenderWrap>();
 	materialRenderWraps = std::vector< MaterialRenderWrap>();
-	meshInstances = std::vector<Mesh>();
+	meshInstances = std::vector<Mesh*>();
 
+}
+RenderCommandBuffer::~RenderCommandBuffer()
+{
+	for each (Mesh * m in meshInstances)
+	{
+		delete m;
+	}
+	meshInstances.clear();
+	materialRenderWraps.clear();
 }
 RenderCommandBufferBuilder::RenderCommandBufferBuilder()
 {
@@ -33,7 +42,7 @@ RenderCommandBufferBuilder::RenderCommandBufferBuilder()
 
 	cameraRenderWraps = std::vector< RenderCommandBuffer::CameraRenderWrap>();
 	materialRenderWraps = std::vector< RenderCommandBuffer::MaterialRenderWrap>();
-	meshInstances = std::vector<Mesh>();
+	meshInstances = std::vector<Mesh*>();
 }
 std::shared_ptr< RenderCommandBuffer> RenderCommandBufferBuilder::BuildCommandBuffer()
 {
@@ -72,7 +81,7 @@ void RenderCommandBufferBuilder::DrawMesh(Mesh& modelMesh, glm::mat4& worldMatri
 	{
 		meshIndex = meshInstances.size();
 		meshMap.operator[](modelMesh.loadCommand.path) = meshIndex;
-		meshInstances.push_back(modelMesh);
+		meshInstances.push_back(modelMesh.Clone());
 	}
 
 	cameraRenderWraps[curCameraRenderWrapIndex].materialInstanceIndex.push_back(materialRenderWraps.size());

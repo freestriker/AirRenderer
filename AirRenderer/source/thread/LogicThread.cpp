@@ -194,6 +194,7 @@ void LogicThread::Init()
     //go134->transform.SetTranslation(glm::vec3(-6, 0, -3));
     //go134->transform.SetScale(glm::vec3(5, 5, 1));
     //go134->AddComponent(new MeshRenderer("../../Resources/Model/Flat_Wall_Normal.ply"));
+
     GameObject* go133 = new GameObject("go133");
     go13->AddChild(go133);
     go133->transform.SetTranslation(glm::vec3(0, 0, -3));

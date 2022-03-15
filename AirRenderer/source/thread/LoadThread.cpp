@@ -22,6 +22,7 @@ LoadThread::LoadCommand LoadThread::Load(std::string path, ProcessOptions proces
 	commandQueueMutex.lock();
 
 	LoadCommand loadCommand = LoadCommand();
+	loadCommand.valid = true;
 	loadCommand.path = path;
 	loadCommand.processOption = processOption;
 	loadCommand.loadOption = LoadOption::LOAD;
@@ -38,7 +39,10 @@ LoadThread::LoadCommand LoadThread::Load(LoadCommand& loadCommand)
 
 	commandQueueMutex.lock();
 
-	command.push_back(loadCommand);
+	if (loadCommand.valid)
+	{
+		command.push_back(loadCommand);
+	}
 
 	commandQueueMutex.unlock();
 
@@ -50,8 +54,11 @@ void LoadThread::Unload(LoadCommand& loadCommand)
 {
 
 	commandQueueMutex.lock();
-	loadCommand.loadOption = LoadOption::UNLOAD;
-	command.push_back(loadCommand);
+	if (loadCommand.valid)
+	{
+		loadCommand.loadOption = LoadOption::UNLOAD;
+		command.push_back(loadCommand);
+	}
 	commandQueueMutex.unlock();
 
 	commandAvailable.wakeAll();
@@ -103,10 +110,10 @@ void LoadThread::run()
 					break;
 				}
 			}
+			command.clear();
 			resourecMapMutex.unlock();
 			resourceAvailable.wakeAll();
 
-			command.clear();
 		}
 		else
 		{
