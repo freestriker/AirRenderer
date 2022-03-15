@@ -20,7 +20,7 @@ public:
     template<typename T>
     T* RemoveComponent(T* component);
     void Init();
-    void Destory();
+    void RealDestory();
     static void Destory(Component* component);
     static void Destory(GameObject* gameObject);
 };

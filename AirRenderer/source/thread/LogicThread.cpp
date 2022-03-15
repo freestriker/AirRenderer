@@ -56,7 +56,7 @@ void LogicThread::run()
         }
 
         global.renderThread->SubmitCommandBuffer(renderCommandBufferBuilder.BuildCommandBuffer());
-        Destory();
+        RealDestory();
         sleep(1);
     }
 }
@@ -120,6 +120,11 @@ void LogicThread::Init()
     //go0->AddComponent(new MeshRenderer("../../Model/Cube_Wall_Normal.ply"));
 
     GameObject* go0 = new GameObject("go0");
+    configuration.sceneObject.AddChild(go0);
+    go0->transform.SetTranslationRotationScale(glm::vec3(0, 0, 0), glm::quat(glm::vec3(1.5707963267948966, 0, 0)), glm::vec3(5, 5, 5));
+    go0->AddComponent(new MeshRenderer("../../Resources/Model/Sphere_Wall_Normal.ply"));
+    Destory(go0);
+    go0 = new GameObject("go0");
     configuration.sceneObject.AddChild(go0);
     go0->transform.SetTranslationRotationScale(glm::vec3(0, 0, 0), glm::quat(glm::vec3(1.5707963267948966, 0, 0)), glm::vec3(5, 5, 5));
     go0->AddComponent(new MeshRenderer("../../Resources/Model/Sphere_Wall_Normal.ply"));
@@ -204,7 +209,7 @@ void LogicThread::Init()
     go134->AddComponent(new MeshRenderer("../../Resources/Model/Cube_Wall_Normal.ply"));
 
 }
-void LogicThread::Destory()
+void LogicThread::RealDestory()
 {
     for (int i = 0; i < destoryComponentVector.size(); i++)
     {
@@ -220,15 +225,19 @@ void LogicThread::Destory()
 
 void LogicThread::Destory(Component* component)
 {
+    component->active = false;
     global.logicThread->destoryComponentVector.push_back(component);
 }
 
 void LogicThread::Destory(GameObject* gameObject)
 {
+    gameObject->active = false;
+    gameObject->RemoveSelf();
     std::vector<Component*> cs = std::vector<Component*>();
     gameObject->RemoveAllComponent<Component>(cs);
     for each (Component * component in cs)
     {
+        component->active = false;
         global.logicThread->componentListMap[component->typeName]->RemoveNode(component);
     }
     global.logicThread->destoryComponentVector.insert(global.logicThread->destoryComponentVector.begin(), cs.begin(), cs.end());
