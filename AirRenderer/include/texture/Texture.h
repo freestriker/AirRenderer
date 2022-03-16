@@ -39,6 +39,7 @@ public:
 	Color Interpolate(glm::vec2& uv);
 	Texture();
 	virtual ~Texture();
+	Texture* Clone();
 	Color Sample(glm::vec2& uv);
 	FIBITMAP* GetTexture();
 	glm::vec3 SampleNormal(glm::vec2& uv);

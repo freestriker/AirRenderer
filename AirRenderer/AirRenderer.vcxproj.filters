@@ -133,12 +133,6 @@
     <ClCompile Include="source\shader\NormalShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\material\NormalMaterial.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="source\shader\ShaderBase.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="source\utils\RegisterIndex.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -160,7 +154,10 @@
     <ClCompile Include="source\thread\RenderCommandBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="include\material\MaterialBase.cpp">
+    <ClCompile Include="source\material\Material.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\shader\Shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -216,9 +213,6 @@
     <ClInclude Include="include\texture\Texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\material\Material.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\utils\Object.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -255,13 +249,7 @@
     <ClInclude Include="include\shader\NormalShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\material\NormalMaterial.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\material\MaterialBase.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\shader\ShaderBase.h">
+    <ClInclude Include="include\material\Material.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\utils\RegisterIndex.h">
@@ -295,6 +283,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\utils\CrossLinkedList.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\shader\ShaderData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

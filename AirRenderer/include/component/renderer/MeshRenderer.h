@@ -11,8 +11,8 @@
 class MeshRenderer: public Component
 {
 public:
-	Mesh mesh;
-	MaterialBase* material;
+	Mesh* mesh;
+	Material* material;
 	MeshRenderer();
 	virtual ~MeshRenderer();
 	MeshRenderer(std::string filePath);

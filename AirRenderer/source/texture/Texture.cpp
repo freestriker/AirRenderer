@@ -29,6 +29,11 @@ Texture::~Texture()
     typeName = "DestoriedTexture";
 }
 
+Texture* Texture::Clone()
+{
+    return new Texture(loadCommand.path, interpolationOption, wrapOption, mipMapOption);
+}
+
 Color Texture::Sample(glm::vec2& uv)
 {
     

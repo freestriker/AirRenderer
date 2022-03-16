@@ -11,9 +11,9 @@ RenderCommandBuffer::CameraRenderWrap::CameraRenderWrap(Camera& camera)
 	cameraContext.primitiveCliper = PrimitiveCliper(clipPlanes, 6);
 	materialInstanceIndex = std::vector<int>();
 }
-RenderCommandBuffer::MaterialRenderWrap::MaterialRenderWrap(MaterialBase* materialInstance, int meshIndex, glm::mat4 worldMatrix, int passIndex)
+RenderCommandBuffer::MaterialRenderWrap::MaterialRenderWrap(Material* materialInstance, int meshIndex, glm::mat4 worldMatrix, int passIndex)
 {
-	this->materialInstance = std::shared_ptr <MaterialBase>(materialInstance);
+	this->materialInstance = std::shared_ptr <Material>(materialInstance);
 	this->meshInstanceIndex = meshIndex;
 	this->worldMatrix = worldMatrix;
 	this->passIndex = passIndex;
@@ -22,15 +22,14 @@ RenderCommandBuffer::RenderCommandBuffer()
 {
 	cameraRenderWraps = std::vector< CameraRenderWrap>();
 	materialRenderWraps = std::vector< MaterialRenderWrap>();
-	meshInstances = std::vector<Mesh*>();
+	meshInstances = std::vector<std::shared_ptr<Mesh>>();
+	lightInstances = std::vector<std::shared_ptr<Light>>();
 
 }
 RenderCommandBuffer::~RenderCommandBuffer()
 {
-	for each (Mesh * m in meshInstances)
-	{
-		delete m;
-	}
+	cameraRenderWraps.clear();
+	lightInstances.clear();
 	meshInstances.clear();
 	materialRenderWraps.clear();
 }
@@ -42,7 +41,16 @@ RenderCommandBufferBuilder::RenderCommandBufferBuilder()
 
 	cameraRenderWraps = std::vector< RenderCommandBuffer::CameraRenderWrap>();
 	materialRenderWraps = std::vector< RenderCommandBuffer::MaterialRenderWrap>();
-	meshInstances = std::vector<Mesh*>();
+	meshInstances = std::vector<std::shared_ptr<Mesh>>();
+}
+RenderCommandBufferBuilder::~RenderCommandBufferBuilder()
+{
+	cameraRenderWrapMap.clear();
+	meshMap.clear();
+	cameraRenderWraps.clear();
+	lightInstances.clear();
+	meshInstances.clear();
+	materialRenderWraps.clear();
 }
 std::shared_ptr< RenderCommandBuffer> RenderCommandBufferBuilder::BuildCommandBuffer()
 {
@@ -68,9 +76,9 @@ void RenderCommandBufferBuilder::SetCamera(Camera& camera)
 }
 void RenderCommandBufferBuilder::AddLight(Light& light)
 {
-	this->lightInstances.push_back(light.Clone());
+	this->lightInstances.push_back(std::shared_ptr<Light>(light.Clone()));
 }
-void RenderCommandBufferBuilder::DrawMesh(Mesh& modelMesh, glm::mat4& worldMatrix, MaterialBase& material, int passIndex)
+void RenderCommandBufferBuilder::DrawMesh(Mesh& modelMesh, glm::mat4& worldMatrix, Material& material, int passIndex)
 {
 	int meshIndex;
 	if (meshMap.count(modelMesh.loadCommand.path))
@@ -81,7 +89,7 @@ void RenderCommandBufferBuilder::DrawMesh(Mesh& modelMesh, glm::mat4& worldMatri
 	{
 		meshIndex = meshInstances.size();
 		meshMap.operator[](modelMesh.loadCommand.path) = meshIndex;
-		meshInstances.push_back(modelMesh.Clone());
+		meshInstances.push_back(std::shared_ptr<Mesh>(modelMesh.Clone()));
 	}
 
 	cameraRenderWraps[curCameraRenderWrapIndex].materialInstanceIndex.push_back(materialRenderWraps.size());

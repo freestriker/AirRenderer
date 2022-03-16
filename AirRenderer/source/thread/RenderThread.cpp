@@ -61,7 +61,10 @@ void RenderThread::run()
 void RenderThread::Render(std::shared_ptr<RenderCommandBuffer> renderCommandBuffer)
 {
     LightContext lightContext = LightContext();
-    lightContext.lights = renderCommandBuffer->lightInstances;
+    for (int i = 0; i < renderCommandBuffer->lightInstances.size(); i++)
+    {
+        lightContext.lights.push_back(renderCommandBuffer->lightInstances[i].get());
+    }
 
     for (RenderCommandBuffer::CameraRenderWrap cameraRenderWrap : renderCommandBuffer->cameraRenderWraps)
     {
@@ -81,14 +84,15 @@ void RenderThread::Render(std::shared_ptr<RenderCommandBuffer> renderCommandBuff
             matrixContext.w_itMatrix = glm::transpose(glm::inverse(matrixContext.worldMatrix));
             matrixContext.wvpMatrix = matrixContext.vpMatrix * matrixContext.worldMatrix;
 
-            ShaderBase* sb = materialRenderWrap.materialInstance->Shader();
+            materialRenderWrap.materialInstance->FillData();
+            Shader* sb = materialRenderWrap.materialInstance->shader;
             int i = materialRenderWrap.passIndex == -1 ? 0 : materialRenderWrap.passIndex;
             int size = materialRenderWrap.passIndex == -1 ? sb->shaderPasses.size() : materialRenderWrap.passIndex + 1;
             for ( ; i < size; i++)
             {
                 std::string ps = sb->shaderPasses[i].passName + ": ";
                 qDebug() << QString::fromStdString(ps);
-                Pipeline(&matrixContext, &lightContext, &cameraContext, renderCommandBuffer->meshInstances[materialRenderWrap.meshInstanceIndex], sb->shaderPasses[i]);
+                Pipeline(&matrixContext, &lightContext, &cameraContext, renderCommandBuffer->meshInstances[materialRenderWrap.meshInstanceIndex].get(), sb->shaderPasses[i]);
             }
 
         }

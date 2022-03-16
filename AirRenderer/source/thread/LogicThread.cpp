@@ -41,8 +41,8 @@ void LogicThread::run()
                 {
                     MeshRenderer* mr = iter.Node<MeshRenderer>();
                     glm::mat4 wvMatrix = viewMatrix * mr->gameObject->transform.worldMatrix;
-                    mr->mesh.WaitForLoad();
-                    if (intersectionTester.Check(mr->mesh.boundingBox->boundryVertexes, 8, wvMatrix))
+                    mr->mesh->WaitForLoad();
+                    if (intersectionTester.Check(mr->mesh->boundingBox->boundryVertexes, 8, wvMatrix))
                     {
                         mr->Render(renderCommandBufferBuilder);
                     }
@@ -57,7 +57,7 @@ void LogicThread::run()
 
         global.renderThread->SubmitCommandBuffer(renderCommandBufferBuilder.BuildCommandBuffer());
         RealDestory();
-        sleep(1);
+        sleep(0);
     }
 }
 LogicThread::LogicThread(QObject* parent):QThread(parent)

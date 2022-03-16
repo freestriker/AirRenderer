@@ -1,7 +1,7 @@
 #pragma once
 #include <include/shader/NormalData.h>
 #include <include/shader/Shader.h>
-class NormalShader: public Shader<NormalData>
+class NormalShader: public Shader
 {
 public:
 	void VertexShading(VertexInContext& vertexInContext, VertexOutContext& vertexOutContext, MatrixContext* matrixContext, LightContext* lightContext);
@@ -15,4 +15,6 @@ public:
 	void NormalGeometryShading(PrimitiveContext& primitiveInContext, PrimitiveOutContextBuilder& primitiveOutContextBuilder, MatrixContext* matrixContext, LightContext* lightContext);
 
 	NormalShader();
+	~NormalShader();
+	Shader* Clone() override;
 };

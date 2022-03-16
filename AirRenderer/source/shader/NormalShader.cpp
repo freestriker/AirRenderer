@@ -19,6 +19,8 @@ void NormalShader::VertexShading(VertexInContext& vertexInContext, VertexOutCont
 
 bool NormalShader::PixelShading(PixelInContext& pixelInContext, PixelOutContext& pixelOutContext, MatrixContext* matrixContext, LightContext* lightContext)
 {
+	NormalData* value = this->Data<NormalData>();
+	
 	glm::vec2 uv = glm::vec2(pixelInContext.data[RegisterIndex::TEXCOORD1]);
 	Color c = Color(pixelInContext.data[RegisterIndex::COLOR]) * value->texture->Sample(uv);
 	Color al = Color::black;
@@ -114,7 +116,7 @@ void NormalShader::NormalGeometryShading(PrimitiveContext& primitiveInContext, P
 	}
 }
 
-NormalShader::NormalShader():Shader<NormalData>()
+NormalShader::NormalShader():Shader()
 {
 	this->shaderPasses = std::vector<ShaderPass>(3);
 	this->shaderPasses[0].passName = "Normal Pass";
@@ -141,4 +143,14 @@ NormalShader::NormalShader():Shader<NormalData>()
 	//this->shaderPasses[0].vertexShading = std::bind(&NormalShader::VertexShading, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
 	//this->shaderPasses[0].pixelShading = std::bind(&NormalShader::PixelShading, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
 	//this->shaderPasses[0].geometryShading = std::bind(&NormalShader::GeometryShading, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4);
+}
+
+NormalShader::~NormalShader()
+{
+
+}
+
+Shader* NormalShader::Clone()
+{
+	return new NormalShader();
 }
