@@ -11,10 +11,17 @@
 #include <include/thread/RenderCommandBuffer.h>
 #include <include/thread/RenderThread.h>
 #include <include/utils/IntersectionTester.h>
+#include <include/utils/Time.h>
 void LogicThread::run()
 {
     while (true)
     {
+        global.time->Refresh();
+        double launchTime = global.time->GetLaunchDuration();
+        double deltaTime = global.time->GetDeltaDuration();
+        std::string lt = "LaunchTime: " + std::to_string(launchTime);
+        std::string dt = "DeltaTime: " + std::to_string(deltaTime);
+        qDebug() << QString::fromStdString(lt) << QString::fromStdString(dt);
         RenderCommandBufferBuilder renderCommandBufferBuilder = RenderCommandBufferBuilder();
         if (componentListMap.count("Light"))
         {
@@ -57,7 +64,7 @@ void LogicThread::run()
 
         global.renderThread->SubmitCommandBuffer(renderCommandBufferBuilder.BuildCommandBuffer());
         RealDestory();
-        sleep(0);
+        msleep(10);
     }
 }
 LogicThread::LogicThread(QObject* parent):QThread(parent)
@@ -67,6 +74,7 @@ LogicThread::LogicThread(QObject* parent):QThread(parent)
 
 void LogicThread::Init()
 {
+    global.time->Launch();
     GameObject* camera = new GameObject("Camera");
     configuration.sceneObject.AddChild(camera);
     camera->AddComponent(new PerspectiveCamera());

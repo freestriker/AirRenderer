@@ -6,6 +6,7 @@
 #include <include/thread/RenderThread.h>
 #include <include/utils/OrientedBoundingBox.h>
 #include <include/thread/LogicThread.h>
+#include <include/utils/Time.h>
 int main(int argc, char* argv[])
 {
     QApplication a(argc, argv);
@@ -15,7 +16,7 @@ int main(int argc, char* argv[])
     global.loadThread = new LoadThread(&window);
     global.renderThread = new RenderThread(&window);
     global.logicThread = new LogicThread(&window);
-
+    global.time = new Time();
     global.loadThread->start();
     global.renderThread->start();
 

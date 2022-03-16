@@ -205,6 +205,7 @@
     <ClInclude Include="include\core_object\Configuration.h" />
     <ClInclude Include="include\utils\Drawer.h" />
     <QtMoc Include="include\thread\RenderThread.h" />
+    <ClInclude Include="include\utils\Time.h" />
     <ClInclude Include="stdafx.h" />
     <ClCompile Include="source\thread\RenderThread.cpp" />
     <ClCompile Include="stdafx.cpp">
