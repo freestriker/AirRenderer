@@ -9,6 +9,7 @@ public:
 	Component(std::string typeName);
 	virtual ~Component();
 	virtual void UpdateSelf(void* data);
+	virtual void OnAddAsComponent();
 	template<typename T>
 	static T* FindComponent(CrossLinkedRowHead& linkedComponents, std::string typeName);
 	template<typename T>

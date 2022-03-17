@@ -119,6 +119,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="include\shader\Shader.cpp" />
+    <ClCompile Include="source\component\Behaviour\Behaviour.cpp" />
+    <ClCompile Include="source\component\Behaviour\CameraMoveBehaviour.cpp" />
     <ClCompile Include="source\material\Material.cpp" />
     <ClCompile Include="source\component\camera\OrthographicCamera.cpp" />
     <ClCompile Include="source\component\camera\PerspectiveCamera.cpp" />
@@ -151,6 +153,8 @@
     <ClCompile Include="source\utils\Log.cpp" />
     <ClCompile Include="source\context\VertexOutContext.cpp" />
     <ClCompile Include="source\context\VertexInContext.cpp" />
+    <ClInclude Include="include\component\Behaviour\Behaviour.h" />
+    <ClInclude Include="include\component\Behaviour\CameraMoveBehaviour.h" />
     <ClInclude Include="include\component\camera\Camera.h" />
     <QtMoc Include="include\thread\LoadThread.h" />
     <ClInclude Include="include\component\camera\OrthographicCamera.h" />

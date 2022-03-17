@@ -44,6 +44,7 @@ void RenderThread::run()
             commandBufferList.erase(commandBufferList.begin());
             commandBufferMutex.unlock();
             qDebug() << "-----Start render-----";
+            ClearBuffer();
             Render(rcb);
             Display();
             qDebug() << "-----Finish render-----";
@@ -260,6 +261,7 @@ void RenderThread::Pipeline(MatrixContext* matrixContext, LightContext* lightCon
 
 void RenderThread::Display()
 {
+    static int index = 0;
     for (int x = 0; x < configuration.resolution.width; x++)
     {
         for (int y = 0; y < configuration.resolution.height; y++)
@@ -269,8 +271,16 @@ void RenderThread::Display()
         }
     }
     configuration.label->setPixmap(QPixmap::fromImage(configuration.canvas));
-    configuration.canvas.save("C:\\Users\\23174\\Desktop\\Out.png", "PNG", 100);
+    std::string s = "C:\\Users\\FREEstriker\\Desktop\\R\\" + std::to_string(index++) + ".png";
+    configuration.canvas.save(QString::fromStdString(s), "PNG", 100);
 
+}
+void RenderThread::ClearBuffer()
+{
+    Color c = Color::black;
+    configuration.colorBuffer->Clear(c);
+    float d = FLT_MAX;
+    configuration.depthBuffer->Clear(d);
 }
 std::function<bool(PrimitiveContext&, glm::vec3*)> RenderThread::CalulateCheckCullOption(ShaderOption shaderOption)
 {

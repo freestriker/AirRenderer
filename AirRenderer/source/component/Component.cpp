@@ -13,3 +13,7 @@ Component::~Component()
 void Component::UpdateSelf(void* data)
 {
 }
+
+void Component::OnAddAsComponent()
+{
+}

@@ -24,6 +24,7 @@ public:
 	int GetIndex(int x, int y, int z);
 
 	int GetDataLength();
+	void Clear(T& value);
 };
 
 template <class T>
@@ -98,5 +99,11 @@ int Buffer<T>::GetDataLength()
 {
 	return dimensionX * dimensionY * dimensionZ;
 }
+template <class T>
+void Buffer<T>::Clear(T& value)
+{
+	std::fill(data, data + dimensionX * dimensionY * dimensionZ, value);
+}
+
 
 

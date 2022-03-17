@@ -12,6 +12,8 @@
 #include <include/thread/RenderThread.h>
 #include <include/utils/IntersectionTester.h>
 #include <include/utils/Time.h>
+#include <include/component/Behaviour/Behaviour.h>
+#include <include/component/Behaviour/CameraMoveBehaviour.h>
 void LogicThread::run()
 {
     while (true)
@@ -22,6 +24,18 @@ void LogicThread::run()
         std::string lt = "LaunchTime: " + std::to_string(launchTime);
         std::string dt = "DeltaTime: " + std::to_string(deltaTime);
         qDebug() << QString::fromStdString(lt) << QString::fromStdString(dt);
+
+        if (componentListMap.count("Behaviour"))
+        {
+            for (CrossLinkedNodeColItertor iter = componentListMap["Behaviour"]->GetItertor(); iter.IsVaild(); ++iter)
+            {
+                Behaviour* behaviour = iter.Node<Behaviour>();
+
+                behaviour->Update();
+            }
+        }
+
+
         RenderCommandBufferBuilder renderCommandBufferBuilder = RenderCommandBufferBuilder();
         if (componentListMap.count("Light"))
         {
@@ -29,7 +43,6 @@ void LogicThread::run()
             {
                 Light* light = iter.Node<Light>();
                 renderCommandBufferBuilder.AddLight(*light);
-
             }
         }
         if (componentListMap.count("Camera") && componentListMap.count("MeshRenderer"))
@@ -81,6 +94,11 @@ void LogicThread::Init()
     //camera->AddComponent(new OrthographicCamera());
     //camera->transform.SetTranslation(glm::vec3(0, 0, 5));
     camera->transform.SetTranslationRotationScale(glm::vec3(0, 0, 15), glm::quat(glm::vec3(0, 0, 0)), glm::vec3(1, 1, 1));
+
+    CameraMoveBehaviour* cmb = new CameraMoveBehaviour();
+    cmb->speed = 1;
+    cmb->direction = glm::vec3(0, 0, 1);
+    camera->AddComponent(cmb);
 
     GameObject* lightRoot = new GameObject("LightRoot");
     configuration.sceneObject.AddChild(lightRoot);
@@ -136,6 +154,7 @@ void LogicThread::Init()
     configuration.sceneObject.AddChild(go0);
     go0->transform.SetTranslationRotationScale(glm::vec3(0, 0, 0), glm::quat(glm::vec3(1.5707963267948966, 0, 0)), glm::vec3(5, 5, 5));
     go0->AddComponent(new MeshRenderer("../../Resources/Model/Sphere_Wall_Normal.ply"));
+
     //go0->RemoveComponent<MeshRenderer>("MeshRenderer");
     //go0->AddComponent(new MeshRenderer("../../Resources/Model/Cube_Wall_Normal.ply"));
     //GameObject* go01 = new GameObject("go01");

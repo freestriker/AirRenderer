@@ -181,7 +181,7 @@ class PrimitiveCliper
 			}
 			else//ÄÚÍâ
 			{
-				throw "";
+				//throw "";
 			}
 
 		}

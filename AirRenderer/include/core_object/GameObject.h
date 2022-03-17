@@ -43,6 +43,7 @@ void GameObject::AddComponent(T* component)
 	Component* t = static_cast<Component*>(component);
 	t->gameObject = this;
 	t->UpdateSelf(this->parent);
+	t->OnAddAsComponent();
 }
 template<typename T>
 T* GameObject::RemoveComponent(std::string typeName)

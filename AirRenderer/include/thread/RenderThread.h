@@ -24,6 +24,7 @@ public:
 	RenderThread(QObject* parent);
 private:
 	void Display();
+	void ClearBuffer();
 	std::function<bool(PrimitiveContext&, glm::vec3*)> CalulateCheckCullOption(ShaderOption shaderOption);
 	std::function<bool(float, float)> CalulateZTestOption(ShaderOption shaderOption);
 	std::function<bool()> CalulateZWriteOption(ShaderOption shaderOption);
